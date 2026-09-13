@@ -1,6 +1,6 @@
 /**
- * Kontrak endpoint PUBLIK `novelo-api` (prefix `/public/`) — lihat
- * plan/novelo/execution-plan.md Fase 2. JANGAN diubah sepihak dari sisi
+ * Kontrak endpoint PUBLIK `bookpedia-api` (prefix `/public/`) — lihat
+ * plan/bookpedia/execution-plan.md Fase 2. JANGAN diubah sepihak dari sisi
  * reader; kontrak ini disepakati bersama backend (dikerjakan paralel).
  *
  * Dipisah dari `lib/types.ts` (kontrak authenticated Studio) karena bentuk

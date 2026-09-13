@@ -1,5 +1,5 @@
 /**
- * Kontrak `novelo-api` — lihat plan/novelo/execution-plan.md Fase 0.
+ * Kontrak `bookpedia-api` — lihat plan/bookpedia/execution-plan.md Fase 0.
  * JANGAN diubah sepihak dari sisi Studio; kontrak ini disepakati bersama
  * backend (dikerjakan paralel).
  */

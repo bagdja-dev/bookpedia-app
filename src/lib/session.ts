@@ -32,7 +32,7 @@ export interface SessionUser {
  * (mis. `Domain=localhost`) sempat dicoba untuk dukung login lintas
  * subdomain (11 Sep 2026), tapi single-label host sintetis seperti
  * `localhost` (beda dari domain asli berlabel banyak seperti
- * `novelo.bagdja.com`) tidak konsisten diterima semua browser sebagai
+ * `bookpedia.bagdja.com`) tidak konsisten diterima semua browser sebagai
  * Domain cookie — menyebabkan bug nyata (loop "memeriksa sesi login" di
  * subdomain `*.localhost`). Diganti pola session-handoff (lihat
  * `oauth-state-store.ts` `saveSessionHandoff`/`consumeSessionHandoff` +

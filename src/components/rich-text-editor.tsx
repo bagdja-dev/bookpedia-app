@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
  * (versi shadcn/Tailwind, bukan HeroUI seperti `bagdja-website-admin`).
  * Toolbar sengaja minimal (bold/italic/underline, heading, list, undo/redo)
  * — Chapter novel itu prosa panjang, bukan editor toko yang butuh gambar/
- * tabel/link (lihat plan/novelo/overview.md §8.1).
+ * tabel/link (lihat plan/bookpedia/overview.md §8.1).
  */
 const EDITOR_CONTENT_CLASS =
   'min-h-[60vh] px-4 py-4 sm:px-8 sm:py-6 text-base leading-loose text-foreground outline-none ' +

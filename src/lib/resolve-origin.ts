@@ -5,7 +5,7 @@ import { getAppUrl } from '@/lib/app-url';
 /**
  * Port verbatim dari `bagdja-auction-web/lib/resolve-origin.ts` (§4.2, 11
  * Sep 2026 — hardening independen dari custom-domain support, lihat
- * plan/novelo/execution-plan.md §4.2 & plan/architecture/custom-domain-setup.md).
+ * plan/bookpedia/execution-plan.md §4.2 & plan/architecture/custom-domain-setup.md).
  *
  * Bind address (alamat LISTEN container), bukan alamat yang bisa dituju
  * browser. Kalau salah satu ini yang ke-resolve, artinya kita sedang
@@ -17,7 +17,7 @@ const LOCAL_HOSTNAMES = new Set(['localhost', '127.0.0.1', '[::1]']);
 
 /**
  * `*.localhost` (mis. `pojokbaca.localhost`) — kemudahan dev lokal khusus
- * novelo-app untuk tes subdomain Platform (lihat middleware.ts
+ * bookpedia-app untuk tes subdomain Platform (lihat middleware.ts
  * LOCAL_SUBDOMAIN_PATTERN), TIDAK ada di versi asli bagdja-auction-web yang
  * di-port file ini. Tanpa ini, proto jatuh ke fallback 'https' (baris di
  * bawah) untuk host seperti `pojokbaca.localhost` — origin yang direkam

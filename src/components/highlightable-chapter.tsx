@@ -22,7 +22,7 @@ interface PendingSelection {
 
 /**
  * Membungkus render konten Chapter (HTML dari TipTap) dan menambahkan
- * highlight interaktif — lihat plan/novelo/execution-plan.md Fase 3 §3 untuk
+ * highlight interaktif — lihat plan/bookpedia/execution-plan.md Fase 3 §3 untuk
  * algoritma lengkap yang diikuti di sini:
  *
  * - `startOffset`/`endOffset` = index karakter di PLAIN TEXT hasil

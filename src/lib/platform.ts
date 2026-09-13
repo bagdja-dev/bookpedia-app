@@ -17,5 +17,5 @@ import { PLATFORM_SLUG_HEADER } from './platform-slug-header';
 
 export const getPlatformSlug = cache(async (): Promise<string> => {
   const h = await headers();
-  return h.get(PLATFORM_SLUG_HEADER) ?? process.env.NEXT_PUBLIC_DEFAULT_PLATFORM_SLUG ?? 'novelo';
+  return h.get(PLATFORM_SLUG_HEADER) ?? process.env.NEXT_PUBLIC_DEFAULT_PLATFORM_SLUG ?? 'bookpedia';
 });

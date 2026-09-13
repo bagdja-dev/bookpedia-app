@@ -34,7 +34,7 @@ export async function generateCodeChallenge(verifier: string): Promise<string> {
 }
 
 const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL ?? 'https://login.bagdja.com';
-const CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID ?? 'novelo';
+const CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID ?? 'bookpedia';
 const REDIRECT_URI =
   process.env.NEXT_PUBLIC_REDIRECT_URI ?? 'http://localhost:5021/auth/callback';
 

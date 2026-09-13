@@ -7,7 +7,7 @@ import type { Library } from '@/lib/types';
 
 /**
  * `GET /libraries/me` mengembalikan `200` dengan body `null` kalau user
- * belum punya Library (BUKAN 404) — lihat plan/novelo/execution-plan.md
+ * belum punya Library (BUKAN 404) — lihat plan/bookpedia/execution-plan.md
  * Fase 0. `library === null` (sudah selesai loading, tidak error) berarti
  * "belum onboarding", beda dengan `library === undefined` (belum tahu / masih
  * loading).

@@ -14,7 +14,7 @@ interface ReadingProgressTrackerProps {
  * Komponen tak-render — di-mount di halaman baca Chapter. Kalau user login,
  * catat chapter ini sebagai "posisi terakhir baca" SEKALI saat halaman
  * dibuka (bukan tracking scroll-position, cukup "chapter ini dibuka" = MVP
- * sesuai plan/novelo/execution-plan.md Fase 3). Gagal-senyap — ini bukan
+ * sesuai plan/bookpedia/execution-plan.md Fase 3). Gagal-senyap — ini bukan
  * fitur kritis, tidak boleh mengganggu pengalaman baca kalau backend error.
  */
 export function ReadingProgressTracker({ bookId, chapterId }: ReadingProgressTrackerProps) {

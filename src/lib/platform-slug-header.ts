@@ -5,4 +5,4 @@
  * `next/headers`) supaya aman diimport `middleware.ts` (edge runtime) TANPA
  * ikut menyeret `next/headers` yang tidak berlaku di sana.
  */
-export const PLATFORM_SLUG_HEADER = 'x-novelo-platform-slug';
+export const PLATFORM_SLUG_HEADER = 'x-bookpedia-platform-slug';

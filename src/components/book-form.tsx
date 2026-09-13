@@ -58,7 +58,7 @@ interface BookFormProps {
 
 /**
  * Form Book — dipakai untuk create & edit (satu komponen dua mode), lihat
- * plan/novelo/execution-plan.md Fase 1. Logic slugify persis pola form
+ * plan/bookpedia/execution-plan.md Fase 1. Logic slugify persis pola form
  * onboarding Library (src/app/onboarding/page.tsx): slug auto-generate dari
  * judul selama belum disentuh manual.
  *

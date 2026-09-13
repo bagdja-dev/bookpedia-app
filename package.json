@@ -1,8 +1,8 @@
 {
-  "name": "bagdja-novelo-app",
+  "name": "bagdja-bookpedia-app",
   "version": "0.1.0",
   "private": true,
-  "description": "Bagdja Novelo — satu app untuk pembaca & penulis (Next.js App Router + shadcn/ui). Rute reader (katalog, baca) + rute /studio/* (CMS penulis).",
+  "description": "Bagdja Bookpedia — satu app untuk pembaca & penulis (Next.js App Router + shadcn/ui). Rute reader (katalog, baca) + rute /studio/* (CMS penulis).",
   "scripts": {
     "dev": "next dev -p 5021 --webpack",
     "build": "next build --webpack",

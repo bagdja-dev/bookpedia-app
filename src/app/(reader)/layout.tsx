@@ -21,12 +21,12 @@ const sourceSerif = Source_Serif_4({
  * Layout rute publik reader — RINGAN, TANPA chrome shadcn dashboard (sidebar
  * dsb) yang dipakai `/dashboard`. Server Component murni supaya SSR penuh
  * (SEO); satu-satunya bagian client adalah `ReaderAuthNav` (status login).
- * Lihat plan/novelo/overview.md §5.
+ * Lihat plan/bookpedia/overview.md §5.
  *
  * `nama`/`logoUrl`/`colors` diambil dari `GET /public/platforms/:platformSlug`
  * (Fase 4, §4.2 — menggantikan `GET /public/config` global lama), Platform
  * di-resolve dari Host via `middleware.ts` (`getPlatformSlug()`). `colors`
- * diterapkan lewat `<style>` inline yang override CSS var `.novelo-reader`
+ * diterapkan lewat `<style>` inline yang override CSS var `.bookpedia-reader`
  * di globals.css — kalau config gagal dimuat / belum diedit, nilainya
  * identik dengan default hardcode lama (lihat `PLATFORM_CONFIG_FALLBACK`),
  * jadi TIDAK ADA perubahan visual sampai memang ada yang mengedit config.
@@ -37,9 +37,9 @@ export default async function ReaderLayout({ children }: { children: ReactNode }
   const c = config.colors;
 
   return (
-    <div className={`novelo-reader ${sourceSerif.variable} flex min-h-screen flex-col`}>
+    <div className={`bookpedia-reader ${sourceSerif.variable} flex min-h-screen flex-col`}>
       <style>{`
-        .novelo-reader {
+        .bookpedia-reader {
           --reader-bg: ${c.bg};
           --reader-surface: ${c.surface};
           --reader-foreground: ${c.foreground};

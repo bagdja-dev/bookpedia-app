@@ -6,14 +6,14 @@
  * Studio yang authenticated. Helper ini dipanggil LANGSUNG dari Server
  * Component (SSR/ISR), tanpa Authorization header, tanpa lewat proxy — supaya
  * konten reader ter-render penuh di HTML awal response (SEO, Google crawl
- * langsung tanpa nunggu client-side fetch). Lihat plan/novelo/overview.md §5
+ * langsung tanpa nunggu client-side fetch). Lihat plan/bookpedia/overview.md §5
  * dan execution-plan.md Fase 2.
  */
 import { cache } from 'react';
 
 import type { PlatformProfileDto } from './public-types';
 
-const API_BASE = process.env.NEXT_PUBLIC_NOVELO_API_URL ?? 'http://localhost:5020';
+const API_BASE = process.env.NEXT_PUBLIC_BOOKPEDIA_API_URL ?? 'http://localhost:5020';
 
 /**
  * Default SAMA PERSIS dengan seed awal `platforms` di backend (migration
@@ -22,8 +22,8 @@ const API_BASE = process.env.NEXT_PUBLIC_NOVELO_API_URL ?? 'http://localhost:502
  * identik dengan sebelum fitur ini ada (bukan layar rusak/kosong).
  */
 const PLATFORM_CONFIG_FALLBACK: PlatformProfileDto = {
-  nama: 'Novelo',
-  slug: 'novelo',
+  nama: 'Bookpedia',
+  slug: 'bookpedia',
   logoUrl: null,
   faviconUrl: null,
   colors: {
@@ -42,7 +42,7 @@ const PLATFORM_CONFIG_FALLBACK: PlatformProfileDto = {
 };
 
 /**
- * GET publik ke `novelo-api`. Return `null` kalau 404 ATAU request gagal
+ * GET publik ke `bookpedia-api`. Return `null` kalau 404 ATAU request gagal
  * (network error, backend belum jalan, response bukan JSON, dst) — pemanggil
  * di halaman detail (Library/Book/Chapter) memanggil `notFound()` dari
  * `next/navigation` saat menerima `null`; pemanggil di halaman katalog

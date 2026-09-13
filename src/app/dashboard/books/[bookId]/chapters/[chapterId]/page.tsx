@@ -120,7 +120,7 @@ export default function ChapterEditorPage({
   }, [bookId, chapterId]);
 
   // Autosave draft — debounce ~2 detik setelah user berhenti mengetik.
-  // TIDAK mengirim `status` (tetap draft), lihat plan/novelo/execution-plan.md
+  // TIDAK mengirim `status` (tetap draft), lihat plan/bookpedia/execution-plan.md
   // Fase 1 & overview.md §8.1 (autosave draft + tombol Publish terpisah).
   useEffect(() => {
     if (skipAutosaveRef.current) {

@@ -2,7 +2,7 @@
  * Resolusi Platform (tenant) berdasarkan Host header — port dari
  * `bagdja-auction-web/middleware.ts` (algoritma host-resolution terbukti
  * production, lihat plan/architecture/custom-domain-setup.md), TAPI
- * mekanisme threading-nya BEDA (keputusan §4.2, 11 Sep 2026): novelo-app
+ * mekanisme threading-nya BEDA (keputusan §4.2, 11 Sep 2026): bookpedia-app
  * inject header internal (`PLATFORM_SLUG_HEADER`) alih-alih rewrite path
  * `/{slug}/...` — dibaca via `lib/platform.ts` (Server Component) atau
  * `PlatformProvider` Context (Client Component). Alasan: baik root layout
@@ -32,8 +32,8 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { PLATFORM_SLUG_HEADER } from '@/lib/platform-slug-header';
 import { PLATFORM_HOST } from '@/lib/platform-host';
 
-const API_URL = process.env.NEXT_PUBLIC_NOVELO_API_URL ?? 'http://localhost:5020';
-const DEFAULT_PLATFORM_SLUG = process.env.NEXT_PUBLIC_DEFAULT_PLATFORM_SLUG ?? 'novelo';
+const API_URL = process.env.NEXT_PUBLIC_BOOKPEDIA_API_URL ?? 'http://localhost:5020';
+const DEFAULT_PLATFORM_SLUG = process.env.NEXT_PUBLIC_DEFAULT_PLATFORM_SLUG ?? 'bookpedia';
 
 const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1']);
 
@@ -44,7 +44,7 @@ const SUBDOMAIN_PATTERN = new RegExp(`^([a-z0-9-]+)\\.${PLATFORM_HOST.replace(/\
  * `127.0.0.1` di browser modern/OS manapun (RFC 6761), TANPA perlu edit
  * `/etc/hosts`. Dicek terpisah dari `SUBDOMAIN_PATTERN` supaya `.env` tetap
  * boleh berisi domain PRODUCTION asli (`NEXT_PUBLIC_PLATFORM_URL=https://
- * novelo.bagdja.com`) tanpa perlu di-toggle manual tiap mau tes subdomain
+ * bookpedia.bagdja.com`) tanpa perlu di-toggle manual tiap mau tes subdomain
  * lokal. Aman di production juga (Host asli tidak akan pernah `*.localhost`),
  * jadi tidak perlu digerbang `NODE_ENV`.
  */

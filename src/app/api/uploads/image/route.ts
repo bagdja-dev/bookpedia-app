@@ -6,7 +6,7 @@
  *
  * Pola di-port PERSIS dari
  * `bagdja-auction-web/app/api/uploads/asset/route.ts`: baca `FormData`
- * masuk, bangun ULANG `FormData` baru, forward ke backend Novelo API dengan
+ * masuk, bangun ULANG `FormData` baru, forward ke backend Bookpedia API dengan
  * Bearer token dari session cookie server-side (`lib/session.ts`, pola sama
  * yang dipakai `lib/backend-api.ts`).
  */
@@ -14,7 +14,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getSession } from '@/lib/session';
 
-const API_BASE = process.env.NEXT_PUBLIC_NOVELO_API_URL ?? 'http://localhost:5020';
+const API_BASE = process.env.NEXT_PUBLIC_BOOKPEDIA_API_URL ?? 'http://localhost:5020';
 
 export async function POST(request: NextRequest) {
   const { token } = await getSession();

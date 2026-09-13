@@ -1,6 +1,6 @@
 /**
  * Kontrak endpoint AUTHENTICATED khusus personalisasi reader (reading
- * progress & highlight) — lihat plan/novelo/execution-plan.md Fase 3.
+ * progress & highlight) — lihat plan/bookpedia/execution-plan.md Fase 3.
  * Dipanggil dari CLIENT COMPONENT lewat BFF proxy (`apiClient`, prefix
  * `/api/proxy/...`), JANGAN diubah sepihak dari sisi reader — kontrak ini
  * disepakati bersama backend (dikerjakan paralel).

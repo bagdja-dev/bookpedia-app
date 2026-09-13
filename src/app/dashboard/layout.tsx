@@ -30,7 +30,7 @@ function AuthGuard({ children }: { children: ReactNode }) {
 }
 
 /**
- * Kriteria E2E Fase 0 (plan/novelo/execution-plan.md): user login tanpa
+ * Kriteria E2E Fase 0 (plan/bookpedia/execution-plan.md): user login tanpa
  * Library harus diarahkan ke onboarding sebelum bisa melihat dashboard.
  * `GET /libraries/me` balas `200` body `null` (bukan 404) kalau belum ada —
  * lihat hooks/use-library.ts.

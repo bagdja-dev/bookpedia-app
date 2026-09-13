@@ -1,12 +1,12 @@
 /**
- * Server-side helper to call `novelo-api` (NestJS) with session token from
+ * Server-side helper to call `bookpedia-api` (NestJS) with session token from
  * httpOnly cookie. Dipakai HANYA oleh Route Handler BFF proxy
  * (`app/api/proxy/[...path]/route.ts`) — token JWT tidak pernah dikirim ke
  * browser.
  */
 import { getSession } from './session';
 
-const API_BASE = process.env.NEXT_PUBLIC_NOVELO_API_URL ?? 'http://localhost:5020';
+const API_BASE = process.env.NEXT_PUBLIC_BOOKPEDIA_API_URL ?? 'http://localhost:5020';
 
 export async function backendFetch<T = unknown>(
   path: string,

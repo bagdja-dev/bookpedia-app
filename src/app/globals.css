@@ -7,7 +7,7 @@
   /* ───────────────────────────────────────────────────────────────
    * shadcn/ui base tokens (style: new-york, base color: neutral)
    *
-   * Brand palette Novelo belum diputuskan (lihat plan/novelo/overview.md)
+   * Brand palette Bookpedia belum diputuskan (lihat plan/bookpedia/overview.md)
    * — sengaja pakai default neutral shadcn dulu, ganti begitu palet resmi
    * tersedia (pola sama dengan bagdja-auction-admin/src/app/globals.css).
    * ─────────────────────────────────────────────────────────────── */
@@ -128,11 +128,11 @@
  * Reader (`(reader)/*`) — palet hangat-netral (terracotta/mustard/olive),
  * SENGAJA dipisah dari token shadcn/ui di atas (dipakai rute /dashboard
  * Studio) supaya perubahan tema reader tidak menyentuh tampilan Studio.
- * Scoped ke class `.novelo-reader` yang dipasang di
- * `app/(reader)/layout.tsx`. Lihat plan/novelo/overview.md §5 & wireframe
+ * Scoped ke class `.bookpedia-reader` yang dipasang di
+ * `app/(reader)/layout.tsx`. Lihat plan/bookpedia/overview.md §5 & wireframe
  * Fase 2 yang sudah disetujui (font serif jadi hero untuk judul/teks baca).
  * ─────────────────────────────────────────────────────────────── */
-.novelo-reader {
+.bookpedia-reader {
   --reader-bg: #fbf6ee;
   --reader-surface: #fffdf8;
   --reader-foreground: #2c2114;

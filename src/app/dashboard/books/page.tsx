@@ -14,7 +14,7 @@ import type { Book } from '@/lib/types';
 function BookCover({ book }: { book: Book }) {
   if (book.coverUrl) {
     return (
-      // eslint-disable-next-line @next/next/no-img-element -- coverUrl bebas domain apapun, belum ada storage service terpusat (lihat plan/novelo/overview.md §8.2).
+      // eslint-disable-next-line @next/next/no-img-element -- coverUrl bebas domain apapun, belum ada storage service terpusat (lihat plan/bookpedia/overview.md §8.2).
       <img
         src={book.coverUrl}
         alt={book.judul}

@@ -7,15 +7,15 @@
  * Catatan riwayat: sempat juga menaruh `isPlatformHost()`/`getCookieDomain()`
  * di sini untuk skema cookie `Domain` wildcard lintas subdomain — DIBATALKAN
  * (11 Sep 2026) karena `Domain=localhost` (single-label, beda dari domain
- * asli berlabel banyak seperti `novelo.bagdja.com`) tidak konsisten diterima
+ * asli berlabel banyak seperti `bookpedia.bagdja.com`) tidak konsisten diterima
  * semua browser, menyebabkan bug loop login di `*.localhost`. Diganti pola
  * session-handoff (lihat `lib/oauth-state-store.ts` + `app/auth/session/
  * route.ts`) yang tidak butuh cookie Domain wildcard sama sekali.
  */
 export const PLATFORM_HOST = (() => {
   try {
-    return new URL(process.env.NEXT_PUBLIC_PLATFORM_URL ?? 'https://novelo.bagdja.com').hostname;
+    return new URL(process.env.NEXT_PUBLIC_PLATFORM_URL ?? 'https://bookpedia.bagdja.com').hostname;
   } catch {
-    return 'novelo.bagdja.com';
+    return 'bookpedia.bagdja.com';
   }
 })();

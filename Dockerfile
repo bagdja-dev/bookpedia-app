@@ -1,4 +1,4 @@
-# Bagdja Novelo App — reader + Studio (Next.js) — build image untuk deploy
+# Bagdja Bookpedia App — reader + Studio (Next.js) — build image untuk deploy
 # di Coolify. Pola PERSIS `bagdja-auction-web/Dockerfile` (sudah terbukti
 # production, termasuk seluruh pahitnya) — JANGAN didesain ulang dari nol.
 #
@@ -23,14 +23,14 @@ RUN mkdir -p public
 # karena Next.js meng-inline nilai NEXT_PUBLIC_* ke bundle client saat
 # `next build` — kalau cuma diset di runtime container, browser tidak akan
 # pernah melihatnya. Isi build arg ini di konfigurasi build Coolify.
-ARG NEXT_PUBLIC_NOVELO_API_URL
+ARG NEXT_PUBLIC_BOOKPEDIA_API_URL
 ARG NEXT_PUBLIC_PLATFORM_URL
 ARG NEXT_PUBLIC_DEFAULT_PLATFORM_SLUG
 ARG NEXT_PUBLIC_AUTH_URL
 ARG NEXT_PUBLIC_CLIENT_ID
 ARG NEXT_PUBLIC_APP_URL
 ARG NEXT_PUBLIC_REDIRECT_URI
-ENV NEXT_PUBLIC_NOVELO_API_URL=$NEXT_PUBLIC_NOVELO_API_URL
+ENV NEXT_PUBLIC_BOOKPEDIA_API_URL=$NEXT_PUBLIC_BOOKPEDIA_API_URL
 ENV NEXT_PUBLIC_PLATFORM_URL=$NEXT_PUBLIC_PLATFORM_URL
 ENV NEXT_PUBLIC_DEFAULT_PLATFORM_SLUG=$NEXT_PUBLIC_DEFAULT_PLATFORM_SLUG
 ENV NEXT_PUBLIC_AUTH_URL=$NEXT_PUBLIC_AUTH_URL

@@ -4,7 +4,7 @@ import { consumeOAuthState, generateHandoffId, saveSessionHandoff } from '@/lib/
 import { resolveOrigin } from '@/lib/resolve-origin';
 
 const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL ?? 'https://login.bagdja.com';
-const CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID ?? 'novelo';
+const CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID ?? 'bookpedia';
 const CLIENT_SECRET = process.env.OAUTH_CLIENT_SECRET ?? '';
 const REDIRECT_URI =
   process.env.NEXT_PUBLIC_REDIRECT_URI ?? 'http://localhost:5021/auth/callback';
