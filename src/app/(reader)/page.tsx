@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { X } from 'lucide-react';
 
 import { BookCard } from '@/components/reader/book-card';
 import { getPlatformSlug } from '@/lib/platform';
@@ -31,6 +32,7 @@ interface CatalogSearchParams {
   searchBy?: string;
   genre?: string;
   category?: string;
+  tag?: string;
   page?: string;
 }
 
@@ -48,6 +50,7 @@ export default async function CatalogPage({
     searchBy: searchByParam = '',
     genre = '',
     category = '',
+    tag = '',
     page: pageParam = '1',
   } = await searchParams;
   const page = Math.max(1, Number.parseInt(pageParam, 10) || 1);
@@ -60,6 +63,7 @@ export default async function CatalogPage({
   if (search && searchBy !== 'judul') query.set('searchBy', searchBy);
   if (genre) query.set('genre', genre);
   if (category) query.set('category', category);
+  if (tag) query.set('tag', tag);
   query.set('page', String(page));
   query.set('limit', String(PAGE_LIMIT));
 
@@ -82,6 +86,7 @@ export default async function CatalogPage({
     if (search && searchBy !== 'judul') params.set('searchBy', searchBy);
     if (genre) params.set('genre', genre);
     if (category) params.set('category', category);
+    if (tag) params.set('tag', tag);
     if (targetPage > 1) params.set('page', String(targetPage));
     const qs = params.toString();
     return qs ? `/?${qs}` : '/';
@@ -93,6 +98,7 @@ export default async function CatalogPage({
     if (search && searchBy !== 'judul') params.set('searchBy', searchBy);
     if (targetGenre) params.set('genre', targetGenre);
     if (category) params.set('category', category);
+    if (tag) params.set('tag', tag);
     const qs = params.toString();
     return qs ? `/?${qs}` : '/';
   }
@@ -103,6 +109,18 @@ export default async function CatalogPage({
     if (search && searchBy !== 'judul') params.set('searchBy', searchBy);
     if (genre) params.set('genre', genre);
     if (targetCategory) params.set('category', targetCategory);
+    if (tag) params.set('tag', tag);
+    const qs = params.toString();
+    return qs ? `/?${qs}` : '/';
+  }
+
+  /** Fase 6 — hapus filter Tag saja, pertahankan search/genre/category yang aktif. */
+  function tagClearHref() {
+    const params = new URLSearchParams();
+    if (search) params.set('search', search);
+    if (search && searchBy !== 'judul') params.set('searchBy', searchBy);
+    if (genre) params.set('genre', genre);
+    if (category) params.set('category', category);
     const qs = params.toString();
     return qs ? `/?${qs}` : '/';
   }
@@ -181,6 +199,18 @@ export default async function CatalogPage({
         ))}
       </div>
 
+      {tag && (
+        <div className="mb-6">
+          <Link
+            href={tagClearHref()}
+            className="inline-flex items-center gap-1.5 rounded-full border border-[var(--reader-border)] bg-[var(--reader-surface)] px-3 py-1 text-xs text-[var(--reader-muted)] hover:border-[var(--reader-terracotta)] hover:text-[var(--reader-terracotta)]"
+          >
+            Filter Tag: #{tag}
+            <X className="h-3 w-3" />
+          </Link>
+        </div>
+      )}
+
       {catalog === null ? (
         <p className="rounded-lg border border-[var(--reader-border)] bg-[var(--reader-surface)] px-4 py-8 text-center text-sm text-[var(--reader-muted)]">
           Katalog belum bisa dimuat saat ini. Coba muat ulang halaman sebentar lagi.
@@ -192,7 +222,7 @@ export default async function CatalogPage({
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
           {items.map((book) => (
-            <BookCard key={book.id} book={book} />
+            <BookCard key={book.id} book={book} showStatus={config.showBookStatus} />
           ))}
         </div>
       )}

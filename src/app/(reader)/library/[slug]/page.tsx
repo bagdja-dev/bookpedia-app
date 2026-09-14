@@ -29,7 +29,10 @@ export async function generateMetadata({ params }: LibraryPageProps): Promise<Me
 export default async function LibraryProfilePage({ params }: LibraryPageProps) {
   const { slug: librarySlug } = await params;
   const platformSlug = await getPlatformSlug();
-  const library = await publicFetch<LibraryProfileDto>(`/public/platforms/${platformSlug}/libraries/${librarySlug}`);
+  const [config, library] = await Promise.all([
+    getPlatformConfig(platformSlug),
+    publicFetch<LibraryProfileDto>(`/public/platforms/${platformSlug}/libraries/${librarySlug}`),
+  ]);
 
   if (!library) {
     notFound();
@@ -75,7 +78,7 @@ export default async function LibraryProfilePage({ params }: LibraryPageProps) {
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
             {library.books.map((book) => (
-              <BookCard key={book.id} book={book} />
+              <BookCard key={book.id} book={book} showStatus={config.showBookStatus} />
             ))}
           </div>
         )}

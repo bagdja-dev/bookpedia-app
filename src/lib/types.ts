@@ -3,7 +3,7 @@
  * JANGAN diubah sepihak dari sisi Studio; kontrak ini disepakati bersama
  * backend (dikerjakan paralel).
  */
-import type { CategorySummaryDto, GenreDto } from './public-types';
+import type { CategorySummaryDto, GenreDto, TagDto } from './public-types';
 
 export interface Library {
   id: string;
@@ -47,6 +47,8 @@ export interface Book {
   sinopsis: string | null;
   genre: GenreDto | null;
   category: CategorySummaryDto | null;
+  /** Fase 6 — Tag bebas milik Book ini. */
+  tags: TagDto[];
   coverUrl: string | null;
   status: BookStatus;
   bookType: BookType;
@@ -71,6 +73,8 @@ export interface CreateBookPayload {
   bookType?: BookType;
   originalAuthor?: string;
   maxFreeChapters?: number;
+  /** Fase 6 — Tag bebas (nama apa adanya, find-or-create di backend). */
+  tags?: string[];
 }
 
 // Catatan: `PATCH /books/:id` TIDAK menerima `slug` (kontrak backend) — slug
@@ -86,6 +90,8 @@ export interface UpdateBookPayload {
   bookType?: BookType;
   originalAuthor?: string | null;
   maxFreeChapters?: number | null;
+  /** Fase 6 — ganti SELURUH Tag Book ini. [] menghapus semua. */
+  tags?: string[];
 }
 
 export interface Chapter {

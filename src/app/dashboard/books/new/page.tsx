@@ -31,6 +31,7 @@ export default function NewBookPage() {
         bookType: values.bookType,
         ...(values.originalAuthor ? { originalAuthor: values.originalAuthor } : {}),
         ...(values.maxFreeChapters.trim() !== '' ? { maxFreeChapters: Number(values.maxFreeChapters) } : {}),
+        ...(values.tags.length > 0 ? { tags: values.tags } : {}),
       };
       const book = await apiClient<Book>('/books', {
         method: 'POST',

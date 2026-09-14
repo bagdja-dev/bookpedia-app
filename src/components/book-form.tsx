@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent, type KeyboardEvent } from 'react';
+import { X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { CoverImageUpload } from '@/components/cover-image-upload';
@@ -18,8 +19,8 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { usePlatformContext } from '@/context/platform-context';
 import { slugify } from '@/lib/api-client';
-import { publicFetch } from '@/lib/public-api';
-import type { CategoryDto, GenreDto } from '@/lib/public-types';
+import { publicFetch, searchTags } from '@/lib/public-api';
+import type { CategoryDto, GenreDto, TagDto } from '@/lib/public-types';
 import type { BookStatus, BookType } from '@/lib/types';
 
 const UNCATEGORIZED_LABEL = 'Lainnya';
@@ -48,6 +49,8 @@ export interface BookFormValues {
   status: BookStatus;
   /** Fase 5 (SEO) — string kosong = ikut kebijakan Platform (null di payload). */
   maxFreeChapters: string;
+  /** Fase 6 — Tag bebas (nama apa adanya, bukan slug/id). */
+  tags: string[];
 }
 
 interface BookFormProps {
@@ -91,11 +94,60 @@ export function BookForm({ mode, initialValues, submitting, submitLabel, onSubmi
   const [originalAuthor, setOriginalAuthor] = useState(initialValues?.originalAuthor ?? '');
   const [status, setStatus] = useState<BookStatus>(initialValues?.status ?? 'draft');
   const [maxFreeChapters, setMaxFreeChapters] = useState(initialValues?.maxFreeChapters ?? '');
+  const [tags, setTags] = useState<string[]>(initialValues?.tags ?? []);
+  const [tagInput, setTagInput] = useState('');
+  const [tagSuggestions, setTagSuggestions] = useState<TagDto[]>([]);
+  const [tagSuggestionsOpen, setTagSuggestionsOpen] = useState(false);
 
   const platformMaxFreeChapters = platformConfig.maxFreeChapters;
+  const platformMaxTagsPerBook = platformConfig.maxTagsPerBook;
+  const tagLimitReached = tags.length >= platformMaxTagsPerBook;
 
   const [genres, setGenres] = useState<GenreDto[] | null>(null);
   const [categories, setCategories] = useState<CategoryDto[] | null>(null);
+
+  // Autocomplete Tag (debounce ~300ms) — saran diambil dari SEMUA Tag yang
+  // pernah dipakai penulis mana pun di Platform ini (folksonomi bersama,
+  // lihat overview.md §12), bukan cuma milik Library sendiri.
+  useEffect(() => {
+    const trimmed = tagInput.trim();
+    if (!trimmed) {
+      setTagSuggestions([]);
+      return;
+    }
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      searchTags(platformSlug, trimmed).then((data) => {
+        if (!cancelled) setTagSuggestions(data.filter((t) => !tags.includes(t.nama)));
+      });
+    }, 300);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [tagInput, platformSlug, tags]);
+
+  function addTag(nama: string) {
+    const trimmed = nama.trim();
+    if (!trimmed || tagLimitReached || tags.includes(trimmed)) return;
+    setTags((prev) => [...prev, trimmed]);
+    setTagInput('');
+    setTagSuggestions([]);
+    setTagSuggestionsOpen(false);
+  }
+
+  function removeTag(nama: string) {
+    setTags((prev) => prev.filter((t) => t !== nama));
+  }
+
+  function handleTagInputKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      addTag(tagInput);
+    } else if (e.key === 'Backspace' && !tagInput && tags.length > 0) {
+      removeTag(tags[tags.length - 1]);
+    }
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -160,6 +212,7 @@ export function BookForm({ mode, initialValues, submitting, submitLabel, onSubmi
       originalAuthor: originalAuthor.trim(),
       status,
       maxFreeChapters,
+      tags,
     });
   }
 
@@ -335,6 +388,62 @@ export function BookForm({ mode, initialValues, submitting, submitLabel, onSubmi
             </p>
           </>
         )}
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="tagInput">Tag (opsional)</Label>
+        <div className="flex flex-wrap gap-1.5 rounded-md border border-input px-2 py-1.5">
+          {tags.map((t) => (
+            <span
+              key={t}
+              className="flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs text-foreground"
+            >
+              {t}
+              <button
+                type="button"
+                onClick={() => removeTag(t)}
+                disabled={submitting}
+                className="text-muted-foreground hover:text-foreground"
+                aria-label={`Hapus tag ${t}`}
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          ))}
+          <input
+            id="tagInput"
+            value={tagInput}
+            onChange={(e) => {
+              setTagInput(e.target.value);
+              setTagSuggestionsOpen(true);
+            }}
+            onKeyDown={handleTagInputKeyDown}
+            onFocus={() => setTagSuggestionsOpen(true)}
+            onBlur={() => setTimeout(() => setTagSuggestionsOpen(false), 150)}
+            placeholder={tagLimitReached ? 'Batas Tag tercapai' : 'Ketik lalu Enter…'}
+            disabled={submitting || tagLimitReached}
+            className="min-w-[120px] flex-1 bg-transparent text-sm outline-none disabled:cursor-not-allowed"
+          />
+        </div>
+        {tagSuggestionsOpen && tagSuggestions.length > 0 && (
+          <div className="rounded-md border bg-popover shadow-sm">
+            {tagSuggestions.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => addTag(t.nama)}
+                className="block w-full px-3 py-1.5 text-left text-sm hover:bg-muted"
+              >
+                {t.nama}
+              </button>
+            ))}
+          </div>
+        )}
+        <p className="text-xs text-muted-foreground">
+          Maksimum {platformMaxTagsPerBook} Tag per Book ({tags.length}/{platformMaxTagsPerBook}). Saran diambil dari
+          Tag yang sudah pernah dipakai penulis lain di Platform ini — ketik Tag baru kalau belum ada di saran.
+        </p>
       </div>
 
       <CoverImageUpload

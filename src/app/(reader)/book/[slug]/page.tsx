@@ -38,7 +38,10 @@ function formatDate(iso: string | null): string {
 export default async function BookDetailPage({ params }: BookPageProps) {
   const { slug: bookSlug } = await params;
   const platformSlug = await getPlatformSlug();
-  const book = await publicFetch<BookDetailDto>(`/public/platforms/${platformSlug}/books/${bookSlug}`);
+  const [config, book] = await Promise.all([
+    getPlatformConfig(platformSlug),
+    publicFetch<BookDetailDto>(`/public/platforms/${platformSlug}/books/${bookSlug}`),
+  ]);
 
   if (!book) {
     notFound();
@@ -84,19 +87,46 @@ export default async function BookDetailPage({ params }: BookPageProps) {
           </p>
 
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant={BOOK_STATUS_VARIANT[book.status]}>{BOOK_STATUS_LABEL[book.status]}</Badge>
+            {config.showBookStatus && (
+              <Badge variant={BOOK_STATUS_VARIANT[book.status]}>{BOOK_STATUS_LABEL[book.status]}</Badge>
+            )}
             {book.bookType !== 'original' && (
               <span className="rounded-full bg-[var(--reader-terracotta)]/10 px-2.5 py-0.5 text-xs font-medium text-[var(--reader-terracotta)]">
                 {BOOK_TYPE_BADGE_LABEL[book.bookType]}
               </span>
             )}
+            {book.category && (
+              <Link
+                href={`/?category=${encodeURIComponent(book.category.slug)}`}
+                className="rounded-full bg-[var(--reader-bg)] px-2.5 py-0.5 text-xs text-[var(--reader-muted)] hover:text-[var(--reader-terracotta)]"
+              >
+                {book.category.nama}
+              </Link>
+            )}
             {book.genre && (
-              <span className="rounded-full bg-[var(--reader-bg)] px-2.5 py-0.5 text-xs text-[var(--reader-muted)]">
+              <Link
+                href={`/?genre=${encodeURIComponent(book.genre.slug)}`}
+                className="rounded-full bg-[var(--reader-bg)] px-2.5 py-0.5 text-xs text-[var(--reader-muted)] hover:text-[var(--reader-terracotta)]"
+              >
                 {book.genre.nama}
-              </span>
+              </Link>
             )}
             <span className="text-xs text-[var(--reader-muted)]">{book.chapters.length} chapter</span>
           </div>
+
+          {book.tags.length > 0 && (
+            <div className="flex flex-wrap items-center gap-1.5">
+              {book.tags.map((tag) => (
+                <Link
+                  key={tag.id}
+                  href={`/?tag=${encodeURIComponent(tag.slug)}`}
+                  className="rounded-full border border-[var(--reader-border)] px-2.5 py-0.5 text-xs text-[var(--reader-muted)] hover:border-[var(--reader-terracotta)] hover:text-[var(--reader-terracotta)]"
+                >
+                  #{tag.nama}
+                </Link>
+              ))}
+            </div>
+          )}
 
           {book.sinopsis && (
             <p className="text-sm leading-relaxed text-[var(--reader-foreground)]/90">{book.sinopsis}</p>

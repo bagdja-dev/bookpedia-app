@@ -11,7 +11,7 @@
  */
 import { cache } from 'react';
 
-import type { PlatformProfileDto } from './public-types';
+import type { PlatformProfileDto, TagDto } from './public-types';
 
 const API_BASE = process.env.NEXT_PUBLIC_BOOKPEDIA_API_URL ?? 'http://localhost:5020';
 
@@ -40,6 +40,8 @@ const PLATFORM_CONFIG_FALLBACK: PlatformProfileDto = {
   lockStudio: false,
   rendererKey: 'reader',
   maxFreeChapters: 0,
+  showBookStatus: true,
+  maxTagsPerBook: 5,
 };
 
 /**
@@ -94,5 +96,26 @@ export const getPlatformConfig = cache(async (platformSlug: string): Promise<Pla
     lockStudio: config.lockStudio ?? PLATFORM_CONFIG_FALLBACK.lockStudio,
     rendererKey: config.rendererKey || PLATFORM_CONFIG_FALLBACK.rendererKey,
     maxFreeChapters: config.maxFreeChapters ?? PLATFORM_CONFIG_FALLBACK.maxFreeChapters,
+    showBookStatus: config.showBookStatus ?? PLATFORM_CONFIG_FALLBACK.showBookStatus,
+    maxTagsPerBook: config.maxTagsPerBook ?? PLATFORM_CONFIG_FALLBACK.maxTagsPerBook,
   };
 });
+
+/**
+ * Autocomplete Tag (Fase 6) — dipanggil dari CLIENT (Studio Book form,
+ * komponen `'use client'`), beda dari helper lain di file ini yang dipanggil
+ * Server Component. Browser `fetch` polos (Next.js cache extension
+ * `next: {revalidate}` cuma berlaku di server) supaya hasil selalu segar
+ * saat mengetik.
+ */
+export async function searchTags(platformSlug: string, search: string): Promise<TagDto[]> {
+  try {
+    const res = await fetch(
+      `${API_BASE}/public/platforms/${encodeURIComponent(platformSlug)}/tags?search=${encodeURIComponent(search)}`,
+    );
+    if (!res.ok) return [];
+    return (await res.json()) as TagDto[];
+  } catch {
+    return [];
+  }
+}

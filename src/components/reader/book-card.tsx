@@ -10,52 +10,84 @@ const STATUS_DOT: Record<BookCatalogDto['status'], string> = {
   completed: 'bg-[var(--reader-terracotta)]',
 };
 
-/** Card Book dipakai di katalog pusat & grid profil Library. */
-export function BookCard({ book }: { book: BookCatalogDto }) {
+/**
+ * Card Book dipakai di katalog pusat & grid profil Library.
+ *
+ * Fase 6 (16 Sep 2026): Category (sebelumnya cuma tampil di detail Book,
+ * bukan di card) dan Tag (baru sama sekali) ditambahkan sebagai chip yang
+ * bisa diklik — arahkan ke katalog pusat dengan filter `?category=`/`?genre=`
+ * /`?tag=`. Karena chip-chip itu perlu link SENDIRI (bukan ikut link Book),
+ * card TIDAK LAGI satu `<Link>` besar membungkus semuanya (nested `<a>`
+ * tidak valid) — cover+judul+byline dibungkus satu `<Link>`, baris chip jadi
+ * elemen terpisah di luar Link itu.
+ */
+export function BookCard({ book, showStatus = true }: { book: BookCatalogDto; showStatus?: boolean }) {
   return (
-    <Link
-      href={`/book/${book.slug}`}
-      className="group flex flex-col overflow-hidden rounded-lg border border-[var(--reader-border)] bg-[var(--reader-surface)] transition-shadow hover:shadow-md"
-    >
-      <div className="relative aspect-[3/4] w-full overflow-hidden bg-[var(--reader-bg)]">
-        {book.coverUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element -- cover berasal dari domain bebas (URL teks penulis), publicFetch tidak lewat next/image loader config
-          <img
-            src={book.coverUrl}
-            alt={book.judul}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center text-3xl font-semibold text-[var(--reader-muted)]" style={{ fontFamily: 'var(--font-source-serif)' }}>
-            {book.judul.charAt(0).toUpperCase()}
-          </div>
+    <div className="group flex flex-col overflow-hidden rounded-lg border border-[var(--reader-border)] bg-[var(--reader-surface)] transition-shadow hover:shadow-md">
+      <Link href={`/book/${book.slug}`} className="flex flex-1 flex-col">
+        <div className="relative aspect-[3/4] w-full overflow-hidden bg-[var(--reader-bg)]">
+          {book.coverUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element -- cover berasal dari domain bebas (URL teks penulis), publicFetch tidak lewat next/image loader config
+            <img
+              src={book.coverUrl}
+              alt={book.judul}
+              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-3xl font-semibold text-[var(--reader-muted)]" style={{ fontFamily: 'var(--font-source-serif)' }}>
+              {book.judul.charAt(0).toUpperCase()}
+            </div>
+          )}
+        </div>
+        <div className="flex flex-col gap-1 p-3 pb-0">
+          <h3
+            className="line-clamp-2 text-sm font-semibold text-[var(--reader-foreground)]"
+            style={{ fontFamily: 'var(--font-source-serif)' }}
+          >
+            {book.judul}
+          </h3>
+          <p className="text-xs text-[var(--reader-muted)]">{formatBookByline(book)}</p>
+        </div>
+      </Link>
+
+      <div className="mt-auto flex flex-wrap items-center gap-1.5 px-3 pb-3 pt-1">
+        {book.bookType !== 'original' && (
+          <span className="rounded-full bg-[var(--reader-terracotta)]/10 px-2 py-0.5 text-[11px] font-medium text-[var(--reader-terracotta)]">
+            {BOOK_TYPE_BADGE_LABEL[book.bookType]}
+          </span>
         )}
-      </div>
-      <div className="flex flex-1 flex-col gap-1 p-3">
-        <h3
-          className="line-clamp-2 text-sm font-semibold text-[var(--reader-foreground)]"
-          style={{ fontFamily: 'var(--font-source-serif)' }}
-        >
-          {book.judul}
-        </h3>
-        <p className="text-xs text-[var(--reader-muted)]">{formatBookByline(book)}</p>
-        <div className="mt-auto flex flex-wrap items-center gap-2 pt-1">
-          {book.bookType !== 'original' && (
-            <span className="rounded-full bg-[var(--reader-terracotta)]/10 px-2 py-0.5 text-[11px] font-medium text-[var(--reader-terracotta)]">
-              {BOOK_TYPE_BADGE_LABEL[book.bookType]}
-            </span>
-          )}
-          {book.genre && (
-            <span className="rounded-full bg-[var(--reader-bg)] px-2 py-0.5 text-[11px] text-[var(--reader-muted)]">
-              {book.genre.nama}
-            </span>
-          )}
+        {book.category && (
+          <Link
+            href={`/?category=${encodeURIComponent(book.category.slug)}`}
+            className="rounded-full bg-[var(--reader-bg)] px-2 py-0.5 text-[11px] text-[var(--reader-muted)] hover:text-[var(--reader-terracotta)]"
+          >
+            {book.category.nama}
+          </Link>
+        )}
+        {book.genre && (
+          <Link
+            href={`/?genre=${encodeURIComponent(book.genre.slug)}`}
+            className="rounded-full bg-[var(--reader-bg)] px-2 py-0.5 text-[11px] text-[var(--reader-muted)] hover:text-[var(--reader-terracotta)]"
+          >
+            {book.genre.nama}
+          </Link>
+        )}
+        {book.tags.slice(0, 3).map((tag) => (
+          <Link
+            key={tag.id}
+            href={`/?tag=${encodeURIComponent(tag.slug)}`}
+            className="rounded-full border border-[var(--reader-border)] px-2 py-0.5 text-[11px] text-[var(--reader-muted)] hover:border-[var(--reader-terracotta)] hover:text-[var(--reader-terracotta)]"
+          >
+            #{tag.nama}
+          </Link>
+        ))}
+        {showStatus && (
           <span className="flex items-center gap-1 text-[11px] text-[var(--reader-muted)]">
             <span className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[book.status]}`} />
             {BOOK_STATUS_LABEL[book.status]}
           </span>
-        </div>
+        )}
       </div>
-    </Link>
+    </div>
   );
 }

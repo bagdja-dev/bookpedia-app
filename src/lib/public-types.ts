@@ -37,6 +37,18 @@ export interface CategorySummaryDto {
   slug: string;
 }
 
+/**
+ * Fase 6 — Tag bebas (folksonomi), beda dari Genre/Category yang kurasi.
+ * Dipakai sebagai item autocomplete (`GET /public/platforms/:slug/tags`)
+ * DAN sebagai field nested `tags` di response Book.
+ */
+export interface TagDto {
+  id: string;
+  platformId: string;
+  nama: string;
+  slug: string;
+}
+
 export interface PlatformColors {
   bg: string;
   surface: string;
@@ -72,6 +84,10 @@ export interface PlatformProfileDto {
   rendererKey: string;
   /** Fase 5 (SEO) — jumlah Chapter pertama tiap Book yang bisa dibaca tanpa login. 0 = SEMUA Chapter gratis (bukan "nol Chapter gratis"). */
   maxFreeChapters: number;
+  /** Tampilkan badge status cerita (draft/ongoing/completed) di halaman publik. */
+  showBookStatus: boolean;
+  /** Fase 6 — batas jumlah Tag yang boleh dilekatkan ke satu Book. */
+  maxTagsPerBook: number;
 }
 
 export interface BookCatalogDto {
@@ -81,6 +97,8 @@ export interface BookCatalogDto {
   sinopsis: string | null;
   genre: GenreDto | null;
   category: CategorySummaryDto | null;
+  /** Fase 6 — Tag bebas milik Book ini. */
+  tags: TagDto[];
   coverUrl: string | null;
   status: BookStatus;
   bookType: BookType;
@@ -125,6 +143,8 @@ export interface BookDetailDto {
   sinopsis: string | null;
   genre: GenreDto | null;
   category: CategorySummaryDto | null;
+  /** Fase 6 — Tag bebas milik Book ini. */
+  tags: TagDto[];
   coverUrl: string | null;
   status: BookStatus;
   bookType: BookType;
