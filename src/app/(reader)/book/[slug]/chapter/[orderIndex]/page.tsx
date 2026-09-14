@@ -13,6 +13,7 @@ import { ReadingProgressTracker } from '@/components/reading-progress-tracker';
 import { ChapterViewTracker } from '@/components/reader/chapter-view-tracker';
 import { ChapterRatingWidget } from '@/components/reader/chapter-rating-widget';
 import { StarRatingDisplay } from '@/components/reader/star-rating-display';
+import { ChapterEngagementBar } from '@/components/reader/chapter-engagement-bar';
 
 interface ChapterPageProps {
   params: Promise<{ slug: string; orderIndex: string }>;
@@ -77,9 +78,16 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
   }
 
   return (
-    <div className="mx-auto max-w-[680px] px-4 py-8 sm:px-6">
+    <div className="mx-auto max-w-[680px] px-4 py-8 pb-28 sm:px-6">
       <ReadingProgressTracker bookId={chapter.book.id} chapterId={chapter.id} />
       <ChapterViewTracker platformSlug={platformSlug} bookSlug={slug} orderIndex={chapter.orderIndex} />
+      <ChapterEngagementBar
+        chapterId={chapter.id}
+        initialLikeCount={chapter.likeCount ?? 0}
+        enableLike={config.enableLike}
+        enableComment={config.enableComment}
+        enableShare={config.enableShare}
+      />
 
       <Link
         href={`/book/${slug}`}

@@ -279,7 +279,14 @@ export default async function CatalogPage({
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
           {items.map((book) => (
-            <BookCard key={book.id} book={book} showStatus={config.showBookStatus} showRating={config.enableRating} />
+            <BookCard
+              key={book.id}
+              book={book}
+              showStatus={config.showBookStatus}
+              showRating={config.enableRating}
+              showLike={config.enableLike}
+              showComment={config.enableComment}
+            />
           ))}
         </div>
       )}

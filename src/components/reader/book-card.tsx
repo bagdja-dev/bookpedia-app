@@ -1,10 +1,11 @@
 import Link from 'next/link';
-import { Eye, ListFilter } from 'lucide-react';
+import { Eye, Heart, ListFilter, MessageCircle } from 'lucide-react';
 
 import { BOOK_STATUS_LABEL } from '@/lib/status';
 import { BOOK_TYPE_BADGE_LABEL, formatBookByline } from '@/lib/book-byline';
 import { buildSimilarBooksHref } from '@/lib/book-filter-href';
 import { formatCompactCount } from '@/lib/format';
+import { getMockCommentCount } from '@/lib/mock-comment-count';
 import { StarRatingDisplay } from '@/components/reader/star-rating-display';
 import type { BookCatalogDto } from '@/lib/public-types';
 
@@ -29,11 +30,17 @@ export function BookCard({
   book,
   showStatus = true,
   showRating = true,
+  showLike = true,
+  showComment = true,
 }: {
   book: BookCatalogDto;
   showStatus?: boolean;
   /** Fase 7 (susulan) — kalau true DAN book.ratingCount > 0, tampilkan agregat rating di card. */
   showRating?: boolean;
+  /** Fase 8 (susulan) — ikut `platform.enableLike`, sembunyikan statistik Like kalau Platform mematikannya. */
+  showLike?: boolean;
+  /** Fase 8 (susulan) — ikut `platform.enableComment`. Angka-nya MOCK (lihat `getMockCommentCount`), bukan dari backend. */
+  showComment?: boolean;
 }) {
   const similarHref = buildSimilarBooksHref(book);
 
@@ -62,11 +69,23 @@ export function BookCard({
             {book.judul}
           </h3>
           <p className="text-xs text-[var(--reader-muted)]">{formatBookByline(book)}</p>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">
               <Eye className="h-3 w-3" />
               {formatCompactCount(book.viewCount)}
             </span>
+            {showLike && (
+              <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">
+                <Heart className="h-3 w-3" />
+                {formatCompactCount(book.likeCount)}
+              </span>
+            )}
+            {showComment && (
+              <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">
+                <MessageCircle className="h-3 w-3" />
+                {formatCompactCount(getMockCommentCount(book.id))}
+              </span>
+            )}
             {showRating && book.ratingCount > 0 && (
               <StarRatingDisplay average={book.ratingAverage} count={book.ratingCount} />
             )}

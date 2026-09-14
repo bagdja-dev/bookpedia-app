@@ -46,6 +46,9 @@ const PLATFORM_CONFIG_FALLBACK: PlatformProfileDto = {
   searchConsoleVerificationContent: null,
   enableRating: true,
   ratingMode: 'book',
+  enableLike: true,
+  enableComment: true,
+  enableShare: true,
 };
 
 /**
@@ -106,6 +109,9 @@ export const getPlatformConfig = cache(async (platformSlug: string): Promise<Pla
     searchConsoleVerificationContent: config.searchConsoleVerificationContent ?? null,
     enableRating: config.enableRating ?? PLATFORM_CONFIG_FALLBACK.enableRating,
     ratingMode: config.ratingMode ?? PLATFORM_CONFIG_FALLBACK.ratingMode,
+    enableLike: config.enableLike ?? PLATFORM_CONFIG_FALLBACK.enableLike,
+    enableComment: config.enableComment ?? PLATFORM_CONFIG_FALLBACK.enableComment,
+    enableShare: config.enableShare ?? PLATFORM_CONFIG_FALLBACK.enableShare,
   };
 });
 

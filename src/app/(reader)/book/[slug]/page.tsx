@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ListFilter, User } from 'lucide-react';
+import { Heart, ListFilter, MessageCircle, User } from 'lucide-react';
 import { ContinueReadingButton } from '@/components/reader/continue-reading-button';
 import { BookRatingWidget } from '@/components/reader/book-rating-widget';
 import { StarRatingDisplay } from '@/components/reader/star-rating-display';
@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { BOOK_STATUS_LABEL, BOOK_STATUS_VARIANT } from '@/lib/status';
 import { BOOK_TYPE_BADGE_LABEL, formatBookByline, formatBookBylinePrefix } from '@/lib/book-byline';
 import { buildSimilarBooksHref } from '@/lib/book-filter-href';
+import { getMockCommentCount } from '@/lib/mock-comment-count';
 import { getPlatformSlug } from '@/lib/platform';
 import { getPlatformConfig, publicFetch } from '@/lib/public-api';
 import { resolveOriginFromHeaders } from '@/lib/resolve-origin';
@@ -159,6 +160,18 @@ export default async function BookDetailPage({ params }: BookPageProps) {
             )}
             <span className="text-xs text-[var(--reader-muted)]">{book.chapters.length} chapter</span>
             <span className="text-xs text-[var(--reader-muted)]">{book.viewCount.toLocaleString('id-ID')}x dibaca</span>
+            {config.enableLike && (
+              <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">
+                <Heart className="h-3.5 w-3.5" />
+                {(book.likeCount ?? 0).toLocaleString('id-ID')}
+              </span>
+            )}
+            {config.enableComment && (
+              <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">
+                <MessageCircle className="h-3.5 w-3.5" />
+                {getMockCommentCount(book.id).toLocaleString('id-ID')}
+              </span>
+            )}
           </div>
 
           {config.enableRating && (

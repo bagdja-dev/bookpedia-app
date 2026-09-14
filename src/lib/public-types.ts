@@ -104,6 +104,12 @@ export interface PlatformProfileDto {
   enableRating: boolean;
   /** Fase 7 — grain rating saat ini: "book" = widget di detail Book, "chapter" = widget di halaman baca Chapter. */
   ratingMode: RatingMode;
+  /** Fase 8 — nyala/mati tombol Like di ChapterEngagementBar. */
+  enableLike: boolean;
+  /** Fase 8 — nyala/mati tombol Comment (mock) di ChapterEngagementBar. */
+  enableComment: boolean;
+  /** Fase 8 — nyala/mati tombol Share di ChapterEngagementBar. Kalau enableLike, enableComment, DAN enableShare ketiganya false, seluruh bar disembunyikan. */
+  enableShare: boolean;
 }
 
 export interface BookCatalogDto {
@@ -130,6 +136,8 @@ export interface BookCatalogDto {
   ratingAverage: number;
   /** Fase 7 — jumlah rating yang membentuk ratingAverage di atas. */
   ratingCount: number;
+  /** Fase 8 (susulan) — total Like (SUM like_count semua Chapter Book ini). */
+  likeCount: number;
 }
 
 export interface CatalogResponse {
@@ -185,6 +193,8 @@ export interface BookDetailDto {
   /** Fase 7 — agregat rating Book ini (0 kalau belum ada rating). Sumbernya ikut ratingMode Platform. */
   ratingAverage: number;
   ratingCount: number;
+  /** Fase 8 — total Like (SUM like_count semua Chapter Book ini). */
+  likeCount: number;
 }
 
 export interface ChapterReadDto {
@@ -210,4 +220,6 @@ export interface ChapterReadDto {
   /** Fase 7 — rating Chapter ini (0 kalau belum ada rating). Cuma relevan/ditampilkan kalau platform.ratingMode="chapter". */
   ratingAverage: number;
   ratingCount: number;
+  /** Fase 8 — total Like Chapter ini. Status like user login sendiri diambil terpisah dari GET /likes/chapter/:chapterId. */
+  likeCount: number;
 }
