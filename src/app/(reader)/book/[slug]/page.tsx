@@ -5,7 +5,7 @@ import { ListFilter, User } from 'lucide-react';
 import { ContinueReadingButton } from '@/components/reader/continue-reading-button';
 import { Badge } from '@/components/ui/badge';
 import { BOOK_STATUS_LABEL, BOOK_STATUS_VARIANT } from '@/lib/status';
-import { BOOK_TYPE_BADGE_LABEL, formatBookBylinePrefix } from '@/lib/book-byline';
+import { BOOK_TYPE_BADGE_LABEL, formatBookByline, formatBookBylinePrefix } from '@/lib/book-byline';
 import { buildSimilarBooksHref } from '@/lib/book-filter-href';
 import { getPlatformSlug } from '@/lib/platform';
 import { getPlatformConfig, publicFetch } from '@/lib/public-api';
@@ -27,8 +27,17 @@ export async function generateMetadata({ params }: BookPageProps): Promise<Metad
   if (!book) {
     return { title: `Cerita tidak ditemukan — ${config.nama}` };
   }
-  const title = `${book.judul} — ${config.nama}`;
-  const description = book.sinopsis ?? `Baca ${book.judul} oleh ${book.library.nama} di ${config.nama}.`;
+  // bookType masuk title+description (16 Sep 2026, susulan SEO Fase 1) —
+  // badge "Terjemahan"/"Adaptasi" di body SAJA sinyalnya terlalu lemah buat
+  // query gabungan (mis. "terjemahan The Early Spring") dibanding title/meta
+  // description, yang jauh lebih dipentingkan Google.
+  const bookTypeLabel = book.bookType !== 'original' ? BOOK_TYPE_BADGE_LABEL[book.bookType] : null;
+  const title = `${book.judul}${bookTypeLabel ? ` (${bookTypeLabel})` : ''} — ${config.nama}`;
+  const description = book.sinopsis
+    ? bookTypeLabel
+      ? `${bookTypeLabel} — ${book.sinopsis}`
+      : book.sinopsis
+    : `Baca ${book.judul} (${formatBookByline(book)}) di ${config.nama}.`;
   return {
     title,
     description,
@@ -61,6 +70,16 @@ export default async function BookDetailPage({ params }: BookPageProps) {
   // schema.org, supaya Google bisa tampilkan rich result (cover, penulis,
   // genre). Server-rendered, tidak butuh JS client.
   const origin = await resolveOriginFromHeaders();
+  // `translationOfWork`/`isBasedOn` (16 Sep 2026, susulan) — vocab resmi
+  // schema.org buat Book terjemahan/adaptasi, sinyal terstruktur tambahan
+  // di luar title/description (lihat bookTypeLabel di generateMetadata).
+  // Cuma disertakan kalau originalAuthor terisi (field opsional).
+  const originalWorkJsonLd =
+    book.bookType !== 'original' && book.originalAuthor
+      ? book.bookType === 'translation'
+        ? { translationOfWork: { '@type': 'Book', author: { '@type': 'Person', name: book.originalAuthor } } }
+        : { isBasedOn: { '@type': 'CreativeWork', author: { '@type': 'Person', name: book.originalAuthor } } }
+      : {};
   const bookJsonLd = toJsonLdScript({
     '@context': 'https://schema.org',
     '@type': 'Book',
@@ -70,6 +89,7 @@ export default async function BookDetailPage({ params }: BookPageProps) {
     ...(book.sinopsis ? { description: book.sinopsis } : {}),
     author: { '@type': 'Person', name: book.library.nama },
     ...(book.genre ? { genre: book.genre.nama } : {}),
+    ...originalWorkJsonLd,
   });
 
   return (
