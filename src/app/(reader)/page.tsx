@@ -5,15 +5,72 @@ import { X } from 'lucide-react';
 import { BookCard } from '@/components/reader/book-card';
 import { getPlatformSlug } from '@/lib/platform';
 import { getPlatformConfig, publicFetch } from '@/lib/public-api';
+import { buildSocialMetadata } from '@/lib/seo';
 import type { CategoryDto, CatalogResponse, GenreDto } from '@/lib/public-types';
 import { cn } from '@/lib/utils';
 
-export async function generateMetadata(): Promise<Metadata> {
+/**
+ * SEO Fase 2 (§2.2-2.3 seo-execution-plan.md, 16 Sep 2026): bedakan filter
+ * "genuine" (SATU dari genre/category/tag tunggal, tanpa search, halaman 1)
+ * — layak diindex, canonical ke dirinya sendiri — dari kombinasi ad-hoc
+ * (search apa pun, halaman >1, ATAU lebih dari satu dimensi filter
+ * sekaligus termasuk `tag` multi-value dari tombol "Cari Serupa") yang
+ * di-`noindex` (tetap `follow` supaya Book di dalamnya tetap ke-crawl lewat
+ * link-nya, cuma halaman filter itu sendiri yang tidak masuk index).
+ */
+function resolveCatalogSeo(params: {
+  search: string;
+  genre: string;
+  category: string;
+  tag: string;
+  page: number;
+  platformNama: string;
+}): { title: string; noindex: boolean; canonicalQuery: string | null } {
+  const { search, genre, category, tag, page, platformNama } = params;
+  const filterDimensions = [genre, category, tag].filter(Boolean);
+  const isMultiTagCombo = tag.includes(',');
+  const isAdHoc = Boolean(search) || page > 1 || filterDimensions.length > 1 || isMultiTagCombo;
+
+  if (filterDimensions.length === 1 && !isAdHoc) {
+    const [label, param] = genre ? ['Genre', `genre=${genre}`] : category ? ['Category', `category=${category}`] : ['Tag', `tag=${tag}`];
+    const value = genre || category || tag;
+    return {
+      title: `${value} (${label}) — Jelajahi Cerita — ${platformNama}`,
+      noindex: false,
+      canonicalQuery: param,
+    };
+  }
+
+  // Halaman bersih (tanpa filter/search, halaman 1) -> canonical eksplisit
+  // ke `/`. Kombinasi ad-hoc -> noindex, TANPA canonical (menaruh canonical
+  // ke tempat lain sambil noindex adalah sinyal yang saling bertentangan).
+  return {
+    title: `${platformNama} — Baca & Tulis Cerita`,
+    noindex: isAdHoc,
+    canonicalQuery: isAdHoc ? null : '',
+  };
+}
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ search?: string; genre?: string; category?: string; tag?: string; page?: string }>;
+}): Promise<Metadata> {
+  const { search = '', genre = '', category = '', tag = '', page: pageParam = '1' } = await searchParams;
+  const page = Math.max(1, Number.parseInt(pageParam, 10) || 1);
+
   const slug = await getPlatformSlug();
   const config = await getPlatformConfig(slug);
+  const seo = resolveCatalogSeo({ search, genre, category, tag, page, platformNama: config.nama });
+  const description = `Jelajahi katalog novel & cerita berseri dari berbagai penulis di ${config.nama}.`;
+
   return {
-    title: `${config.nama} — Baca & Tulis Cerita`,
-    description: `Jelajahi katalog novel & cerita berseri dari berbagai penulis di ${config.nama}.`,
+    title: seo.title,
+    description,
+    robots: seo.noindex ? { index: false, follow: true } : undefined,
+    alternates:
+      seo.canonicalQuery !== null ? { canonical: seo.canonicalQuery ? `/?${seo.canonicalQuery}` : '/' } : undefined,
+    ...buildSocialMetadata({ title: seo.title, description, imageUrl: config.logoUrl }),
   };
 }
 

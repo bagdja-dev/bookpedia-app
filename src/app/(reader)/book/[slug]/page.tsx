@@ -9,6 +9,8 @@ import { BOOK_TYPE_BADGE_LABEL, formatBookBylinePrefix } from '@/lib/book-byline
 import { buildSimilarBooksHref } from '@/lib/book-filter-href';
 import { getPlatformSlug } from '@/lib/platform';
 import { getPlatformConfig, publicFetch } from '@/lib/public-api';
+import { resolveOriginFromHeaders } from '@/lib/resolve-origin';
+import { buildSocialMetadata, toJsonLdScript } from '@/lib/seo';
 import type { BookDetailDto } from '@/lib/public-types';
 
 interface BookPageProps {
@@ -25,9 +27,13 @@ export async function generateMetadata({ params }: BookPageProps): Promise<Metad
   if (!book) {
     return { title: `Cerita tidak ditemukan — ${config.nama}` };
   }
+  const title = `${book.judul} — ${config.nama}`;
+  const description = book.sinopsis ?? `Baca ${book.judul} oleh ${book.library.nama} di ${config.nama}.`;
   return {
-    title: `${book.judul} — ${config.nama}`,
-    description: book.sinopsis ?? `Baca ${book.judul} oleh ${book.library.nama} di ${config.nama}.`,
+    title,
+    description,
+    alternates: { canonical: `/book/${book.slug}` },
+    ...buildSocialMetadata({ title, description, imageUrl: book.coverUrl }),
   };
 }
 
@@ -51,8 +57,24 @@ export default async function BookDetailPage({ params }: BookPageProps) {
   const firstChapter = book.chapters[0];
   const similarHref = buildSimilarBooksHref(book);
 
+  // JSON-LD (SEO Fase 3, plan/bookpedia/seo-execution-plan.md §3.1) — Book
+  // schema.org, supaya Google bisa tampilkan rich result (cover, penulis,
+  // genre). Server-rendered, tidak butuh JS client.
+  const origin = await resolveOriginFromHeaders();
+  const bookJsonLd = toJsonLdScript({
+    '@context': 'https://schema.org',
+    '@type': 'Book',
+    name: book.judul,
+    url: `${origin}/book/${book.slug}`,
+    ...(book.coverUrl ? { image: book.coverUrl } : {}),
+    ...(book.sinopsis ? { description: book.sinopsis } : {}),
+    author: { '@type': 'Person', name: book.library.nama },
+    ...(book.genre ? { genre: book.genre.nama } : {}),
+  });
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: bookJsonLd }} />
       <div className="flex flex-col gap-6 sm:flex-row">
         <div className="w-40 shrink-0 overflow-hidden rounded-lg border border-[var(--reader-border)] bg-[var(--reader-surface)] shadow-sm sm:w-56">
           <div className="aspect-[3/4] w-full bg-[var(--reader-bg)]">

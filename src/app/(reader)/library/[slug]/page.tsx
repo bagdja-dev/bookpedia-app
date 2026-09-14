@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { BookCard } from '@/components/reader/book-card';
 import { getPlatformSlug } from '@/lib/platform';
 import { getPlatformConfig, publicFetch } from '@/lib/public-api';
+import { buildSocialMetadata } from '@/lib/seo';
 import type { LibraryProfileDto } from '@/lib/public-types';
 
 interface LibraryPageProps {
@@ -20,9 +21,13 @@ export async function generateMetadata({ params }: LibraryPageProps): Promise<Me
   if (!library) {
     return { title: `Library tidak ditemukan — ${config.nama}` };
   }
+  const title = `${library.nama} — ${config.nama}`;
+  const description = library.deskripsi ?? `Karya-karya dari ${library.nama} di ${config.nama}.`;
   return {
-    title: `${library.nama} — ${config.nama}`,
-    description: library.deskripsi ?? `Karya-karya dari ${library.nama} di ${config.nama}.`,
+    title,
+    description,
+    alternates: { canonical: `/library/${library.slug}` },
+    ...buildSocialMetadata({ title, description, imageUrl: library.coverUrl }),
   };
 }
 

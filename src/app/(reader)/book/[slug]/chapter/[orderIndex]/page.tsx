@@ -6,6 +6,7 @@ import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getPlatformSlug } from '@/lib/platform';
 import { getPlatformConfig, publicFetch } from '@/lib/public-api';
 import { getSession } from '@/lib/session';
+import { buildSocialMetadata } from '@/lib/seo';
 import type { ChapterReadDto } from '@/lib/public-types';
 import { HighlightableChapter } from '@/components/highlightable-chapter';
 import { ReadingProgressTracker } from '@/components/reading-progress-tracker';
@@ -24,8 +25,16 @@ export async function generateMetadata({ params }: ChapterPageProps): Promise<Me
   if (!chapter) {
     return { title: `Chapter tidak ditemukan — ${config.nama}` };
   }
+  // Chapter yang butuh login diredirect di komponen halaman (bukan di sini)
+  // — respons redirect tidak pernah membawa tag metadata ini ke browser,
+  // jadi tidak perlu cabang isFree khusus di sini (lihat seo-execution-plan.md §1.2).
+  const title = `${chapter.judul} — ${chapter.book.judul} — ${config.nama}`;
+  const description = `Baca ${chapter.judul} dari ${chapter.book.judul} di ${config.nama}.`;
   return {
-    title: `${chapter.judul} — ${chapter.book.judul} — ${config.nama}`,
+    title,
+    description,
+    alternates: { canonical: `/book/${chapter.book.slug}/chapter/${chapter.orderIndex}` },
+    ...buildSocialMetadata({ title, description, imageUrl: chapter.book.coverUrl }),
   };
 }
 

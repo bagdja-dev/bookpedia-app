@@ -1,3 +1,4 @@
+import { headers } from 'next/headers';
 import type { NextRequest } from 'next/server';
 
 import { getAppUrl } from '@/lib/app-url';
@@ -47,6 +48,35 @@ function firstHeaderValue(request: NextRequest, name: string): string | undefine
   return request.headers.get(name)?.split(',')[0]?.trim() || undefined;
 }
 
+/** Sama seperti `firstHeaderValue()` tapi baca dari `ReadonlyHeaders` (`next/headers`), bukan `NextRequest`. */
+function firstHeaderValueFrom(source: { get(name: string): string | null }, name: string): string | undefined {
+  return source.get(name)?.split(',')[0]?.trim() || undefined;
+}
+
+/**
+ * Resolusi inti dipakai KEDUA varian di bawah (`resolveOrigin` dari
+ * `NextRequest` di middleware/route handler, `resolveOriginFromHeaders` dari
+ * `next/headers` di Server Component/`generateMetadata`) — satu sumber
+ * aturan, jangan disalin dua kali (persis alasan helper ini ada sejak awal,
+ * lihat doc-comment `resolveOrigin()` di bawah).
+ */
+function resolveOriginCore(getHeader: (name: string) => string | undefined): string {
+  const forwardedProto = getHeader('x-forwarded-proto');
+
+  const forwardedHost = getHeader('x-forwarded-host');
+  if (isUsableHost(forwardedHost)) {
+    return `${forwardedProto || 'https'}://${forwardedHost}`;
+  }
+
+  const host = getHeader('host');
+  if (isUsableHost(host)) {
+    const proto = forwardedProto || (isLocalHostname(hostnameOf(host)) ? 'http' : 'https');
+    return `${proto}://${host}`;
+  }
+
+  return getAppUrl();
+}
+
 /**
  * Origin asal request sebenarnya (scheme+host yang BENAR-BENAR dipakai
  * browser user) — dipakai untuk SEMUA redirect yang kita kirim balik dari
@@ -70,21 +100,19 @@ function firstHeaderValue(request: NextRequest, name: string): string | undefine
  *      `ERR_CONNECTION_REFUSED` ke alamat yang tidak ada di jaringan mana pun.
  */
 export function resolveOrigin(request: NextRequest): string {
-  const forwardedProto = firstHeaderValue(request, 'x-forwarded-proto');
+  return resolveOriginCore((name) => firstHeaderValue(request, name));
+}
 
-  const forwardedHost = firstHeaderValue(request, 'x-forwarded-host');
-  if (isUsableHost(forwardedHost)) {
-    return `${forwardedProto || 'https'}://${forwardedHost}`;
-  }
-
-  const host = firstHeaderValue(request, 'host');
-  if (isUsableHost(host)) {
-    // Tanpa `x-forwarded-proto` (request tidak lewat proxy sama sekali):
-    // host dev lokal pasti http, sisanya di infra ini selalu di balik TLS
-    // Cloudflare/Traefik.
-    const proto = forwardedProto || (isLocalHostname(hostnameOf(host)) ? 'http' : 'https');
-    return `${proto}://${host}`;
-  }
-
-  return getAppUrl();
+/**
+ * Varian `resolveOrigin()` untuk Server Component/`generateMetadata` (tidak
+ * ada `NextRequest` di situ) — baca header lewat `next/headers` (async,
+ * Next.js 16). Dipakai buat `metadataBase` dinamis per-Platform (§6.1
+ * plan/bookpedia/seo-plan.md, keputusan 16 Sep 2026: metadataBase WAJIB
+ * ikut host request, bukan satu env var statis — supaya OG image URL Book
+ * detail dkk resolve ke domain yang benar-benar diakses pengunjung, bukan
+ * domain default hardcode).
+ */
+export async function resolveOriginFromHeaders(): Promise<string> {
+  const h = await headers();
+  return resolveOriginCore((name) => firstHeaderValueFrom(h, name));
 }

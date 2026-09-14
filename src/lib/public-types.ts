@@ -73,6 +73,12 @@ export interface PlatformColors {
  * titik keputusan renderer per-Platform (overview.md §9.2) sudah ada tanpa
  * re-arsitektur nanti.
  */
+/** SEO Fase 2 — kontrak `GET /public/platforms/:slug/sitemap-entries`, dipakai `src/app/sitemap.ts`. */
+export interface SitemapEntriesDto {
+  books: { slug: string; updatedAt: string }[];
+  libraries: { slug: string; updatedAt: string }[];
+}
+
 export interface PlatformProfileDto {
   nama: string;
   slug: string;
@@ -170,6 +176,8 @@ export interface ChapterReadDto {
     id: string;
     judul: string;
     slug: string;
+    /** SEO Fase 1 — dipakai og:image halaman Chapter. */
+    coverUrl: string | null;
   };
   prevOrderIndex: number | null;
   nextOrderIndex: number | null;
