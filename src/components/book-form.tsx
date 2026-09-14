@@ -46,6 +46,8 @@ export interface BookFormValues {
   bookType: BookType;
   originalAuthor: string;
   status: BookStatus;
+  /** Fase 5 (SEO) — string kosong = ikut kebijakan Platform (null di payload). */
+  maxFreeChapters: string;
 }
 
 interface BookFormProps {
@@ -76,7 +78,7 @@ interface BookFormProps {
  * di bawah label "Lainnya".
  */
 export function BookForm({ mode, initialValues, submitting, submitLabel, onSubmit }: BookFormProps) {
-  const { slug: platformSlug } = usePlatformContext();
+  const { slug: platformSlug, config: platformConfig } = usePlatformContext();
   const [judul, setJudul] = useState(initialValues?.judul ?? '');
   const [slug, setSlug] = useState(initialValues?.slug ?? '');
   const [slugTouched, setSlugTouched] = useState(mode === 'edit');
@@ -88,6 +90,9 @@ export function BookForm({ mode, initialValues, submitting, submitLabel, onSubmi
   const [bookType, setBookType] = useState<BookType>(initialValues?.bookType ?? 'original');
   const [originalAuthor, setOriginalAuthor] = useState(initialValues?.originalAuthor ?? '');
   const [status, setStatus] = useState<BookStatus>(initialValues?.status ?? 'draft');
+  const [maxFreeChapters, setMaxFreeChapters] = useState(initialValues?.maxFreeChapters ?? '');
+
+  const platformMaxFreeChapters = platformConfig.maxFreeChapters;
 
   const [genres, setGenres] = useState<GenreDto[] | null>(null);
   const [categories, setCategories] = useState<CategoryDto[] | null>(null);
@@ -154,6 +159,7 @@ export function BookForm({ mode, initialValues, submitting, submitLabel, onSubmi
       bookType,
       originalAuthor: originalAuthor.trim(),
       status,
+      maxFreeChapters,
     });
   }
 
@@ -303,6 +309,33 @@ export function BookForm({ mode, initialValues, submitting, submitLabel, onSubmi
           </p>
         </div>
       )}
+
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="maxFreeChapters">Batas Chapter Gratis (opsional)</Label>
+        {platformMaxFreeChapters === 0 ? (
+          <p className="text-xs text-muted-foreground">
+            Platform ini sudah mengatur semua Chapter gratis (tanpa login) — Book tidak bisa override.
+          </p>
+        ) : (
+          <>
+            <Input
+              id="maxFreeChapters"
+              type="number"
+              min={0}
+              value={maxFreeChapters}
+              onChange={(e) => setMaxFreeChapters(e.target.value)}
+              placeholder={`Kosongkan untuk ikut Platform (${platformMaxFreeChapters})`}
+              disabled={submitting}
+            />
+            <p className="text-xs text-muted-foreground">
+              Kosongkan untuk ikut kebijakan Platform saat ini ({platformMaxFreeChapters} Chapter pertama
+              gratis). Kalau diisi: isi <strong>0</strong> supaya SEMUA Chapter Book ini gratis, atau angka{' '}
+              <strong>lebih besar dari {platformMaxFreeChapters}</strong> — tidak boleh diisi angka yang
+              lebih kecil/sama dengan kebijakan Platform.
+            </p>
+          </>
+        )}
+      </div>
 
       <CoverImageUpload
         id="coverUrl"

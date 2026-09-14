@@ -70,6 +70,8 @@ export interface PlatformProfileDto {
   colors: PlatformColors;
   lockStudio: boolean;
   rendererKey: string;
+  /** Fase 5 (SEO) — jumlah Chapter pertama tiap Book yang bisa dibaca tanpa login. 0 = SEMUA Chapter gratis (bukan "nol Chapter gratis"). */
+  maxFreeChapters: number;
 }
 
 export interface BookCatalogDto {
@@ -112,6 +114,8 @@ export interface BookChapterSummary {
   judul: string;
   orderIndex: number;
   publishedAt: string | null;
+  /** Fase 5 (SEO) — true kalau Chapter ini bisa dibaca tanpa login. */
+  isFree: boolean;
 }
 
 export interface BookDetailDto {
@@ -149,4 +153,6 @@ export interface ChapterReadDto {
   };
   prevOrderIndex: number | null;
   nextOrderIndex: number | null;
+  /** Fase 5 (SEO) — true kalau Chapter ini bisa dibaca tanpa login. */
+  isFree: boolean;
 }

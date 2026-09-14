@@ -30,6 +30,7 @@ export default function NewBookPage() {
         ...(values.coverUrl ? { coverUrl: values.coverUrl } : {}),
         bookType: values.bookType,
         ...(values.originalAuthor ? { originalAuthor: values.originalAuthor } : {}),
+        ...(values.maxFreeChapters.trim() !== '' ? { maxFreeChapters: Number(values.maxFreeChapters) } : {}),
       };
       const book = await apiClient<Book>('/books', {
         method: 'POST',

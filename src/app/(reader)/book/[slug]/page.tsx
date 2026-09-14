@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { User } from 'lucide-react';
 import { ContinueReadingButton } from '@/components/reader/continue-reading-button';
 import { Badge } from '@/components/ui/badge';
 import { BOOK_STATUS_LABEL, BOOK_STATUS_VARIANT } from '@/lib/status';
@@ -134,11 +135,14 @@ export default async function BookDetailPage({ params }: BookPageProps) {
                   <span className="truncate text-[var(--reader-foreground)]">
                     {chapter.orderIndex}. {chapter.judul}
                   </span>
-                  {chapter.publishedAt && (
-                    <span className="shrink-0 text-xs text-[var(--reader-muted)]">
-                      {formatDate(chapter.publishedAt)}
-                    </span>
-                  )}
+                  <span className="flex shrink-0 items-center gap-2">
+                    {!chapter.isFree && (
+                      <User className="h-3.5 w-3.5 text-[var(--reader-muted)]" aria-label="Perlu login" />
+                    )}
+                    {chapter.publishedAt && (
+                      <span className="text-xs text-[var(--reader-muted)]">{formatDate(chapter.publishedAt)}</span>
+                    )}
+                  </span>
                 </Link>
               </li>
             ))}

@@ -39,6 +39,7 @@ const PLATFORM_CONFIG_FALLBACK: PlatformProfileDto = {
   },
   lockStudio: false,
   rendererKey: 'reader',
+  maxFreeChapters: 0,
 };
 
 /**
@@ -92,5 +93,6 @@ export const getPlatformConfig = cache(async (platformSlug: string): Promise<Pla
     colors: { ...PLATFORM_CONFIG_FALLBACK.colors, ...config.colors },
     lockStudio: config.lockStudio ?? PLATFORM_CONFIG_FALLBACK.lockStudio,
     rendererKey: config.rendererKey || PLATFORM_CONFIG_FALLBACK.rendererKey,
+    maxFreeChapters: config.maxFreeChapters ?? PLATFORM_CONFIG_FALLBACK.maxFreeChapters,
   };
 });

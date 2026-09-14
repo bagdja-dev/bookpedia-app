@@ -33,24 +33,32 @@ export async function generateMetadata({ params }: ChapterPageProps): Promise<Me
 // karakter/baris pada font serif ukuran ini), font serif jadi hero, line-
 // height lega. TIDAK ada toolbar tema/ukuran font/highlight — itu Fase 3.
 //
-// Guard login (disepakati 9 Sep 2026): katalog/detail Book/Library tetap
-// publik (discovery & SEO), tapi KONTEN chapter (halaman ini) wajib login —
+// Guard login (disepakati 9 Sep 2026, direvisi Fase 5/14 Sep 2026 — SEO):
+// katalog/detail Book/Library tetap publik (discovery & SEO). KONTEN chapter
+// (halaman ini) wajib login KECUALI Chapter ini termasuk "Maximum Free
+// Chapter" efektif Platform/Book (`chapter.isFree`, dihitung backend — lihat
+// plan/bookpedia/overview.md §11). Chapter gratis dirender penuh TANPA cek
+// session sama sekali, termasuk untuk crawler (tidak dibedakan bot/manusia,
+// sengaja, supaya tidak dianggap cloaking oleh search engine). Chapter
 // dicek server-side via cookie `ns_token` (httpOnly, lihat lib/session.ts)
-// SEBELUM fetch konten, supaya tidak ada flash konten ke pengunjung yang
-// belum login (beda dari pola client-side redirect di reader-auth-nav.tsx).
+// SEBELUM fetch konten kalau memang perlu, supaya tidak ada flash konten ke
+// pengunjung yang belum login (beda dari pola client-side redirect di
+// reader-auth-nav.tsx).
 export default async function ChapterPage({ params }: ChapterPageProps) {
   const { slug, orderIndex } = await params;
-
-  const { token } = await getSession();
-  if (!token) {
-    redirect(`/auth/login?next=${encodeURIComponent(`/book/${slug}/chapter/${orderIndex}`)}`);
-  }
 
   const platformSlug = await getPlatformSlug();
   const chapter = await publicFetch<ChapterReadDto>(`/public/platforms/${platformSlug}/books/${slug}/chapters/${orderIndex}`);
 
   if (!chapter) {
     notFound();
+  }
+
+  if (!chapter.isFree) {
+    const { token } = await getSession();
+    if (!token) {
+      redirect(`/auth/login?next=${encodeURIComponent(`/book/${slug}/chapter/${orderIndex}`)}`);
+    }
   }
 
   return (

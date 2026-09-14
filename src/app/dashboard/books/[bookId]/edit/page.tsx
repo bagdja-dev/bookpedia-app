@@ -50,6 +50,7 @@ export default function EditBookPage({ params }: { params: Promise<{ bookId: str
         bookType: values.bookType,
         originalAuthor: values.originalAuthor,
         status: values.status,
+        maxFreeChapters: values.maxFreeChapters.trim() === '' ? null : Number(values.maxFreeChapters),
       };
       await apiClient<Book>(`/books/${bookId}`, {
         method: 'PATCH',
@@ -95,6 +96,7 @@ export default function EditBookPage({ params }: { params: Promise<{ bookId: str
               bookType: book.bookType,
               originalAuthor: book.originalAuthor ?? '',
               status: book.status,
+              maxFreeChapters: book.maxFreeChapters === null ? '' : String(book.maxFreeChapters),
             }}
           />
         </CardContent>

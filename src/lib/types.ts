@@ -54,6 +54,8 @@ export interface Book {
   originalAuthor: string | null;
   /** Saklar publikasi level Book, terpisah dari `status` di atas dan dari status publish per-Chapter. */
   publishedAt: string | null;
+  /** Fase 5 (SEO) — override "Maximum Free Chapter" Platform. null = ikut kebijakan Platform. */
+  maxFreeChapters: number | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -68,6 +70,7 @@ export interface CreateBookPayload {
   coverUrl?: string;
   bookType?: BookType;
   originalAuthor?: string;
+  maxFreeChapters?: number;
 }
 
 // Catatan: `PATCH /books/:id` TIDAK menerima `slug` (kontrak backend) — slug
@@ -82,6 +85,7 @@ export interface UpdateBookPayload {
   published?: boolean;
   bookType?: BookType;
   originalAuthor?: string | null;
+  maxFreeChapters?: number | null;
 }
 
 export interface Chapter {
