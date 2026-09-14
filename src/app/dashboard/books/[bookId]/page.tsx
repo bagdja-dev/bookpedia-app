@@ -7,11 +7,13 @@ import { toast } from 'sonner';
 import { ArrowLeft, ArrowUp, ArrowDown, Eye, EyeOff, FileText, Pencil, Plus, Trash2 } from 'lucide-react';
 
 import { LoadingSpinner } from '@/components/loading-spinner';
+import { StarRatingDisplay } from '@/components/reader/star-rating-display';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { apiClient, ApiError } from '@/lib/api-client';
 import { BOOK_STATUS_LABEL, BOOK_STATUS_VARIANT, CHAPTER_STATUS_LABEL, CHAPTER_STATUS_VARIANT } from '@/lib/status';
 import { BOOK_TYPE_BADGE_LABEL } from '@/lib/book-byline';
+import { usePlatformContext } from '@/context/platform-context';
 import type { Book, Chapter, ReorderChapterPayload } from '@/lib/types';
 
 function ChapterRow({
@@ -25,6 +27,7 @@ function ChapterRow({
   publishingId,
   onDelete,
   deletingId,
+  showRating,
 }: {
   chapter: Chapter;
   index: number;
@@ -36,6 +39,8 @@ function ChapterRow({
   publishingId: string | null;
   onDelete: (chapter: Chapter) => void;
   deletingId: string | null;
+  /** Fase 7 — tampilkan rating Chapter ini, cuma relevan kalau Platform ratingMode="chapter". */
+  showRating: boolean;
 }) {
   const isPublished = chapter.status === 'published';
   const isPublishing = publishingId === chapter.id;
@@ -52,6 +57,12 @@ function ChapterRow({
         <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
         <span className="truncate">{chapter.judul}</span>
       </Link>
+
+      <span className="shrink-0 text-xs text-muted-foreground">{chapter.viewCount.toLocaleString('id-ID')}x dibaca</span>
+
+      {showRating && chapter.ratingCount > 0 && (
+        <StarRatingDisplay average={chapter.ratingAverage} count={chapter.ratingCount} />
+      )}
 
       <Badge variant={CHAPTER_STATUS_VARIANT[chapter.status]}>
         {CHAPTER_STATUS_LABEL[chapter.status]}
@@ -103,6 +114,7 @@ function ChapterRow({
 export default function BookDetailPage({ params }: { params: Promise<{ bookId: string }> }) {
   const { bookId } = use(params);
   const router = useRouter();
+  const { config } = usePlatformContext();
 
   const [book, setBook] = useState<Book | null>(null);
   const [chapters, setChapters] = useState<Chapter[] | null>(null);
@@ -269,6 +281,12 @@ export default function BookDetailPage({ params }: { params: Promise<{ bookId: s
             {book.originalAuthor && (
               <p className="text-sm text-muted-foreground">Penulis asli: {book.originalAuthor}</p>
             )}
+            <div className="flex items-center gap-3 text-sm text-muted-foreground">
+              <span>{book.viewCount.toLocaleString('id-ID')}x dibaca</span>
+              {config.enableRating && (
+                <StarRatingDisplay average={book.ratingAverage} count={book.ratingCount} size="md" />
+              )}
+            </div>
             {book.sinopsis && (
               <p className="max-w-2xl text-sm text-muted-foreground">{book.sinopsis}</p>
             )}
@@ -325,6 +343,7 @@ export default function BookDetailPage({ params }: { params: Promise<{ bookId: s
                 publishingId={publishingId}
                 onDelete={handleDeleteChapter}
                 deletingId={deletingId}
+                showRating={config.enableRating && config.ratingMode === 'chapter'}
               />
             ))}
           </div>

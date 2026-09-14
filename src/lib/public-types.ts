@@ -9,6 +9,9 @@
  */
 import type { BookStatus, BookType } from './types';
 
+/** Fase 7 — grain rating: "book" = satu rating per Book, "chapter" = rating terpisah tiap Chapter (diagregasi ke Book saat ditampilkan). */
+export type RatingMode = 'book' | 'chapter';
+
 /** Kontrak `GET /public/genres` — daftar genre resmi dari database (bukan lagi hardcode frontend). */
 export interface GenreDto {
   id: string;
@@ -97,6 +100,10 @@ export interface PlatformProfileDto {
   /** Verifikasi Google Search Console ("HTML file" method), dibalas dinamis oleh middleware.ts. */
   searchConsoleVerificationFilename: string | null;
   searchConsoleVerificationContent: string | null;
+  /** Fase 7 — nyala/mati fitur rating Book/Chapter. false = sembunyikan seluruh UI rating. */
+  enableRating: boolean;
+  /** Fase 7 — grain rating saat ini: "book" = widget di detail Book, "chapter" = widget di halaman baca Chapter. */
+  ratingMode: RatingMode;
 }
 
 export interface BookCatalogDto {
@@ -117,6 +124,12 @@ export interface BookCatalogDto {
     nama: string;
     slug: string;
   };
+  /** Fase 7 — total dibaca (SUM view_count semua Chapter Book ini). */
+  viewCount: number;
+  /** Fase 7 — agregat rating Book ini (0 kalau belum ada rating). Sumbernya ikut ratingMode Platform. */
+  ratingAverage: number;
+  /** Fase 7 — jumlah rating yang membentuk ratingAverage di atas. */
+  ratingCount: number;
 }
 
 export interface CatalogResponse {
@@ -143,6 +156,9 @@ export interface BookChapterSummary {
   publishedAt: string | null;
   /** Fase 5 (SEO) — true kalau Chapter ini bisa dibaca tanpa login. */
   isFree: boolean;
+  /** Fase 7 — rating Chapter ini (0 kalau belum ada rating). Cuma relevan/ditampilkan kalau platform.ratingMode="chapter". */
+  ratingAverage: number;
+  ratingCount: number;
 }
 
 export interface BookDetailDto {
@@ -164,6 +180,11 @@ export interface BookDetailDto {
     slug: string;
   };
   chapters: BookChapterSummary[];
+  /** Fase 7 — total dibaca (SUM view_count semua Chapter Book ini). */
+  viewCount: number;
+  /** Fase 7 — agregat rating Book ini (0 kalau belum ada rating). Sumbernya ikut ratingMode Platform. */
+  ratingAverage: number;
+  ratingCount: number;
 }
 
 export interface ChapterReadDto {
@@ -186,4 +207,7 @@ export interface ChapterReadDto {
   nextOrderIndex: number | null;
   /** Fase 5 (SEO) — true kalau Chapter ini bisa dibaca tanpa login. */
   isFree: boolean;
+  /** Fase 7 — rating Chapter ini (0 kalau belum ada rating). Cuma relevan/ditampilkan kalau platform.ratingMode="chapter". */
+  ratingAverage: number;
+  ratingCount: number;
 }

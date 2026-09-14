@@ -5,10 +5,12 @@ import Link from 'next/link';
 import { BookOpen, Plus } from 'lucide-react';
 
 import { LoadingSpinner } from '@/components/loading-spinner';
+import { StarRatingDisplay } from '@/components/reader/star-rating-display';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { apiClient, ApiError } from '@/lib/api-client';
 import { BOOK_STATUS_LABEL, BOOK_STATUS_VARIANT } from '@/lib/status';
+import { usePlatformContext } from '@/context/platform-context';
 import type { Book } from '@/lib/types';
 
 function BookCover({ book }: { book: Book }) {
@@ -31,6 +33,8 @@ function BookCover({ book }: { book: Book }) {
 }
 
 function BookGrid({ books }: { books: Book[] }) {
+  const { config } = usePlatformContext();
+
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
       {books.map((book) => (
@@ -55,6 +59,12 @@ function BookGrid({ books }: { books: Book[] }) {
                 <Badge variant="outline" className="text-muted-foreground">
                   {book.genre.nama}
                 </Badge>
+              )}
+            </div>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span>{book.viewCount.toLocaleString('id-ID')}x dibaca</span>
+              {config.enableRating && book.ratingCount > 0 && (
+                <StarRatingDisplay average={book.ratingAverage} count={book.ratingCount} />
               )}
             </div>
           </div>

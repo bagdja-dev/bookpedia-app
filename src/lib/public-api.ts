@@ -44,6 +44,8 @@ const PLATFORM_CONFIG_FALLBACK: PlatformProfileDto = {
   maxTagsPerBook: 5,
   searchConsoleVerificationFilename: null,
   searchConsoleVerificationContent: null,
+  enableRating: true,
+  ratingMode: 'book',
 };
 
 /**
@@ -102,6 +104,8 @@ export const getPlatformConfig = cache(async (platformSlug: string): Promise<Pla
     maxTagsPerBook: config.maxTagsPerBook ?? PLATFORM_CONFIG_FALLBACK.maxTagsPerBook,
     searchConsoleVerificationFilename: config.searchConsoleVerificationFilename ?? null,
     searchConsoleVerificationContent: config.searchConsoleVerificationContent ?? null,
+    enableRating: config.enableRating ?? PLATFORM_CONFIG_FALLBACK.enableRating,
+    ratingMode: config.ratingMode ?? PLATFORM_CONFIG_FALLBACK.ratingMode,
   };
 });
 
@@ -121,5 +125,23 @@ export async function searchTags(platformSlug: string, search: string): Promise<
     return (await res.json()) as TagDto[];
   } catch {
     return [];
+  }
+}
+
+/**
+ * Fase 7 — catat 1x "buka" Chapter (statistik baca). Dipanggil dari
+ * komponen client `ChapterViewTracker`, TANPA lewat `apiClient`/proxy
+ * authenticated (endpoint publik, dihitung untuk pembaca anonim juga) —
+ * pola sama `searchTags` di atas (fetch polos langsung ke backend).
+ * Fire-and-forget: gagal diam-diam, tidak pernah men-throw ke pemanggil.
+ */
+export async function recordChapterView(platformSlug: string, bookSlug: string, orderIndex: number): Promise<void> {
+  try {
+    await fetch(
+      `${API_BASE}/public/platforms/${encodeURIComponent(platformSlug)}/books/${encodeURIComponent(bookSlug)}/chapters/${orderIndex}/view`,
+      { method: 'POST' },
+    );
+  } catch (err) {
+    console.error('[recordChapterView] gagal catat view:', err);
   }
 }

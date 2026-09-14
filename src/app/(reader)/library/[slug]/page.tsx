@@ -83,7 +83,7 @@ export default async function LibraryProfilePage({ params }: LibraryPageProps) {
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
             {library.books.map((book) => (
-              <BookCard key={book.id} book={book} showStatus={config.showBookStatus} />
+              <BookCard key={book.id} book={book} showStatus={config.showBookStatus} showRating={config.enableRating} />
             ))}
           </div>
         )}

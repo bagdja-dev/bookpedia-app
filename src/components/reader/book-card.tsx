@@ -1,9 +1,11 @@
 import Link from 'next/link';
-import { ListFilter } from 'lucide-react';
+import { Eye, ListFilter } from 'lucide-react';
 
 import { BOOK_STATUS_LABEL } from '@/lib/status';
 import { BOOK_TYPE_BADGE_LABEL, formatBookByline } from '@/lib/book-byline';
 import { buildSimilarBooksHref } from '@/lib/book-filter-href';
+import { formatCompactCount } from '@/lib/format';
+import { StarRatingDisplay } from '@/components/reader/star-rating-display';
 import type { BookCatalogDto } from '@/lib/public-types';
 
 const STATUS_DOT: Record<BookCatalogDto['status'], string> = {
@@ -23,7 +25,16 @@ const STATUS_DOT: Record<BookCatalogDto['status'], string> = {
  * tidak valid) — cover+judul+byline dibungkus satu `<Link>`, baris chip jadi
  * elemen terpisah di luar Link itu.
  */
-export function BookCard({ book, showStatus = true }: { book: BookCatalogDto; showStatus?: boolean }) {
+export function BookCard({
+  book,
+  showStatus = true,
+  showRating = true,
+}: {
+  book: BookCatalogDto;
+  showStatus?: boolean;
+  /** Fase 7 (susulan) — kalau true DAN book.ratingCount > 0, tampilkan agregat rating di card. */
+  showRating?: boolean;
+}) {
   const similarHref = buildSimilarBooksHref(book);
 
   return (
@@ -51,6 +62,15 @@ export function BookCard({ book, showStatus = true }: { book: BookCatalogDto; sh
             {book.judul}
           </h3>
           <p className="text-xs text-[var(--reader-muted)]">{formatBookByline(book)}</p>
+          <div className="flex items-center gap-2">
+            <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">
+              <Eye className="h-3 w-3" />
+              {formatCompactCount(book.viewCount)}
+            </span>
+            {showRating && book.ratingCount > 0 && (
+              <StarRatingDisplay average={book.ratingAverage} count={book.ratingCount} />
+            )}
+          </div>
         </div>
       </Link>
 

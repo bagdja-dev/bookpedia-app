@@ -10,6 +10,9 @@ import { buildSocialMetadata } from '@/lib/seo';
 import type { ChapterReadDto } from '@/lib/public-types';
 import { HighlightableChapter } from '@/components/highlightable-chapter';
 import { ReadingProgressTracker } from '@/components/reading-progress-tracker';
+import { ChapterViewTracker } from '@/components/reader/chapter-view-tracker';
+import { ChapterRatingWidget } from '@/components/reader/chapter-rating-widget';
+import { StarRatingDisplay } from '@/components/reader/star-rating-display';
 
 interface ChapterPageProps {
   params: Promise<{ slug: string; orderIndex: string }>;
@@ -57,7 +60,10 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
   const { slug, orderIndex } = await params;
 
   const platformSlug = await getPlatformSlug();
-  const chapter = await publicFetch<ChapterReadDto>(`/public/platforms/${platformSlug}/books/${slug}/chapters/${orderIndex}`);
+  const [config, chapter] = await Promise.all([
+    getPlatformConfig(platformSlug),
+    publicFetch<ChapterReadDto>(`/public/platforms/${platformSlug}/books/${slug}/chapters/${orderIndex}`),
+  ]);
 
   if (!chapter) {
     notFound();
@@ -73,6 +79,7 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
   return (
     <div className="mx-auto max-w-[680px] px-4 py-8 sm:px-6">
       <ReadingProgressTracker bookId={chapter.book.id} chapterId={chapter.id} />
+      <ChapterViewTracker platformSlug={platformSlug} bookSlug={slug} orderIndex={chapter.orderIndex} />
 
       <Link
         href={`/book/${slug}`}
@@ -96,6 +103,14 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
         className="chapter-content text-[1.0625rem] leading-[1.9] text-[var(--reader-foreground)]"
         style={{ fontFamily: 'var(--font-source-serif)' }}
       />
+
+      {config.enableRating && config.ratingMode === 'chapter' && (
+        <div className="mt-10 flex flex-col items-start gap-2 border-t border-[var(--reader-border)] pt-6">
+          <p className="text-sm font-medium text-[var(--reader-foreground)]">Rating Chapter ini</p>
+          <StarRatingDisplay average={chapter.ratingAverage} count={chapter.ratingCount} size="md" />
+          <ChapterRatingWidget chapterId={chapter.id} />
+        </div>
+      )}
 
       <nav className="mt-12 flex items-center justify-between gap-4 border-t border-[var(--reader-border)] pt-6">
         {chapter.prevOrderIndex !== null ? (

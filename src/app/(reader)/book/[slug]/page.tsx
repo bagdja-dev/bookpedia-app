@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ListFilter, User } from 'lucide-react';
 import { ContinueReadingButton } from '@/components/reader/continue-reading-button';
+import { BookRatingWidget } from '@/components/reader/book-rating-widget';
+import { StarRatingDisplay } from '@/components/reader/star-rating-display';
 import { Badge } from '@/components/ui/badge';
 import { BOOK_STATUS_LABEL, BOOK_STATUS_VARIANT } from '@/lib/status';
 import { BOOK_TYPE_BADGE_LABEL, formatBookByline, formatBookBylinePrefix } from '@/lib/book-byline';
@@ -156,7 +158,15 @@ export default async function BookDetailPage({ params }: BookPageProps) {
               </Link>
             )}
             <span className="text-xs text-[var(--reader-muted)]">{book.chapters.length} chapter</span>
+            <span className="text-xs text-[var(--reader-muted)]">{book.viewCount.toLocaleString('id-ID')}x dibaca</span>
           </div>
+
+          {config.enableRating && (
+            <div className="flex items-center gap-3">
+              <StarRatingDisplay average={book.ratingAverage} count={book.ratingCount} size="md" />
+              {config.ratingMode === 'book' && <BookRatingWidget bookId={book.id} />}
+            </div>
+          )}
 
           {book.tags.length > 0 && (
             <div className="flex flex-wrap items-center gap-1.5">
@@ -220,6 +230,9 @@ export default async function BookDetailPage({ params }: BookPageProps) {
                     {chapter.orderIndex}. {chapter.judul}
                   </span>
                   <span className="flex shrink-0 items-center gap-2">
+                    {config.enableRating && config.ratingMode === 'chapter' && chapter.ratingCount > 0 && (
+                      <StarRatingDisplay average={chapter.ratingAverage} count={chapter.ratingCount} />
+                    )}
                     {!chapter.isFree && (
                       <User className="h-3.5 w-3.5 text-[var(--reader-muted)]" aria-label="Perlu login" />
                     )}

@@ -58,6 +58,11 @@ export interface Book {
   publishedAt: string | null;
   /** Fase 5 (SEO) — override "Maximum Free Chapter" Platform. null = ikut kebijakan Platform. */
   maxFreeChapters: number | null;
+  /** Fase 7 — total dibaca (SUM view_count semua Chapter Book ini), read-only. */
+  viewCount: number;
+  /** Fase 7 — agregat rating Book ini (0 kalau belum ada rating). Sumbernya ikut ratingMode Platform. */
+  ratingAverage: number;
+  ratingCount: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -103,6 +108,11 @@ export interface Chapter {
   status: ChapterStatus;
   contentVersion: number;
   publishedAt: string | null;
+  /** Fase 7 — total dibaca Chapter ini, read-only. */
+  viewCount: number;
+  /** Fase 7 — rating Chapter ini (0 kalau belum ada rating). Cuma relevan kalau Platform pemiliknya ratingMode="chapter". */
+  ratingAverage: number;
+  ratingCount: number;
   createdAt: string;
   updatedAt: string;
 }
