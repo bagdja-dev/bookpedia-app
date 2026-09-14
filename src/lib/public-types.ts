@@ -94,6 +94,9 @@ export interface PlatformProfileDto {
   showBookStatus: boolean;
   /** Fase 6 — batas jumlah Tag yang boleh dilekatkan ke satu Book. */
   maxTagsPerBook: number;
+  /** Verifikasi Google Search Console ("HTML file" method), dibalas dinamis oleh middleware.ts. */
+  searchConsoleVerificationFilename: string | null;
+  searchConsoleVerificationContent: string | null;
 }
 
 export interface BookCatalogDto {

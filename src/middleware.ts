@@ -21,8 +21,14 @@
  *     `/etc/hosts`) ikut dicek di sini untuk kemudahan dev lokal — lihat
  *     `LOCAL_SUBDOMAIN_PATTERN`.
  *  3. Host lain (kandidat custom domain) -> `GET /public/platforms/resolve
- *     ?host=...` — dorman sampai infra §4.3 (Traefik/DNS) aktif, endpoint
- *     backend-nya sudah ada tapi belum ada domain custom yang bisa dites.
+ *     ?host=...` — infra §4.3 (Traefik/DNS) sudah aktif production sejak
+ *     16 Sep 2026 (custom domain `novello.bagdja.com` terverifikasi & jalan).
+ *
+ * Susulan 17 Sep 2026 (SEO, `seo-execution-plan.md` §4): SETELAH slug
+ * ter-resolve (kasus 1-3 di atas), path yang match pola verifikasi Google
+ * Search Console (`/google<hash>.html`) dibalas LANGSUNG dari
+ * `platforms.search_console_verification_content` Platform yang resolve —
+ * bukan halaman aplikasi, jadi dicek sebelum `withPlatformSlug()`.
  *
  * `/auth/*` HARUS dikecualikan PALING AWAL — pelajaran insiden nyata
  * auction-web (lupa ini bikin `/auth/session` di custom domain 404).
@@ -69,6 +75,35 @@ function withPlatformSlug(request: NextRequest, slug: string): NextResponse {
   return NextResponse.next({ request: { headers } });
 }
 
+/**
+ * Verifikasi Google Search Console per-Platform (17 Sep 2026, susulan SEO —
+ * lihat plan/bookpedia/seo-execution-plan.md §4). Filename Google SELALU
+ * berpola `google<hash>.html` — dicek di sini SEBELUM rute aplikasi manapun,
+ * dibalas apa adanya dari `platforms.search_console_verification_content`
+ * milik Platform yang resolve dari Host request. Menggantikan pendekatan
+ * file statis di `public/` (dibagikan SEMUA Platform, butuh rebuild tiap
+ * Platform baru mau verifikasi) — sekarang per-Platform lewat Platform
+ * Settings, tanpa deploy ulang.
+ */
+const GOOGLE_VERIFICATION_PATTERN = /^\/google[a-zA-Z0-9_-]+\.html$/;
+
+async function getPlatformVerificationFile(slug: string): Promise<{ filename: string; content: string } | null> {
+  try {
+    const res = await fetch(`${API_URL}/public/platforms/${encodeURIComponent(slug)}`, {
+      next: { revalidate: 300 },
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as {
+      searchConsoleVerificationFilename?: string | null;
+      searchConsoleVerificationContent?: string | null;
+    };
+    if (!data.searchConsoleVerificationFilename || !data.searchConsoleVerificationContent) return null;
+    return { filename: data.searchConsoleVerificationFilename, content: data.searchConsoleVerificationContent };
+  } catch {
+    return null;
+  }
+}
+
 export async function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith('/auth/')) {
     return NextResponse.next();
@@ -77,24 +112,34 @@ export async function middleware(request: NextRequest) {
   const hostHeader = request.headers.get('host') ?? '';
   const hostname = hostHeader.split(':')[0];
 
+  let slug: string;
   if (!hostname || LOCAL_HOSTS.has(hostname) || hostname === PLATFORM_HOST) {
-    return withPlatformSlug(request, DEFAULT_PLATFORM_SLUG);
+    slug = DEFAULT_PLATFORM_SLUG;
+  } else {
+    const subdomainMatch = hostname.match(SUBDOMAIN_PATTERN) ?? hostname.match(LOCAL_SUBDOMAIN_PATTERN);
+    if (subdomainMatch) {
+      slug = subdomainMatch[1];
+    } else {
+      const resolved = await resolveSlugForDomain(hostname);
+      if (!resolved) {
+        // Host tak-terdaftar (custom domain belum di-resolve) — diamkan,
+        // biarkan `getPlatformSlug()` fallback ke default. Lihat catatan
+        // risiko di plan §4.2 (revisit jadi halaman "Platform not found"
+        // begitu §4.3 aktif).
+        return NextResponse.next();
+      }
+      slug = resolved;
+    }
   }
 
-  const subdomainMatch = hostname.match(SUBDOMAIN_PATTERN) ?? hostname.match(LOCAL_SUBDOMAIN_PATTERN);
-  if (subdomainMatch) {
-    return withPlatformSlug(request, subdomainMatch[1]);
+  if (GOOGLE_VERIFICATION_PATTERN.test(request.nextUrl.pathname)) {
+    const file = await getPlatformVerificationFile(slug);
+    if (file && `/${file.filename}` === request.nextUrl.pathname) {
+      return new NextResponse(file.content, { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+    }
   }
 
-  const slug = await resolveSlugForDomain(hostname);
-  if (slug) {
-    return withPlatformSlug(request, slug);
-  }
-
-  // Host tak-terdaftar (custom domain belum di-resolve) — diamkan, biarkan
-  // `getPlatformSlug()` fallback ke default. Lihat catatan risiko di plan
-  // §4.2 (revisit jadi halaman "Platform not found" begitu §4.3 aktif).
-  return NextResponse.next();
+  return withPlatformSlug(request, slug);
 }
 
 export const config = {

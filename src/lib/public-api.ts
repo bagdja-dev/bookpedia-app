@@ -42,6 +42,8 @@ const PLATFORM_CONFIG_FALLBACK: PlatformProfileDto = {
   maxFreeChapters: 0,
   showBookStatus: true,
   maxTagsPerBook: 5,
+  searchConsoleVerificationFilename: null,
+  searchConsoleVerificationContent: null,
 };
 
 /**
@@ -98,6 +100,8 @@ export const getPlatformConfig = cache(async (platformSlug: string): Promise<Pla
     maxFreeChapters: config.maxFreeChapters ?? PLATFORM_CONFIG_FALLBACK.maxFreeChapters,
     showBookStatus: config.showBookStatus ?? PLATFORM_CONFIG_FALLBACK.showBookStatus,
     maxTagsPerBook: config.maxTagsPerBook ?? PLATFORM_CONFIG_FALLBACK.maxTagsPerBook,
+    searchConsoleVerificationFilename: config.searchConsoleVerificationFilename ?? null,
+    searchConsoleVerificationContent: config.searchConsoleVerificationContent ?? null,
   };
 });
 
