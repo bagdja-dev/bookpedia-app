@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { User } from 'lucide-react';
+import { ListFilter, User } from 'lucide-react';
 import { ContinueReadingButton } from '@/components/reader/continue-reading-button';
 import { Badge } from '@/components/ui/badge';
 import { BOOK_STATUS_LABEL, BOOK_STATUS_VARIANT } from '@/lib/status';
 import { BOOK_TYPE_BADGE_LABEL, formatBookBylinePrefix } from '@/lib/book-byline';
+import { buildSimilarBooksHref } from '@/lib/book-filter-href';
 import { getPlatformSlug } from '@/lib/platform';
 import { getPlatformConfig, publicFetch } from '@/lib/public-api';
 import type { BookDetailDto } from '@/lib/public-types';
@@ -48,6 +49,7 @@ export default async function BookDetailPage({ params }: BookPageProps) {
   }
 
   const firstChapter = book.chapters[0];
+  const similarHref = buildSimilarBooksHref(book);
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
@@ -126,6 +128,16 @@ export default async function BookDetailPage({ params }: BookPageProps) {
                 </Link>
               ))}
             </div>
+          )}
+
+          {similarHref && (
+            <Link
+              href={similarHref}
+              className="inline-flex w-fit items-center gap-1.5 rounded-full border border-[var(--reader-border)] px-3 py-1 text-xs text-[var(--reader-muted)] hover:border-[var(--reader-terracotta)] hover:text-[var(--reader-terracotta)]"
+            >
+              <ListFilter className="h-3.5 w-3.5" />
+              Cari Cerita Serupa
+            </Link>
           )}
 
           {book.sinopsis && (

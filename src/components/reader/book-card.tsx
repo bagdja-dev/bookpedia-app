@@ -1,7 +1,9 @@
 import Link from 'next/link';
+import { ListFilter } from 'lucide-react';
 
 import { BOOK_STATUS_LABEL } from '@/lib/status';
 import { BOOK_TYPE_BADGE_LABEL, formatBookByline } from '@/lib/book-byline';
+import { buildSimilarBooksHref } from '@/lib/book-filter-href';
 import type { BookCatalogDto } from '@/lib/public-types';
 
 const STATUS_DOT: Record<BookCatalogDto['status'], string> = {
@@ -22,6 +24,8 @@ const STATUS_DOT: Record<BookCatalogDto['status'], string> = {
  * elemen terpisah di luar Link itu.
  */
 export function BookCard({ book, showStatus = true }: { book: BookCatalogDto; showStatus?: boolean }) {
+  const similarHref = buildSimilarBooksHref(book);
+
   return (
     <div className="group flex flex-col overflow-hidden rounded-lg border border-[var(--reader-border)] bg-[var(--reader-surface)] transition-shadow hover:shadow-md">
       <Link href={`/book/${book.slug}`} className="flex flex-1 flex-col">
@@ -86,6 +90,16 @@ export function BookCard({ book, showStatus = true }: { book: BookCatalogDto; sh
             <span className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[book.status]}`} />
             {BOOK_STATUS_LABEL[book.status]}
           </span>
+        )}
+        {similarHref && (
+          <Link
+            href={similarHref}
+            title="Cari cerita serupa (Category, Genre & Tag yang sama)"
+            aria-label="Cari cerita serupa"
+            className="ml-auto shrink-0 rounded-full p-1 text-[var(--reader-muted)] hover:bg-[var(--reader-bg)] hover:text-[var(--reader-terracotta)]"
+          >
+            <ListFilter className="h-3.5 w-3.5" />
+          </Link>
         )}
       </div>
     </div>

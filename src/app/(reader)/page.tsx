@@ -205,7 +205,7 @@ export default async function CatalogPage({
             href={tagClearHref()}
             className="inline-flex items-center gap-1.5 rounded-full border border-[var(--reader-border)] bg-[var(--reader-surface)] px-3 py-1 text-xs text-[var(--reader-muted)] hover:border-[var(--reader-terracotta)] hover:text-[var(--reader-terracotta)]"
           >
-            Filter Tag: #{tag}
+            Filter Tag: {tag.split(',').map((t) => `#${t.trim()}`).join(' ')}
             <X className="h-3 w-3" />
           </Link>
         </div>
