@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Source_Serif_4 } from 'next/font/google';
 
 import { ReaderAuthNav } from '@/components/reader/reader-auth-nav';
+import { RealtimeProvider } from '@/components/reader/realtime-provider';
 import { SearchBar } from '@/components/reader/search-bar';
 import { getPlatformSlug } from '@/lib/platform';
 import { getPlatformConfig } from '@/lib/public-api';
@@ -37,7 +38,8 @@ export default async function ReaderLayout({ children }: { children: ReactNode }
   const c = config.colors;
 
   return (
-    <div className={`bookpedia-reader ${sourceSerif.variable} flex min-h-screen flex-col`}>
+    <RealtimeProvider>
+      <div className={`bookpedia-reader ${sourceSerif.variable} flex min-h-screen flex-col`}>
       <style>{`
         .bookpedia-reader {
           --reader-bg: ${c.bg};
@@ -80,6 +82,7 @@ export default async function ReaderLayout({ children }: { children: ReactNode }
       <footer className="border-t border-[var(--reader-border)] px-4 py-6 text-center text-xs text-[var(--reader-muted)] sm:px-6">
         {config.nama} — Baca &amp; tulis cerita, oleh Bagdja.
       </footer>
-    </div>
+      </div>
+    </RealtimeProvider>
   );
 }

@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { apiClient } from '@/lib/api-client';
 import { useAuth } from '@/hooks/use-auth';
 import { useScrollDirection } from '@/hooks/use-scroll-direction';
-import { CommentSheetMock } from './comment-sheet-mock';
+import { CommentSheet } from './comment-sheet';
 
 interface ToggleLikeResponse {
   liked: boolean;
@@ -16,6 +16,9 @@ interface ToggleLikeResponse {
 
 interface ChapterEngagementBarProps {
   chapterId: string;
+  platformSlug: string;
+  bookSlug: string;
+  orderIndex: number;
   initialLikeCount: number;
   enableLike: boolean;
   enableComment: boolean;
@@ -34,6 +37,9 @@ interface ChapterEngagementBarProps {
  */
 export function ChapterEngagementBar({
   chapterId,
+  platformSlug,
+  bookSlug,
+  orderIndex,
   initialLikeCount,
   enableLike,
   enableComment,
@@ -158,7 +164,7 @@ export function ChapterEngagementBar({
         </div>
       </div>
 
-      {enableComment && <CommentSheetMock open={commentOpen} onClose={() => setCommentOpen(false)} />}
+      {enableComment && <CommentSheet chapterId={chapterId} platformSlug={platformSlug} bookSlug={bookSlug} orderIndex={orderIndex} open={commentOpen} onClose={() => setCommentOpen(false)} />}
     </>
   );
 }

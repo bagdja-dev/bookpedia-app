@@ -9,7 +9,6 @@ import { Badge } from '@/components/ui/badge';
 import { BOOK_STATUS_LABEL, BOOK_STATUS_VARIANT } from '@/lib/status';
 import { BOOK_TYPE_BADGE_LABEL, formatBookByline, formatBookBylinePrefix } from '@/lib/book-byline';
 import { buildSimilarBooksHref } from '@/lib/book-filter-href';
-import { getMockCommentCount } from '@/lib/mock-comment-count';
 import { getPlatformSlug } from '@/lib/platform';
 import { getPlatformConfig, publicFetch } from '@/lib/public-api';
 import { resolveOriginFromHeaders } from '@/lib/resolve-origin';
@@ -98,8 +97,8 @@ export default async function BookDetailPage({ params }: BookPageProps) {
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: bookJsonLd }} />
-      <div className="flex flex-col gap-6 sm:flex-row">
-        <div className="w-40 shrink-0 overflow-hidden rounded-lg border border-[var(--reader-border)] bg-[var(--reader-surface)] shadow-sm sm:w-56">
+      <div className="flex flex-col items-start gap-6 sm:flex-row">
+        <div className="w-40 shrink-0 self-start overflow-hidden rounded-lg border border-[var(--reader-border)] bg-[var(--reader-surface)] shadow-sm sm:w-56">
           <div className="aspect-[3/4] w-full bg-[var(--reader-bg)]">
             {book.coverUrl ? (
               // eslint-disable-next-line @next/next/no-img-element -- cover dari URL bebas milik penulis
@@ -169,7 +168,7 @@ export default async function BookDetailPage({ params }: BookPageProps) {
             {config.enableComment && (
               <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">
                 <MessageCircle className="h-3.5 w-3.5" />
-                {getMockCommentCount(book.id).toLocaleString('id-ID')}
+                {(book.commentCount ?? 0).toLocaleString('id-ID')}
               </span>
             )}
           </div>

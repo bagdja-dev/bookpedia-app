@@ -83,6 +83,9 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
       <ChapterViewTracker platformSlug={platformSlug} bookSlug={slug} orderIndex={chapter.orderIndex} />
       <ChapterEngagementBar
         chapterId={chapter.id}
+        platformSlug={platformSlug}
+        bookSlug={slug}
+        orderIndex={chapter.orderIndex}
         initialLikeCount={chapter.likeCount ?? 0}
         enableLike={config.enableLike}
         enableComment={config.enableComment}

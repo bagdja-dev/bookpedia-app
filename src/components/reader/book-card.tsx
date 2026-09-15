@@ -5,7 +5,6 @@ import { BOOK_STATUS_LABEL } from '@/lib/status';
 import { BOOK_TYPE_BADGE_LABEL, formatBookByline } from '@/lib/book-byline';
 import { buildSimilarBooksHref } from '@/lib/book-filter-href';
 import { formatCompactCount } from '@/lib/format';
-import { getMockCommentCount } from '@/lib/mock-comment-count';
 import { StarRatingDisplay } from '@/components/reader/star-rating-display';
 import type { BookCatalogDto } from '@/lib/public-types';
 
@@ -39,7 +38,7 @@ export function BookCard({
   showRating?: boolean;
   /** Fase 8 (susulan) — ikut `platform.enableLike`, sembunyikan statistik Like kalau Platform mematikannya. */
   showLike?: boolean;
-  /** Fase 8 (susulan) — ikut `platform.enableComment`. Angka-nya MOCK (lihat `getMockCommentCount`), bukan dari backend. */
+  /** Fase 8 (susulan) — ikut `platform.enableComment`. */
   showComment?: boolean;
 }) {
   const similarHref = buildSimilarBooksHref(book);
@@ -83,7 +82,7 @@ export function BookCard({
             {showComment && (
               <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">
                 <MessageCircle className="h-3 w-3" />
-                {formatCompactCount(getMockCommentCount(book.id))}
+                {formatCompactCount(book.commentCount ?? 0)}
               </span>
             )}
             {showRating && book.ratingCount > 0 && (
