@@ -262,6 +262,7 @@ export function CommentSheet({ open, onClose, chapterId, platformSlug, bookSlug,
               key={comment.id}
               comment={comment}
               userId={user?.userId}
+              isLoggedIn={isLoggedIn}
               replies={replies[comment.id] ?? []}
               expanded={!!expanded[comment.id]}
               loadingReplies={loadingReplies === comment.id}
@@ -277,10 +278,22 @@ export function CommentSheet({ open, onClose, chapterId, platformSlug, bookSlug,
             />
           ))}
         </div>
-        <form onSubmit={submit} className="flex shrink-0 items-center gap-2 border-t border-[var(--reader-border)] p-4">
-          <input value={body} onChange={(event) => setBody(event.target.value)} disabled={submitting} placeholder={isLoggedIn ? 'Tulis komentar...' : 'Login untuk berkomentar'} className="min-w-0 flex-1 rounded-full border border-[var(--reader-border)] bg-transparent px-4 py-2 text-sm text-[var(--reader-foreground)] outline-none focus:border-[var(--reader-terracotta)] disabled:opacity-60" />
-          <button type="submit" disabled={submitting || !body.trim()} aria-label="Kirim komentar" className="rounded-full bg-[var(--reader-terracotta)] p-2 text-[var(--reader-terracotta-foreground)] disabled:opacity-50"><Send className="h-4 w-4" /></button>
-        </form>
+        {isLoggedIn ? (
+          <form onSubmit={submit} className="flex shrink-0 items-center gap-2 border-t border-[var(--reader-border)] p-4">
+            <input value={body} onChange={(event) => setBody(event.target.value)} disabled={submitting} placeholder="Tulis komentar..." className="min-w-0 flex-1 rounded-full border border-[var(--reader-border)] bg-transparent px-4 py-2 text-sm text-[var(--reader-foreground)] outline-none focus:border-[var(--reader-terracotta)] disabled:opacity-60" />
+            <button type="submit" disabled={submitting || !body.trim()} aria-label="Kirim komentar" className="rounded-full bg-[var(--reader-terracotta)] p-2 text-[var(--reader-terracotta-foreground)] disabled:opacity-50"><Send className="h-4 w-4" /></button>
+          </form>
+        ) : (
+          <div className="flex shrink-0 justify-center border-t border-[var(--reader-border)] p-4">
+            <button
+              type="button"
+              onClick={() => { window.location.href = `/auth/login?next=${encodeURIComponent(window.location.pathname)}`; }}
+              className="text-sm font-medium text-[var(--reader-terracotta)] hover:underline"
+            >
+              Login untuk berkomentar
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -289,6 +302,7 @@ export function CommentSheet({ open, onClose, chapterId, platformSlug, bookSlug,
 interface CommentNodeProps {
   comment: CommentMessage;
   userId?: string;
+  isLoggedIn: boolean;
   replies: CommentMessage[];
   expanded: boolean;
   loadingReplies: boolean;
@@ -314,6 +328,7 @@ interface CommentNodeProps {
 function CommentNode({
   comment,
   userId,
+  isLoggedIn,
   replies,
   expanded,
   loadingReplies,
@@ -334,13 +349,15 @@ function CommentNode({
       <p className="text-sm font-medium text-[var(--reader-foreground)]">{commentLabel(comment, userId)}</p>
       <p className="text-sm text-[var(--reader-muted)]">{comment.body}</p>
       <div className="mt-1 flex items-center gap-3 text-xs font-medium">
-        <button
-          type="button"
-          onClick={() => (isReplyTarget ? onCancelReply() : onStartReply(comment))}
-          className={isReplyTarget ? 'text-[var(--reader-terracotta)]' : 'text-[var(--reader-muted)] hover:text-[var(--reader-terracotta)]'}
-        >
-          Balas
-        </button>
+        {isLoggedIn && (
+          <button
+            type="button"
+            onClick={() => (isReplyTarget ? onCancelReply() : onStartReply(comment))}
+            className={isReplyTarget ? 'text-[var(--reader-terracotta)]' : 'text-[var(--reader-muted)] hover:text-[var(--reader-terracotta)]'}
+          >
+            Balas
+          </button>
+        )}
         {comment.senderUserId === userId && comment.body !== '[Pesan dihapus]' && (
           <button type="button" onClick={() => onDelete(comment)} className="text-[var(--reader-muted)] hover:text-red-600">
             Hapus
@@ -385,6 +402,7 @@ function CommentNode({
               key={reply.id}
               comment={reply}
               userId={userId}
+              isLoggedIn={isLoggedIn}
               replies={[]}
               expanded={false}
               loadingReplies={false}
