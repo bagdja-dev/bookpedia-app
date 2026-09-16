@@ -56,12 +56,36 @@ function InboxPageInner() {
     void loadConversations();
   }, [authLoading, isLoggedIn, router, loadConversations]);
 
+  // Fase 3.5 (Status Baca) — tandai percakapan sudah dibaca sampai sekarang.
+  // Optimistic: nolkan badge lokal DULU (biar hilang seketika di UI), baru
+  // panggil API di belakang layar; gagal pun tidak perlu di-rollback (paling
+  // parah badge nongol lagi pas refetch `GET /inbox` berikutnya).
+  const markConversationRead = useCallback(async (topicId: string) => {
+    setConversations((current) =>
+      current?.map((c) => (c.topicId === topicId ? { ...c, unreadCount: 0 } : c)) ?? current,
+    );
+    try {
+      await apiClient(`/inbox/${encodeURIComponent(topicId)}/read`, { method: 'POST' });
+    } catch (error) {
+      console.error('[InboxPage] gagal menandai percakapan sudah dibaca:', error);
+    }
+  }, []);
+
+  const selectConversation = useCallback(
+    (topicId: string) => {
+      setSelectedTopicId(topicId);
+      void markConversationRead(topicId);
+    },
+    [markConversationRead],
+  );
+
   // Deep-link dari luar (comment/card Author "Kirim Pesan") — dibaca sekali
   // saat halaman dibuka, TIDAK dipaksa terus mengikuti perubahan URL supaya
   // klik kontak lain di list tidak "ditarik balik" oleh query param lama.
   useEffect(() => {
     const topic = searchParams.get('topic');
-    if (topic) setSelectedTopicId(topic);
+    if (topic) selectConversation(topic);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
   const loadMessages = useCallback(async (topicId: string, silent = false) => {
@@ -80,20 +104,38 @@ function InboxPageInner() {
   }, []);
 
   // Realtime — event `bagdja.chat.message.created` disiarkan buat SEMUA
-  // type Topic (comment/public/private, sama persis pola CommentSheet),
-  // jadi cukup filter di sini pakai `topicId` yang sedang dibuka. Sengaja
-  // REFETCH penuh (bukan append kayak CommentSheet) — thread DM jauh lebih
-  // pendek dari comment chapter, jadi tidak perlu endpoint "ambil 1 pesan"
-  // terpisah; `silent: true` biar tidak ada kedip loading spinner nimpa
-  // pesan yang sudah tampil.
+  // type Topic (comment/public/private, sama persis pola CommentSheet), jadi
+  // cukup filter di sini pakai `topicId`. Topic yang SEDANG dibuka: REFETCH
+  // penuh (bukan append kayak CommentSheet — thread DM jauh lebih pendek dari
+  // comment chapter, jadi tidak perlu endpoint "ambil 1 pesan" terpisah;
+  // `silent: true` biar tidak ada kedip loading spinner) + langsung mark-read
+  // (sedang dibuka). Topic LAIN — badge `unreadCount`-nya harus tetap update
+  // walau percakapannya tidak sedang dibuka/tidak ada yang dipilih sama
+  // sekali (makanya effect ini TIDAK digerbang `if (!selectedTopicId)` lagi):
+  // increment lokal kalau sudah ada di daftar (instan, tanpa round-trip),
+  // atau refetch `GET /inbox` kalau ini percakapan baru yang belum pernah
+  // muncul di state (mis. reader baru pertama kali klik "Kirim Pesan").
   useEffect(() => {
-    if (!selectedTopicId) return;
     return subscribe('bagdja.chat.message.created', (data) => {
-      if (data.topicId === selectedTopicId) {
+      const topicId = data.topicId as string | undefined;
+      if (!topicId) return;
+
+      if (topicId === selectedTopicId) {
         void loadMessages(selectedTopicId, true);
+        void markConversationRead(selectedTopicId);
+        return;
       }
+
+      setConversations((current) => {
+        if (!current) return current;
+        if (!current.some((c) => c.topicId === topicId)) {
+          void loadConversations();
+          return current;
+        }
+        return current.map((c) => (c.topicId === topicId ? { ...c, unreadCount: c.unreadCount + 1 } : c));
+      });
     });
-  }, [selectedTopicId, subscribe, loadMessages]);
+  }, [selectedTopicId, subscribe, loadMessages, markConversationRead, loadConversations]);
 
   useEffect(() => {
     if (selectedTopicId) void loadMessages(selectedTopicId);
@@ -157,7 +199,7 @@ function InboxPageInner() {
                 <li key={conversation.topicId}>
                   <button
                     type="button"
-                    onClick={() => setSelectedTopicId(conversation.topicId)}
+                    onClick={() => selectConversation(conversation.topicId)}
                     className={cn(
                       'flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-[var(--reader-bg)]',
                       selectedTopicId === conversation.topicId && 'bg-[var(--reader-bg)]',
@@ -182,6 +224,11 @@ function InboxPageInner() {
                         <p className="text-xs text-[var(--reader-muted)]">Library</p>
                       )}
                     </div>
+                    {conversation.unreadCount > 0 && (
+                      <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-[var(--reader-terracotta)] px-1.5 text-[11px] font-semibold text-[var(--reader-terracotta-foreground)]">
+                        {conversation.unreadCount > 99 ? '99+' : conversation.unreadCount}
+                      </span>
+                    )}
                   </button>
                 </li>
               ))}

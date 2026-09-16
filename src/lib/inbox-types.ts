@@ -15,6 +15,8 @@ export interface ConversationSummaryDto {
   /** Avatar Library (fresh) kalau contextType=library; null buat peer (belum ada sumber avatar user lain). */
   contactAvatarUrl: string | null;
   librarySlug: string | null;
+  /** Fase 3.5 (Status Baca) — jumlah pesan belum dibaca (bukan milik user login sendiri). */
+  unreadCount: number;
   createdAt: string;
 }
 
@@ -22,6 +24,7 @@ export interface LibraryConversationSummaryDto {
   topicId: string;
   readerUserId: string;
   readerDisplayName: string;
+  unreadCount: number;
   createdAt: string;
 }
 

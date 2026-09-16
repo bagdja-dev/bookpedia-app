@@ -4,6 +4,7 @@ import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { Loader2, MessageCircle, Send } from 'lucide-react';
 
 import { LoadingSpinner } from '@/components/loading-spinner';
+import { useRealtime } from '@/components/reader/realtime-provider';
 import { apiClient, ApiError } from '@/lib/api-client';
 import { useAuth } from '@/hooks/use-auth';
 import { cn } from '@/lib/utils';
@@ -33,6 +34,7 @@ function EmptyState() {
  */
 export default function DashboardInboxPage() {
   const { user } = useAuth();
+  const { subscribe } = useRealtime();
   const [conversations, setConversations] = useState<LibraryConversationSummaryDto[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
@@ -55,22 +57,70 @@ export default function DashboardInboxPage() {
     void loadConversations();
   }, [loadConversations]);
 
-  const loadMessages = useCallback(async (topicId: string) => {
-    setLoadingMessages(true);
+  const loadMessages = useCallback(async (topicId: string, silent = false) => {
+    if (!silent) setLoadingMessages(true);
     try {
       const data = await apiClient<ChatMessageListResponse>(`/inbox/${encodeURIComponent(topicId)}/messages?limit=50`);
       setMessages(data.items.slice().reverse());
     } catch (err) {
       console.error('[DashboardInboxPage] gagal memuat pesan:', err);
-      setMessages([]);
+      if (!silent) setMessages([]);
     } finally {
-      setLoadingMessages(false);
+      if (!silent) setLoadingMessages(false);
     }
   }, []);
 
   useEffect(() => {
     if (selectedTopicId) void loadMessages(selectedTopicId);
   }, [selectedTopicId, loadMessages]);
+
+  // Fase 3.5 (Status Baca) — sama persis pola reader app `/inbox`: nolkan
+  // badge lokal dulu (optimistic), baru panggil endpoint Studio di belakang.
+  const markConversationRead = useCallback(async (topicId: string) => {
+    setConversations((current) =>
+      current?.map((c) => (c.topicId === topicId ? { ...c, unreadCount: 0 } : c)) ?? current,
+    );
+    try {
+      await apiClient(`/library/inbox/${encodeURIComponent(topicId)}/read`, { method: 'POST' });
+    } catch (err) {
+      console.error('[DashboardInboxPage] gagal menandai percakapan sudah dibaca:', err);
+    }
+  }, []);
+
+  const selectConversation = useCallback(
+    (topicId: string) => {
+      setSelectedTopicId(topicId);
+      void markConversationRead(topicId);
+    },
+    [markConversationRead],
+  );
+
+  // Realtime — sama pola reader app `/inbox`: topic yang SEDANG dibuka
+  // di-refetch silent + langsung mark-read. Topic lain: increment badge
+  // `unreadCount` lokal SEKETIKA kalau percakapannya sudah ada di daftar
+  // (tanpa nunggu round-trip network), atau refetch `GET /library/inbox`
+  // kalau ini percakapan baru yang belum pernah muncul di state.
+  useEffect(() => {
+    return subscribe('bagdja.chat.message.created', (data) => {
+      const topicId = data.topicId as string | undefined;
+      if (!topicId) return;
+
+      if (topicId === selectedTopicId) {
+        void loadMessages(selectedTopicId, true);
+        void markConversationRead(selectedTopicId);
+        return;
+      }
+
+      setConversations((current) => {
+        if (!current) return current;
+        if (!current.some((c) => c.topicId === topicId)) {
+          void loadConversations();
+          return current;
+        }
+        return current.map((c) => (c.topicId === topicId ? { ...c, unreadCount: c.unreadCount + 1 } : c));
+      });
+    });
+  }, [selectedTopicId, subscribe, loadMessages, markConversationRead, loadConversations]);
 
   async function sendMessage(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -120,7 +170,7 @@ export default function DashboardInboxPage() {
                 <li key={conversation.topicId}>
                   <button
                     type="button"
-                    onClick={() => setSelectedTopicId(conversation.topicId)}
+                    onClick={() => selectConversation(conversation.topicId)}
                     className={cn(
                       'flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-muted',
                       selectedTopicId === conversation.topicId && 'bg-muted',
@@ -130,6 +180,11 @@ export default function DashboardInboxPage() {
                       {conversation.readerDisplayName.charAt(0).toUpperCase()}
                     </div>
                     <p className="min-w-0 flex-1 truncate text-sm font-medium">{conversation.readerDisplayName}</p>
+                    {conversation.unreadCount > 0 && (
+                      <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-primary px-1.5 text-[11px] font-semibold text-primary-foreground">
+                        {conversation.unreadCount > 99 ? '99+' : conversation.unreadCount}
+                      </span>
+                    )}
                   </button>
                 </li>
               ))}

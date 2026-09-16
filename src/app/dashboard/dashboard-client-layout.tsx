@@ -4,6 +4,7 @@ import { useEffect, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { LoadingSpinner } from '@/components/loading-spinner';
+import { RealtimeProvider } from '@/components/reader/realtime-provider';
 import { Button } from '@/components/ui/button';
 import { Sidebar } from '@/components/sidebar';
 import { Topbar } from '@/components/topbar';
@@ -96,12 +97,19 @@ function DashboardTopbar({ title, icon }: { title: string; icon: string | null }
   return <Topbar library={library} title={title} icon={icon} />;
 }
 
+// `RealtimeProvider` sebelumnya cuma dipasang di `(reader)/layout.tsx` — Studio
+// (`/dashboard/inbox`) jadi tidak punya akses `useRealtime()`, jadi pesan baru
+// baru muncul setelah pindah percakapan/refresh manual. Providernya generik
+// (endpoint `ws-token` publik, tidak spesifik reader) meski lokasi filenya
+// masih di `components/reader/` — cukup dipasang di sini juga.
 export function DashboardClientLayout({ children }: { children: ReactNode }) {
   return (
-    <AuthGuard>
-      <LibraryGuard>
-        <DashboardShell>{children}</DashboardShell>
-      </LibraryGuard>
-    </AuthGuard>
+    <RealtimeProvider>
+      <AuthGuard>
+        <LibraryGuard>
+          <DashboardShell>{children}</DashboardShell>
+        </LibraryGuard>
+      </AuthGuard>
+    </RealtimeProvider>
   );
 }
