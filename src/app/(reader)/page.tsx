@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { X } from 'lucide-react';
 
-import { BookCard } from '@/components/reader/book-card';
+import { BookMasonryGrid } from '@/components/reader/book-masonry-grid';
 import { getPlatformSlug } from '@/lib/platform';
 import { getPlatformConfig, publicFetch } from '@/lib/public-api';
 import { buildSocialMetadata } from '@/lib/seo';
@@ -277,18 +277,13 @@ export default async function CatalogPage({
           Belum ada cerita yang cocok{search || genre || category ? ' dengan pencarian/filter ini' : ''}.
         </p>
       ) : (
-        <div className="grid items-start gap-4 grid-cols-[repeat(auto-fit,minmax(140px,1fr))]">
-          {items.map((book) => (
-            <BookCard
-              key={book.id}
-              book={book}
-              showStatus={config.showBookStatus}
-              showRating={config.enableRating}
-              showLike={config.enableLike}
-              showComment={config.enableComment}
-            />
-          ))}
-        </div>
+        <BookMasonryGrid
+          books={items}
+          showStatus={config.showBookStatus}
+          showRating={config.enableRating}
+          showLike={config.enableLike}
+          showComment={config.enableComment}
+        />
       )}
 
       {totalPages > 1 && (

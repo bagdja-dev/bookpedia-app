@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { BookOpen, History } from 'lucide-react';
 
-import { BookCard } from '@/components/reader/book-card';
+import { BookMasonryGrid } from '@/components/reader/book-masonry-grid';
 import { SafeImage } from '@/components/safe-image';
 import { StartMessageButton } from '@/components/reader/start-message-button';
 import { getPlatformSlug } from '@/lib/platform';
@@ -98,18 +98,13 @@ export default async function UserProfilePage({ params, searchParams }: UserProf
             Belum ada buku yang pernah dibuka.
           </p>
         ) : (
-          <div className="grid items-start gap-4 grid-cols-[repeat(auto-fit,minmax(140px,1fr))]">
-            {stats.readingList.map((book) => (
-              <BookCard
-                key={book.id}
-                book={book}
-                showStatus={config.showBookStatus}
-                showRating={config.enableRating}
-                showLike={config.enableLike}
-                showComment={config.enableComment}
-              />
-            ))}
-          </div>
+          <BookMasonryGrid
+            books={stats.readingList}
+            showStatus={config.showBookStatus}
+            showRating={config.enableRating}
+            showLike={config.enableLike}
+            showComment={config.enableComment}
+          />
         )}
       </div>
     </div>
