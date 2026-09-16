@@ -76,10 +76,11 @@ export interface PlatformColors {
  * titik keputusan renderer per-Platform (overview.md §9.2) sudah ada tanpa
  * re-arsitektur nanti.
  */
-/** SEO Fase 2 — kontrak `GET /public/platforms/:slug/sitemap-entries`, dipakai `src/app/sitemap.ts`. */
+/** SEO Fase 2 — kontrak `GET /public/platforms/:slug/sitemap-entries`, dipakai `src/app/sitemap.ts`. Chapter individual disertakan sejak revisi 17 Sep 2026 (seo-plan.md §6.2 dibuka ulang). */
 export interface SitemapEntriesDto {
   books: { slug: string; updatedAt: string }[];
   libraries: { slug: string; updatedAt: string }[];
+  chapters: { bookSlug: string; orderIndex: number; updatedAt: string }[];
 }
 
 export interface PlatformProfileDto {
