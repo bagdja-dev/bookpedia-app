@@ -169,6 +169,10 @@ export interface BookChapterSummary {
   /** Fase 7 — rating Chapter ini (0 kalau belum ada rating). Cuma relevan/ditampilkan kalau platform.ratingMode="chapter". */
   ratingAverage: number;
   ratingCount: number;
+  /** Susulan 17 Sep 2026 — total dibaca Chapter ini. */
+  viewCount: number;
+  /** Susulan 17 Sep 2026 — jumlah komentar Chapter ini (termasuk balasan). */
+  commentCount: number;
 }
 
 export interface BookDetailDto {

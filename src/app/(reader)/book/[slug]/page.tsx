@@ -279,12 +279,22 @@ export default async function BookDetailPage({ params }: BookPageProps) {
               <li key={chapter.id}>
                 <Link
                   href={`/book/${book.slug}/chapter/${chapter.orderIndex}`}
-                  className="flex items-center justify-between gap-4 px-4 py-3 text-sm transition-colors hover:bg-[var(--reader-bg)]"
+                  className="flex flex-col gap-2 px-4 py-3 text-sm transition-colors hover:bg-[var(--reader-bg)] sm:flex-row sm:items-center sm:justify-between sm:gap-4"
                 >
-                  <span className="truncate text-[var(--reader-foreground)]">
+                  <span className="truncate text-[var(--reader-foreground)] sm:min-w-0 sm:flex-1">
                     {chapter.orderIndex}. {chapter.judul}
                   </span>
-                  <span className="flex shrink-0 items-center gap-2">
+                  <span className="flex flex-wrap items-center gap-2 sm:shrink-0">
+                    <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">
+                      <Eye className="h-3.5 w-3.5" />
+                      {(chapter.viewCount ?? 0).toLocaleString('id-ID')}
+                    </span>
+                    {config.enableComment && (
+                      <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">
+                        <MessageCircle className="h-3.5 w-3.5" />
+                        {(chapter.commentCount ?? 0).toLocaleString('id-ID')}
+                      </span>
+                    )}
                     {config.enableRating && config.ratingMode === 'chapter' && chapter.ratingCount > 0 && (
                       <StarRatingDisplay average={chapter.ratingAverage} count={chapter.ratingCount} />
                     )}
