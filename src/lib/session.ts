@@ -25,6 +25,8 @@ export interface SessionUser {
   userId: string;
   email?: string;
   username?: string;
+  /** Avatar URL — klaim `picture` di JWT `/oauth/token` (bagdja-auth), hanya terisi untuk user Google OAuth. Pola sama `bagdja-website/lib/session.ts`. */
+  avatar?: string;
 }
 
 /**

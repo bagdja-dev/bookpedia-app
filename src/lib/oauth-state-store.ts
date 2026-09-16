@@ -56,7 +56,7 @@ export interface StudioOAuthStatePayload {
  */
 export interface SessionHandoffPayload {
   accessToken: string;
-  user: { userId: string; email?: string; username?: string };
+  user: { userId: string; email?: string; username?: string; avatar?: string };
   redirectTo: string;
 }
 

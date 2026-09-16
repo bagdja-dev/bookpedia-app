@@ -1,10 +1,12 @@
 'use client';
 
 import { FormEvent, useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import { ChevronDown, ChevronUp, Loader2, Send, X } from 'lucide-react';
 
 import { apiClient } from '@/lib/api-client';
 import { useAuth } from '@/hooks/use-auth';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useRealtime } from './realtime-provider';
 
 interface CommentSheetProps {
@@ -20,11 +22,22 @@ interface CommentMessage {
   id: string;
   senderUserId: string;
   senderDisplayName: string | null;
+  /** Susulan Inbox/DM, 16 Sep 2026 — snapshot avatar pengirim, bisa null (user non-Google atau baris lama). */
+  senderAvatarUrl: string | null;
   body: string;
   parentMessageId: string | null;
   threadRootMessageId: string;
   replyCount: number;
   createdAt: string;
+}
+
+/** `/u/[userId]` butuh nama/avatar dibawa dari konteks klik (bookpedia-api sengaja tanpa tabel users lokal, lihat bookpedia/overview.md §15.3). */
+function profileHref(comment: CommentMessage): string {
+  const params = new URLSearchParams();
+  if (comment.senderDisplayName) params.set('name', comment.senderDisplayName);
+  if (comment.senderAvatarUrl) params.set('avatar', comment.senderAvatarUrl);
+  const query = params.toString();
+  return `/u/${encodeURIComponent(comment.senderUserId)}${query ? `?${query}` : ''}`;
 }
 
 interface CommentListResponse {
@@ -346,7 +359,15 @@ function CommentNode({
 
   return (
     <div className="py-1.5">
-      <p className="text-sm font-medium text-[var(--reader-foreground)]">{commentLabel(comment, userId)}</p>
+      <Link href={profileHref(comment)} className="flex w-fit min-w-0 items-center gap-1.5">
+        <Avatar className="h-5 w-5 shrink-0">
+          {comment.senderAvatarUrl && <AvatarImage src={comment.senderAvatarUrl} alt="" />}
+          <AvatarFallback className="bg-[var(--reader-bg)] text-[10px] font-semibold text-[var(--reader-muted)]">
+            {(comment.senderDisplayName || comment.senderUserId).charAt(0).toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
+        <span className="truncate text-sm font-medium text-[var(--reader-foreground)]">{commentLabel(comment, userId)}</span>
+      </Link>
       <p className="text-sm text-[var(--reader-muted)]">{comment.body}</p>
       <div className="mt-1 flex items-center gap-3 text-xs font-medium">
         {isLoggedIn && (

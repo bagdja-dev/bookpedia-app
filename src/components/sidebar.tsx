@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BookOpen, Library, Settings } from 'lucide-react';
+import { BookOpen, Library, MessageCircle, Settings } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 
 const NAV_ITEMS = [
   { href: '/dashboard/books', label: 'Book & Chapter', icon: Library },
+  { href: '/dashboard/inbox', label: 'Inbox', icon: MessageCircle },
 ];
 
 const SETTINGS_ITEM = { href: '/dashboard/settings', label: 'Pengaturan', icon: Settings };

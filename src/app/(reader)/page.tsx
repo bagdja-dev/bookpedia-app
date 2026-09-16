@@ -277,7 +277,7 @@ export default async function CatalogPage({
           Belum ada cerita yang cocok{search || genre || category ? ' dengan pencarian/filter ini' : ''}.
         </p>
       ) : (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+        <div className="grid items-start gap-4 grid-cols-[repeat(auto-fit,minmax(140px,1fr))]">
           {items.map((book) => (
             <BookCard
               key={book.id}

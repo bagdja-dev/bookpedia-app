@@ -6,6 +6,7 @@ interface AuthUser {
   userId: string;
   email?: string;
   username?: string;
+  avatar?: string;
 }
 
 function getCookie(name: string): string | null {

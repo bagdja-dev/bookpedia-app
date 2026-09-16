@@ -66,6 +66,9 @@ export async function GET(request: NextRequest) {
       userId: payload.sub ?? payload.userId,
       email: payload.email,
       username: payload.username,
+      // Klaim `picture` (bagdja-auth) cuma terisi untuk user Google OAuth —
+      // pola sama `bagdja-website/app/auth/callback/route.ts`.
+      avatar: payload.picture ?? payload.avatar,
     };
 
     const nextPath = decoded.next;

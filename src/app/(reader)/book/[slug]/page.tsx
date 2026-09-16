@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { BookOpen, Eye, Heart, ListFilter, MessageCircle, User } from 'lucide-react';
 import { ContinueReadingButton } from '@/components/reader/continue-reading-button';
 import { BookRatingWidget } from '@/components/reader/book-rating-widget';
+import { SendMessageToLibraryButton } from '@/components/reader/send-message-to-library-button';
 import { StarRatingDisplay } from '@/components/reader/star-rating-display';
 import { Badge } from '@/components/ui/badge';
 import { BOOK_STATUS_LABEL, BOOK_STATUS_VARIANT } from '@/lib/status';
@@ -171,6 +172,7 @@ export default async function BookDetailPage({ params }: BookPageProps) {
                 </span>
               </div>
             </div>
+            <SendMessageToLibraryButton libraryId={book.library.id} />
           </div>
 
           <div className="flex flex-wrap items-center gap-2">

@@ -186,6 +186,8 @@ export interface BookDetailDto {
   /** Nama penulis asli — relevan kalau `bookType` bukan 'original'. */
   originalAuthor: string | null;
   library: {
+    /** Susulan Inbox/DM, 16 Sep 2026 — dipakai tombol "Kirim Pesan ke Penulis" (POST /messages/direct/libraries/:libraryId). */
+    id: string;
     nama: string;
     slug: string;
     coverUrl: string | null;
@@ -204,6 +206,19 @@ export interface BookDetailDto {
   likeCount: number;
   /** Jumlah komentar sungguhan pada semua Chapter published Book ini. */
   commentCount: number;
+}
+
+/**
+ * Susulan Inbox/DM & halaman Profile User, 16 Sep 2026 — `GET
+ * public/platforms/:slug/users/:userId`. Murni display statistik, TANPA
+ * nama/avatar (bookpedia-api sengaja tidak punya tabel `users` lokal —
+ * nama/avatar dibawa dari konteks klik di frontend, lihat overview.md §15.3)
+ * dan TANPA Followers (tidak ada konsepnya di Bookpedia sama sekali).
+ */
+export interface UserProfileStatsDto {
+  worksCount: number;
+  librarySlug: string | null;
+  readingList: BookCatalogDto[];
 }
 
 export interface ChapterReadDto {
