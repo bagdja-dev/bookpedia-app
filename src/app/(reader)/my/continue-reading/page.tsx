@@ -6,6 +6,7 @@ import Link from 'next/link';
 
 import { apiClient } from '@/lib/api-client';
 import { useAuth } from '@/hooks/use-auth';
+import { SafeImage } from '@/components/safe-image';
 import type { ReadingProgressListItemDto } from '@/lib/reader-types';
 
 /**
@@ -72,13 +73,14 @@ export default function ContinueReadingPage() {
               href={`/book/${item.bookSlug}/chapter/${item.lastChapterOrderIndex}`}
               className="group flex flex-col overflow-hidden rounded-lg border border-[var(--reader-border)] bg-[var(--reader-surface)] transition-shadow hover:shadow-md"
             >
-              <div className="aspect-[3/4] w-full overflow-hidden bg-[var(--reader-bg)]">
+              <div className="relative aspect-[3/4] w-full overflow-hidden bg-[var(--reader-bg)]">
                 {item.bookCoverUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element -- cover dari URL bebas milik penulis
-                  <img
+                  <SafeImage
                     src={item.bookCoverUrl}
                     alt={item.bookJudul}
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    fill
+                    sizes="(min-width: 1024px) 200px, (min-width: 640px) 33vw, 50vw"
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                 ) : (
                   <div

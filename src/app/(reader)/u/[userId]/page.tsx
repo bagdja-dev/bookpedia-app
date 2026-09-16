@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { BookOpen, History } from 'lucide-react';
 
 import { BookCard } from '@/components/reader/book-card';
+import { SafeImage } from '@/components/safe-image';
 import { StartMessageButton } from '@/components/reader/start-message-button';
 import { getPlatformSlug } from '@/lib/platform';
 import { getPlatformConfig, publicFetch } from '@/lib/public-api';
@@ -47,8 +48,7 @@ export default async function UserProfilePage({ params, searchParams }: UserProf
       <div className="flex items-start gap-4">
         <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[var(--reader-border)] bg-[var(--reader-bg)]">
           {avatar ? (
-            // eslint-disable-next-line @next/next/no-img-element -- avatar dari bagdja-auth (Google), domain bebas
-            <img src={avatar} alt={displayName} className="h-full w-full object-cover" />
+            <SafeImage src={avatar} alt={displayName} width={80} height={80} priority className="h-full w-full object-cover" />
           ) : (
             <span className="text-2xl font-semibold text-[var(--reader-muted)]" style={{ fontFamily: 'var(--font-source-serif)' }}>
               {initial}

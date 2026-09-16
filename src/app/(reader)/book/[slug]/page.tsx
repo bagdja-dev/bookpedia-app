@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { BookOpen, Eye, Heart, ListFilter, MessageCircle, User } from 'lucide-react';
 import { ContinueReadingButton } from '@/components/reader/continue-reading-button';
 import { BookRatingWidget } from '@/components/reader/book-rating-widget';
+import { SafeImage } from '@/components/safe-image';
 import { SendMessageToLibraryButton } from '@/components/reader/send-message-to-library-button';
 import { StarRatingDisplay } from '@/components/reader/star-rating-display';
 import { Badge } from '@/components/ui/badge';
@@ -100,10 +101,16 @@ export default async function BookDetailPage({ params }: BookPageProps) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: bookJsonLd }} />
       <div className="flex flex-col items-start gap-6 sm:flex-row">
         <div className="w-40 shrink-0 self-start overflow-hidden rounded-lg border border-[var(--reader-border)] bg-[var(--reader-surface)] shadow-sm sm:w-56">
-          <div className="aspect-[3/4] w-full bg-[var(--reader-bg)]">
+          <div className="relative aspect-[3/4] w-full bg-[var(--reader-bg)]">
             {book.coverUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element -- cover dari URL bebas milik penulis
-              <img src={book.coverUrl} alt={book.judul} className="h-full w-full object-cover" />
+              <SafeImage
+                src={book.coverUrl}
+                alt={book.judul}
+                fill
+                priority
+                sizes="(min-width: 640px) 224px, 160px"
+                className="object-cover"
+              />
             ) : (
               <div
                 className="flex h-full w-full items-center justify-center text-5xl font-semibold text-[var(--reader-muted)]"
@@ -139,8 +146,13 @@ export default async function BookDetailPage({ params }: BookPageProps) {
               className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[var(--reader-border)] bg-[var(--reader-bg)]"
             >
               {book.library.coverUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element -- cover dari URL bebas milik penulis
-                <img src={book.library.coverUrl} alt={book.library.nama} className="h-full w-full object-cover" />
+                <SafeImage
+                  src={book.library.coverUrl}
+                  alt={book.library.nama}
+                  width={40}
+                  height={40}
+                  className="h-full w-full object-cover"
+                />
               ) : (
                 <span
                   className="text-base font-semibold text-[var(--reader-muted)]"

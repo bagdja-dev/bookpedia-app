@@ -5,6 +5,7 @@ import { BOOK_STATUS_LABEL } from '@/lib/status';
 import { BOOK_TYPE_BADGE_LABEL, formatBookByline } from '@/lib/book-byline';
 import { buildSimilarBooksHref } from '@/lib/book-filter-href';
 import { formatCompactCount } from '@/lib/format';
+import { SafeImage } from '@/components/safe-image';
 import { StarRatingDisplay } from '@/components/reader/star-rating-display';
 import type { BookCatalogDto } from '@/lib/public-types';
 
@@ -48,11 +49,12 @@ export function BookCard({
       <Link href={`/book/${book.slug}`} className="flex flex-1 flex-col">
         <div className="relative aspect-[3/4] w-full overflow-hidden bg-[var(--reader-bg)]">
           {book.coverUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element -- cover berasal dari domain bebas (URL teks penulis), publicFetch tidak lewat next/image loader config
-            <img
+            <SafeImage
               src={book.coverUrl}
               alt={book.judul}
-              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+              fill
+              sizes="(min-width: 1024px) 200px, (min-width: 640px) 33vw, 50vw"
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-3xl font-semibold text-[var(--reader-muted)]" style={{ fontFamily: 'var(--font-source-serif)' }}>

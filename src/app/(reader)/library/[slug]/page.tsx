@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { BookCard } from '@/components/reader/book-card';
+import { SafeImage } from '@/components/safe-image';
 import { getPlatformSlug } from '@/lib/platform';
 import { getPlatformConfig, publicFetch } from '@/lib/public-api';
 import { buildSocialMetadata } from '@/lib/seo';
@@ -49,8 +50,14 @@ export default async function LibraryProfilePage({ params }: LibraryPageProps) {
         <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-10 sm:flex-row sm:items-center sm:px-6">
           <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[var(--reader-border)] bg-[var(--reader-bg)]">
             {library.coverUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element -- cover dari URL bebas milik penulis
-              <img src={library.coverUrl} alt={library.nama} className="h-full w-full object-cover" />
+              <SafeImage
+                src={library.coverUrl}
+                alt={library.nama}
+                width={96}
+                height={96}
+                priority
+                className="h-full w-full object-cover"
+              />
             ) : (
               <span
                 className="text-3xl font-semibold text-[var(--reader-muted)]"

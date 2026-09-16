@@ -4,6 +4,7 @@ import { Source_Serif_4 } from 'next/font/google';
 
 import { ReaderAuthNav } from '@/components/reader/reader-auth-nav';
 import { RealtimeProvider } from '@/components/reader/realtime-provider';
+import { SafeImage } from '@/components/safe-image';
 import { SearchBar } from '@/components/reader/search-bar';
 import { getPlatformSlug } from '@/lib/platform';
 import { getPlatformConfig } from '@/lib/public-api';
@@ -62,8 +63,7 @@ export default async function ReaderLayout({ children }: { children: ReactNode }
             style={{ fontFamily: 'var(--font-source-serif)' }}
           >
             {config.logoUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element -- logo dari URL config bebas domain, bukan aset lokal
-              <img src={config.logoUrl} alt={config.nama} className="h-7 w-auto" />
+              <SafeImage src={config.logoUrl} alt={config.nama} width={140} height={28} priority className="h-7 w-auto" />
             ) : (
               config.nama
             )}
