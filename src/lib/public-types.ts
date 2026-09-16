@@ -188,6 +188,11 @@ export interface BookDetailDto {
   library: {
     nama: string;
     slug: string;
+    coverUrl: string | null;
+    /** Susulan "Author/Library card", 16 Sep 2026 — agregat milik Library ini (bukan per-Book). */
+    totalBooks: number;
+    totalViews: number;
+    totalComments: number;
   };
   chapters: BookChapterSummary[];
   /** Fase 7 — total dibaca (SUM view_count semua Chapter Book ini). */

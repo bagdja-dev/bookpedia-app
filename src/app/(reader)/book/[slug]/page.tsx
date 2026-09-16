@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Heart, ListFilter, MessageCircle, User } from 'lucide-react';
+import { BookOpen, Eye, Heart, ListFilter, MessageCircle, User } from 'lucide-react';
 import { ContinueReadingButton } from '@/components/reader/continue-reading-button';
 import { BookRatingWidget } from '@/components/reader/book-rating-widget';
 import { StarRatingDisplay } from '@/components/reader/star-rating-display';
@@ -131,6 +131,47 @@ export default async function BookDetailPage({ params }: BookPageProps) {
               {book.library.nama}
             </Link>
           </p>
+
+          <div className="flex items-center gap-2.5">
+            <Link
+              href={`/library/${book.library.slug}`}
+              className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[var(--reader-border)] bg-[var(--reader-bg)]"
+            >
+              {book.library.coverUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element -- cover dari URL bebas milik penulis
+                <img src={book.library.coverUrl} alt={book.library.nama} className="h-full w-full object-cover" />
+              ) : (
+                <span
+                  className="text-base font-semibold text-[var(--reader-muted)]"
+                  style={{ fontFamily: 'var(--font-source-serif)' }}
+                >
+                  {book.library.nama.charAt(0).toUpperCase()}
+                </span>
+              )}
+            </Link>
+            <div className="flex flex-col gap-0.5">
+              <Link
+                href={`/library/${book.library.slug}`}
+                className="w-fit text-sm font-semibold text-[var(--reader-foreground)] hover:text-[var(--reader-terracotta)]"
+              >
+                {book.library.nama}
+              </Link>
+              <div className="flex flex-wrap items-center gap-2.5">
+                <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">
+                  <BookOpen className="h-3.5 w-3.5" />
+                  {book.library.totalBooks.toLocaleString('id-ID')} karya
+                </span>
+                <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">
+                  <Eye className="h-3.5 w-3.5" />
+                  {book.library.totalViews.toLocaleString('id-ID')} views
+                </span>
+                <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">
+                  <MessageCircle className="h-3.5 w-3.5" />
+                  {book.library.totalComments.toLocaleString('id-ID')} komentar
+                </span>
+              </div>
+            </div>
+          </div>
 
           <div className="flex flex-wrap items-center gap-2">
             {config.showBookStatus && (
