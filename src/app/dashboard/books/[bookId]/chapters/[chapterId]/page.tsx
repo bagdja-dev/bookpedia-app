@@ -284,7 +284,7 @@ export default function ChapterEditorPage({
   );
 
   const chapterSidebar = chapters && (
-    <aside className="hidden w-52 shrink-0 flex-col overflow-y-auto border-r bg-card md:flex">
+    <aside className="hidden w-44 shrink-0 flex-col overflow-y-auto border-r bg-card md:flex">
       <div className="flex items-center justify-between border-b px-3 py-3">
         <span className="text-xs font-semibold text-muted-foreground">Chapter di Book ini</span>
         <Button

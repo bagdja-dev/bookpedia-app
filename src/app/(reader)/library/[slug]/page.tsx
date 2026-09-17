@@ -90,7 +90,7 @@ export default async function LibraryProfilePage({ params }: LibraryPageProps) {
         ) : (
           <BookMasonryGrid
             books={library.books}
-            showStatus={config.showBookStatus}
+            showStatus
             showRating={config.enableRating}
             showLike={config.enableLike}
             showComment={config.enableComment}

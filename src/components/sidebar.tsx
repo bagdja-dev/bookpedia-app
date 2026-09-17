@@ -22,7 +22,7 @@ export function Sidebar({ title, icon }: SidebarProps) {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden w-56 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground md:flex">
+    <aside className="hidden w-48 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground md:flex">
       <div className="flex h-16 items-center gap-2 px-4">
         {/* Klik ikon -> balik ke domain dasar (katalog publik), sama seperti
             ikon di Topbar untuk layar kecil (lihat topbar.tsx). */}

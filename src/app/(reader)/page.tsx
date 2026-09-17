@@ -279,7 +279,7 @@ export default async function CatalogPage({
       ) : (
         <BookMasonryGrid
           books={items}
-          showStatus={config.showBookStatus}
+          showStatus
           showRating={config.enableRating}
           showLike={config.enableLike}
           showComment={config.enableComment}
