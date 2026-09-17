@@ -87,6 +87,7 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
         bookSlug={slug}
         orderIndex={chapter.orderIndex}
         initialLikeCount={chapter.likeCount ?? 0}
+        initialCommentCount={chapter.commentCount ?? 0}
         enableLike={config.enableLike}
         enableComment={config.enableComment}
         enableShare={config.enableShare}

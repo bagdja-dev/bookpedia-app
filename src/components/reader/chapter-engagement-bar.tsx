@@ -20,6 +20,7 @@ interface ChapterEngagementBarProps {
   bookSlug: string;
   orderIndex: number;
   initialLikeCount: number;
+  initialCommentCount: number;
   enableLike: boolean;
   enableComment: boolean;
   enableShare: boolean;
@@ -41,6 +42,7 @@ export function ChapterEngagementBar({
   bookSlug,
   orderIndex,
   initialLikeCount,
+  initialCommentCount,
   enableLike,
   enableComment,
   enableShare,
@@ -148,6 +150,7 @@ export function ChapterEngagementBar({
               className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm text-[var(--reader-muted)] transition-colors hover:bg-[var(--reader-border)]/40"
             >
               <MessageCircle className="h-5 w-5" />
+              <span>{initialCommentCount}</span>
             </button>
           )}
 

@@ -13,6 +13,8 @@ import { Button } from '@/components/ui/button';
 import { apiClient, ApiError } from '@/lib/api-client';
 import { BOOK_STATUS_LABEL, BOOK_STATUS_VARIANT, CHAPTER_STATUS_LABEL, CHAPTER_STATUS_VARIANT } from '@/lib/status';
 import { BOOK_TYPE_BADGE_LABEL } from '@/lib/book-byline';
+import { BookCommentsButton } from '@/components/reader/book-comments-button';
+import { ChapterCommentsButton } from '@/components/reader/chapter-comments-button';
 import { usePlatformContext } from '@/context/platform-context';
 import type { Book, Chapter, ReorderChapterPayload } from '@/lib/types';
 
@@ -21,6 +23,8 @@ function ChapterRow({
   index,
   total,
   bookId,
+  bookSlug,
+  platformSlug,
   onMove,
   moving,
   onTogglePublish,
@@ -33,6 +37,8 @@ function ChapterRow({
   index: number;
   total: number;
   bookId: string;
+  bookSlug: string;
+  platformSlug: string;
   onMove: (index: number, direction: -1 | 1) => void;
   moving: boolean;
   onTogglePublish: (chapter: Chapter) => void;
@@ -47,65 +53,85 @@ function ChapterRow({
   const isDeleting = deletingId === chapter.id;
 
   return (
-    <div className="flex items-center gap-3 rounded-lg border bg-card px-4 py-3">
+    <div className="flex items-start gap-3 rounded-lg border bg-card px-4 py-3">
       <span className="w-6 shrink-0 text-sm text-muted-foreground">{index + 1}</span>
 
-      <Link
-        href={`/dashboard/books/${bookId}/chapters/${chapter.id}`}
-        className="flex flex-1 items-center gap-2 truncate text-sm font-medium hover:underline"
-      >
-        <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
-        <span className="truncate">{chapter.judul}</span>
-      </Link>
-
-      <span className="shrink-0 text-xs text-muted-foreground">{chapter.viewCount.toLocaleString('id-ID')}x dibaca</span>
-
-      {showRating && chapter.ratingCount > 0 && (
-        <StarRatingDisplay average={chapter.ratingAverage} count={chapter.ratingCount} />
-      )}
-
-      <Badge variant={CHAPTER_STATUS_VARIANT[chapter.status]}>
-        {CHAPTER_STATUS_LABEL[chapter.status]}
-      </Badge>
-
-      <div className="flex shrink-0 items-center gap-1">
-        <Button
-          variant="outline"
-          size="icon-sm"
-          disabled={isPublishing}
-          title={isPublished ? 'Batalkan Publish' : 'Publish'}
-          onClick={() => onTogglePublish(chapter)}
+      <div className="min-w-0 flex-1">
+        <Link
+          href={`/dashboard/books/${bookId}/chapters/${chapter.id}`}
+          className="flex min-w-0 items-center gap-2 truncate text-sm font-medium hover:underline"
         >
-          {isPublished ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-        </Button>
-        <Button
-          variant="outline"
-          size="icon-sm"
-          disabled={moving || index === 0}
-          title="Pindah ke atas"
-          onClick={() => onMove(index, -1)}
-        >
-          <ArrowUp className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="outline"
-          size="icon-sm"
-          disabled={moving || index === total - 1}
-          title="Pindah ke bawah"
-          onClick={() => onMove(index, 1)}
-        >
-          <ArrowDown className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="outline"
-          size="icon-sm"
-          disabled={isDeleting}
-          title="Hapus Chapter"
-          onClick={() => onDelete(chapter)}
-          className="hover:text-destructive"
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
+          <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
+          <span className="truncate">{chapter.judul}</span>
+        </Link>
+
+        <div className="mt-2 flex flex-wrap items-center gap-2 sm:mt-0 sm:justify-end">
+          <span
+            className="flex shrink-0 items-center gap-1 text-muted-foreground"
+            title={`${chapter.viewCount.toLocaleString('id-ID')}x dibaca`}
+            aria-label={`${chapter.viewCount.toLocaleString('id-ID')}x dibaca`}
+          >
+            <Eye className="h-3.5 w-3.5" />
+            <span>{chapter.viewCount.toLocaleString('id-ID')}</span>
+          </span>
+
+          <ChapterCommentsButton
+            chapterId={chapter.id}
+            platformSlug={platformSlug}
+            bookSlug={bookSlug}
+            orderIndex={chapter.orderIndex}
+            commentCount={chapter.commentCount}
+            iconOnly
+          />
+
+          {showRating && chapter.ratingCount > 0 && (
+            <StarRatingDisplay average={chapter.ratingAverage} count={chapter.ratingCount} />
+          )}
+
+          <Badge variant={CHAPTER_STATUS_VARIANT[chapter.status]}>
+            {CHAPTER_STATUS_LABEL[chapter.status]}
+          </Badge>
+
+          <div className="flex shrink-0 items-center gap-1">
+            <Button
+              variant="outline"
+              size="icon-sm"
+              disabled={isPublishing}
+              title={isPublished ? 'Batalkan Publish' : 'Publish'}
+              onClick={() => onTogglePublish(chapter)}
+            >
+              {isPublished ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </Button>
+            <Button
+              variant="outline"
+              size="icon-sm"
+              disabled={moving || index === 0}
+              title="Pindah ke atas"
+              onClick={() => onMove(index, -1)}
+            >
+              <ArrowUp className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon-sm"
+              disabled={moving || index === total - 1}
+              title="Pindah ke bawah"
+              onClick={() => onMove(index, 1)}
+            >
+              <ArrowDown className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon-sm"
+              disabled={isDeleting}
+              title="Hapus Chapter"
+              onClick={() => onDelete(chapter)}
+              className="hover:text-destructive"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -114,7 +140,7 @@ function ChapterRow({
 export default function BookDetailPage({ params }: { params: Promise<{ bookId: string }> }) {
   const { bookId } = use(params);
   const router = useRouter();
-  const { config } = usePlatformContext();
+  const { config, slug: platformSlug } = usePlatformContext();
 
   const [book, setBook] = useState<Book | null>(null);
   const [chapters, setChapters] = useState<Chapter[] | null>(null);
@@ -282,7 +308,17 @@ export default function BookDetailPage({ params }: { params: Promise<{ bookId: s
               <p className="text-sm text-muted-foreground">Penulis asli: {book.originalAuthor}</p>
             )}
             <div className="flex items-center gap-3 text-sm text-muted-foreground">
-              <span>{book.viewCount.toLocaleString('id-ID')}x dibaca</span>
+              <span className="flex items-center gap-1" title={`${book.viewCount.toLocaleString('id-ID')}x dibaca`}>
+                <Eye className="h-4 w-4" />
+                <span>{book.viewCount.toLocaleString('id-ID')}</span>
+              </span>
+              <BookCommentsButton
+                platformSlug={platformSlug}
+                bookSlug={book.slug}
+                commentCount={book.commentCount}
+                iconOnly
+                className="flex items-center gap-1 text-muted-foreground hover:text-foreground"
+              />
               {config.enableRating && (
                 <StarRatingDisplay average={book.ratingAverage} count={book.ratingCount} size="md" />
               )}
@@ -337,6 +373,8 @@ export default function BookDetailPage({ params }: { params: Promise<{ bookId: s
                 index={index}
                 total={chapters.length}
                 bookId={bookId}
+                bookSlug={book.slug}
+                platformSlug={platformSlug}
                 onMove={handleMove}
                 moving={reordering}
                 onTogglePublish={handleTogglePublish}

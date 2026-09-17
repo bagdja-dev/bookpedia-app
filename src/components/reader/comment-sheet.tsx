@@ -263,7 +263,7 @@ export function CommentSheet({ open, onClose, chapterId, platformSlug, bookSlug,
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} aria-hidden="true" />
-      <div className="relative flex h-[80vh] w-full max-w-[680px] flex-col overflow-hidden rounded-t-2xl border-x border-t border-[var(--reader-border)] bg-[var(--reader-surface)] shadow-xl">
+      <div className="relative flex h-[80vh] w-full max-w-[680px] flex-col overflow-hidden rounded-t-2xl border-x border-t border-slate-200 bg-white shadow-xl">
         <div className="flex shrink-0 justify-center pb-1 pt-2.5" aria-hidden="true"><div className="h-1 w-10 rounded-full bg-[var(--reader-border)]" /></div>
         <div className="flex shrink-0 items-center justify-between border-b border-[var(--reader-border)] px-4 pb-3">
           <h2 className="text-sm font-semibold text-[var(--reader-foreground)]">Komentar ({comments.length})</h2>

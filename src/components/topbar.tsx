@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { BookOpen, LogOut } from 'lucide-react';
+import { BookOpen, LogOut, Menu } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
@@ -11,14 +11,25 @@ interface TopbarProps {
   library: Library;
   title: string;
   icon: string | null;
+  onMenuToggle: () => void;
 }
 
-export function Topbar({ library, title, icon }: TopbarProps) {
+export function Topbar({ library, title, icon, onMenuToggle }: TopbarProps) {
   const { user } = useAuth();
 
   return (
     <header className="flex h-16 shrink-0 items-center justify-between border-b px-4 sm:px-6">
       <div className="flex items-center gap-3">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden"
+          onClick={onMenuToggle}
+          aria-label="Buka menu"
+          title="Buka menu"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
         {/* Sidebar (md+) sudah tampilkan ikon platform — di sini cuma untuk
             layar kecil, di mana Sidebar disembunyikan total (lihat
             `hidden ... md:flex` di sidebar.tsx) sehingga tidak ada cara lain

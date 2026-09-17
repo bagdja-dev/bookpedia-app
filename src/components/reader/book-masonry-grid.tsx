@@ -3,6 +3,7 @@ import type { BookCatalogDto } from '@/lib/public-types';
 
 interface BookMasonryGridProps {
   books: BookCatalogDto[];
+  platformSlug: string;
   showStatus?: boolean;
   showRating?: boolean;
   showLike?: boolean;
@@ -19,12 +20,12 @@ interface BookMasonryGridProps {
  * `/my/continue-reading` (tetap grid seragam, kebutuhannya beda: daftar
  * lanjut baca, bukan discovery/browsing).
  */
-export function BookMasonryGrid({ books, showStatus, showRating, showLike, showComment }: BookMasonryGridProps) {
+export function BookMasonryGrid({ books, platformSlug, showStatus, showRating, showLike, showComment }: BookMasonryGridProps) {
   return (
     <div className="columns-2 gap-4 sm:columns-3 lg:columns-4 xl:columns-5">
       {books.map((book) => (
         <div key={book.id} className="mb-4 break-inside-avoid">
-          <BookCard book={book} showStatus={showStatus} showRating={showRating} showLike={showLike} showComment={showComment} />
+          <BookCard book={book} platformSlug={platformSlug} showStatus={showStatus} showRating={showRating} showLike={showLike} showComment={showComment} />
         </div>
       ))}
     </div>

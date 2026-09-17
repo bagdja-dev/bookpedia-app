@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Eye, Heart, ListFilter, MessageCircle } from 'lucide-react';
+import { Eye, Heart, ListFilter } from 'lucide-react';
 
 import { BOOK_STATUS_LABEL } from '@/lib/status';
 import { BOOK_TYPE_BADGE_LABEL, formatBookByline } from '@/lib/book-byline';
@@ -7,6 +7,7 @@ import { buildSimilarBooksHref } from '@/lib/book-filter-href';
 import { formatCompactCount } from '@/lib/format';
 import { SafeImage } from '@/components/safe-image';
 import { StarRatingDisplay } from '@/components/reader/star-rating-display';
+import { BookCommentsButton } from '@/components/reader/book-comments-button';
 import type { BookCatalogDto } from '@/lib/public-types';
 
 const STATUS_DOT: Record<BookCatalogDto['status'], string> = {
@@ -28,12 +29,14 @@ const STATUS_DOT: Record<BookCatalogDto['status'], string> = {
  */
 export function BookCard({
   book,
+  platformSlug,
   showStatus = true,
   showRating = true,
   showLike = true,
   showComment = true,
 }: {
   book: BookCatalogDto;
+  platformSlug: string;
   showStatus?: boolean;
   /** Fase 7 (susulan) — kalau true DAN book.ratingCount > 0, tampilkan agregat rating di card. */
   showRating?: boolean;
@@ -76,6 +79,14 @@ export function BookCard({
               {BOOK_STATUS_LABEL[book.status]}
             </span>
           )}
+          {book.latestChapterTitle && (
+            <span
+              className="max-w-full truncate text-[11px] text-[var(--reader-muted)]"
+              title={book.latestChapterTitle}
+            >
+              {book.latestChapterTitle}
+            </span>
+          )}
           <div className="flex flex-wrap items-center gap-2">
             <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">
               <Eye className="h-3 w-3" />
@@ -87,12 +98,6 @@ export function BookCard({
                 {formatCompactCount(book.likeCount)}
               </span>
             )}
-            {showComment && (
-              <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">
-                <MessageCircle className="h-3 w-3" />
-                {formatCompactCount(book.commentCount ?? 0)}
-              </span>
-            )}
             {showRating && book.ratingCount > 0 && (
               <StarRatingDisplay average={book.ratingAverage} count={book.ratingCount} />
             )}
@@ -101,6 +106,14 @@ export function BookCard({
       </Link>
 
       <div className="mt-auto flex flex-wrap items-center gap-1.5 px-3 pb-3 pt-1">
+        {showComment && (
+          <BookCommentsButton
+            platformSlug={platformSlug}
+            bookSlug={book.slug}
+            commentCount={book.commentCount ?? 0}
+            className="flex items-center gap-1 rounded-full bg-[var(--reader-bg)] px-2 py-0.5 text-[11px] text-[var(--reader-muted)] hover:text-[var(--reader-terracotta)]"
+          />
+        )}
         {book.bookType !== 'original' && (
           <span className="rounded-full bg-[var(--reader-terracotta)]/10 px-2 py-0.5 text-[11px] font-medium text-[var(--reader-terracotta)]">
             {BOOK_TYPE_BADGE_LABEL[book.bookType]}

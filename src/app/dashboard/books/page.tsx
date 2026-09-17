@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { BookOpen, Plus } from 'lucide-react';
+import { BookOpen, Eye, Plus } from 'lucide-react';
 
 import { LoadingSpinner } from '@/components/loading-spinner';
 import { StarRatingDisplay } from '@/components/reader/star-rating-display';
+import { BookCommentsButton } from '@/components/reader/book-comments-button';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { apiClient, ApiError } from '@/lib/api-client';
@@ -33,18 +34,18 @@ function BookCover({ book }: { book: Book }) {
 }
 
 function BookGrid({ books }: { books: Book[] }) {
-  const { config } = usePlatformContext();
+  const { config, slug: platformSlug } = usePlatformContext();
 
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
       {books.map((book) => (
-        <Link
+        <div
           key={book.id}
-          href={`/dashboard/books/${book.id}`}
           className="group overflow-hidden rounded-xl border bg-card shadow-sm transition-shadow hover:shadow-md"
         >
-          <BookCover book={book} />
-          <div className="flex flex-col gap-1.5 p-3">
+          <Link href={`/dashboard/books/${book.id}`}>
+            <BookCover book={book} />
+            <div className="flex flex-col gap-1.5 p-3">
             <span className="line-clamp-2 text-sm font-semibold leading-snug group-hover:underline">
               {book.judul}
             </span>
@@ -61,14 +62,28 @@ function BookGrid({ books }: { books: Book[] }) {
                 </Badge>
               )}
             </div>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span>{book.viewCount.toLocaleString('id-ID')}x dibaca</span>
-              {config.enableRating && book.ratingCount > 0 && (
-                <StarRatingDisplay average={book.ratingAverage} count={book.ratingCount} />
-              )}
             </div>
+          </Link>
+          <div className="flex items-center gap-3 px-3 pb-3 text-xs text-muted-foreground">
+            <span
+              className="flex items-center gap-1"
+              title={`${book.viewCount.toLocaleString('id-ID')}x dibaca`}
+            >
+              <Eye className="h-3.5 w-3.5" />
+              <span>{book.viewCount.toLocaleString('id-ID')}</span>
+            </span>
+            <BookCommentsButton
+              platformSlug={platformSlug}
+              bookSlug={book.slug}
+              commentCount={book.commentCount}
+              iconOnly
+              className="flex items-center gap-1 text-muted-foreground hover:text-foreground"
+            />
+            {config.enableRating && book.ratingCount > 0 && (
+              <StarRatingDisplay average={book.ratingAverage} count={book.ratingCount} />
+            )}
           </div>
-        </Link>
+        </div>
       ))}
     </div>
   );

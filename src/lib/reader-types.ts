@@ -11,6 +11,7 @@ export interface ReadingProgressDto {
   lastChapterId: string;
   lastChapterOrderIndex: number;
   lastChapterJudul: string;
+  isPublic: boolean;
   updatedAt: string;
 }
 
@@ -22,6 +23,7 @@ export interface ReadingProgressListItemDto {
   lastChapterId: string;
   lastChapterOrderIndex: number;
   lastChapterJudul: string;
+  isPublic: boolean;
   updatedAt: string;
 }
 

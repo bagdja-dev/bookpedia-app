@@ -124,6 +124,8 @@ export interface BookCatalogDto {
   tags: TagDto[];
   coverUrl: string | null;
   status: BookStatus;
+  /** Nama Chapter published terakhir berdasarkan orderIndex. */
+  latestChapterTitle: string | null;
   bookType: BookType;
   /** Nama penulis asli — relevan kalau `bookType` bukan 'original'. */
   originalAuthor: string | null;
@@ -251,4 +253,6 @@ export interface ChapterReadDto {
   ratingCount: number;
   /** Fase 8 — total Like Chapter ini. Status like user login sendiri diambil terpisah dari GET /likes/chapter/:chapterId. */
   likeCount: number;
+  /** Total komentar Chapter ini, termasuk balasan. */
+  commentCount: number;
 }

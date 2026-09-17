@@ -60,6 +60,8 @@ export interface Book {
   maxFreeChapters: number | null;
   /** Fase 7 — total dibaca (SUM view_count semua Chapter Book ini), read-only. */
   viewCount: number;
+  /** Total komentar pada semua Chapter Book ini, termasuk balasan. */
+  commentCount: number;
   /** Fase 7 — agregat rating Book ini (0 kalau belum ada rating). Sumbernya ikut ratingMode Platform. */
   ratingAverage: number;
   ratingCount: number;
@@ -110,6 +112,8 @@ export interface Chapter {
   publishedAt: string | null;
   /** Fase 7 — total dibaca Chapter ini, read-only. */
   viewCount: number;
+  /** Total komentar Chapter ini, termasuk balasan. */
+  commentCount: number;
   /** Fase 7 — rating Chapter ini (0 kalau belum ada rating). Cuma relevan kalau Platform pemiliknya ratingMode="chapter". */
   ratingAverage: number;
   ratingCount: number;

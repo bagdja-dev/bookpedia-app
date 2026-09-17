@@ -7,6 +7,8 @@ import { BookRatingWidget } from '@/components/reader/book-rating-widget';
 import { SafeImage } from '@/components/safe-image';
 import { SendMessageToLibraryButton } from '@/components/reader/send-message-to-library-button';
 import { StarRatingDisplay } from '@/components/reader/star-rating-display';
+import { BookCommentsButton } from '@/components/reader/book-comments-button';
+import { ChapterCommentsButton } from '@/components/reader/chapter-comments-button';
 import { Badge } from '@/components/ui/badge';
 import { BOOK_STATUS_LABEL, BOOK_STATUS_VARIANT } from '@/lib/status';
 import { BOOK_TYPE_BADGE_LABEL, formatBookByline, formatBookBylinePrefix } from '@/lib/book-byline';
@@ -221,10 +223,12 @@ export default async function BookDetailPage({ params }: BookPageProps) {
               </span>
             )}
             {config.enableComment && (
-              <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">
-                <MessageCircle className="h-3.5 w-3.5" />
-                {(book.commentCount ?? 0).toLocaleString('id-ID')}
-              </span>
+              <BookCommentsButton
+                platformSlug={platformSlug}
+                bookSlug={book.slug}
+                commentCount={book.commentCount ?? 0}
+                className="flex items-center gap-1 text-xs text-[var(--reader-muted)] hover:text-[var(--reader-terracotta)]"
+              />
             )}
           </div>
 
@@ -288,10 +292,10 @@ export default async function BookDetailPage({ params }: BookPageProps) {
         ) : (
           <ul className="divide-y divide-[var(--reader-border)] overflow-hidden rounded-lg border border-[var(--reader-border)] bg-[var(--reader-surface)]">
             {book.chapters.map((chapter) => (
-              <li key={chapter.id}>
+              <li key={chapter.id} className="flex items-center gap-3 px-4 py-3 hover:bg-[var(--reader-bg)]">
                 <Link
                   href={`/book/${book.slug}/chapter/${chapter.orderIndex}`}
-                  className="flex flex-col gap-2 px-4 py-3 text-sm transition-colors hover:bg-[var(--reader-bg)] sm:flex-row sm:items-center sm:justify-between sm:gap-4"
+                  className="flex min-w-0 flex-1 flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between sm:gap-4"
                 >
                   <span className="truncate text-[var(--reader-foreground)] sm:min-w-0 sm:flex-1">
                     {chapter.orderIndex}. {chapter.judul}
@@ -301,12 +305,6 @@ export default async function BookDetailPage({ params }: BookPageProps) {
                       <Eye className="h-3.5 w-3.5" />
                       {(chapter.viewCount ?? 0).toLocaleString('id-ID')}
                     </span>
-                    {config.enableComment && (
-                      <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">
-                        <MessageCircle className="h-3.5 w-3.5" />
-                        {(chapter.commentCount ?? 0).toLocaleString('id-ID')}
-                      </span>
-                    )}
                     {config.enableRating && config.ratingMode === 'chapter' && chapter.ratingCount > 0 && (
                       <StarRatingDisplay average={chapter.ratingAverage} count={chapter.ratingCount} />
                     )}
@@ -318,6 +316,15 @@ export default async function BookDetailPage({ params }: BookPageProps) {
                     )}
                   </span>
                 </Link>
+                {config.enableComment && (
+                  <ChapterCommentsButton
+                    chapterId={chapter.id}
+                    platformSlug={platformSlug}
+                    bookSlug={book.slug}
+                    orderIndex={chapter.orderIndex}
+                    commentCount={chapter.commentCount ?? 0}
+                  />
+                )}
               </li>
             ))}
           </ul>

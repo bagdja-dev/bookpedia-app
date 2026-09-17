@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { LoadingSpinner } from '@/components/loading-spinner';
@@ -78,12 +78,41 @@ function LibraryGuard({ children }: { children: ReactNode }) {
 // khusus header reader.
 function DashboardShell({ children }: { children: ReactNode }) {
   const { config } = usePlatformContext();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  useEffect(() => {
+    try {
+      setSidebarCollapsed(localStorage.getItem('bookpedia_studio_sidebar_collapsed') === '1');
+    } catch {
+      // localStorage bisa dibatasi browser; gunakan mode terbuka sebagai fallback.
+    }
+  }, []);
+
+  function toggleSidebar() {
+    setSidebarCollapsed((current) => {
+      const next = !current;
+      try {
+        localStorage.setItem('bookpedia_studio_sidebar_collapsed', next ? '1' : '0');
+      } catch {
+        // Preferensi tidak harus menghalangi navigasi Studio.
+      }
+      return next;
+    });
+  }
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      <Sidebar title={config.nama} icon={config.faviconUrl} />
+      <Sidebar
+        title={config.nama}
+        icon={config.faviconUrl}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        collapsed={sidebarCollapsed}
+        onToggleCollapsed={toggleSidebar}
+      />
       <div className="flex flex-1 flex-col overflow-hidden">
-        <DashboardTopbar title={config.nama} icon={config.faviconUrl} />
+        <DashboardTopbar title={config.nama} icon={config.faviconUrl} onMenuToggle={() => setSidebarOpen(true)} />
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">{children}</main>
       </div>
     </div>
@@ -92,9 +121,9 @@ function DashboardShell({ children }: { children: ReactNode }) {
 
 // Dipisah supaya bisa memanggil useLibraryContext() setelah LibraryProvider
 // terpasang (Topbar butuh data Library untuk header).
-function DashboardTopbar({ title, icon }: { title: string; icon: string | null }) {
+function DashboardTopbar({ title, icon, onMenuToggle }: { title: string; icon: string | null; onMenuToggle: () => void }) {
   const library = useLibraryContext();
-  return <Topbar library={library} title={title} icon={icon} />;
+  return <Topbar library={library} title={title} icon={icon} onMenuToggle={onMenuToggle} />;
 }
 
 // `RealtimeProvider` sebelumnya cuma dipasang di `(reader)/layout.tsx` — Studio

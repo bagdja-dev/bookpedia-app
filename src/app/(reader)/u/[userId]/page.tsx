@@ -100,6 +100,7 @@ export default async function UserProfilePage({ params, searchParams }: UserProf
         ) : (
           <BookMasonryGrid
             books={stats.readingList}
+            platformSlug={platformSlug}
             showStatus={config.showBookStatus}
             showRating={config.enableRating}
             showLike={config.enableLike}
