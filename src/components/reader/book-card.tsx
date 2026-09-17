@@ -70,6 +70,12 @@ export function BookCard({
             {book.judul}
           </h3>
           <p className="text-xs text-[var(--reader-muted)]">{formatBookByline(book)}</p>
+          {showStatus && (
+            <span className="flex w-fit items-center gap-1 rounded-full bg-[var(--reader-bg)] px-2 py-0.5 text-[11px] text-[var(--reader-muted)]">
+              <span className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[book.status]}`} />
+              {BOOK_STATUS_LABEL[book.status]}
+            </span>
+          )}
           <div className="flex flex-wrap items-center gap-2">
             <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">
               <Eye className="h-3 w-3" />
@@ -125,12 +131,6 @@ export function BookCard({
             #{tag.nama}
           </Link>
         ))}
-        {showStatus && (
-          <span className="flex items-center gap-1 text-[11px] text-[var(--reader-muted)]">
-            <span className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[book.status]}`} />
-            {BOOK_STATUS_LABEL[book.status]}
-          </span>
-        )}
         {similarHref && (
           <Link
             href={similarHref}
