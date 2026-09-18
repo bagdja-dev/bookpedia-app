@@ -13,14 +13,16 @@ export function buildSocialMetadata({
   title,
   description,
   imageUrl,
+  imageAlt,
   type = 'website',
 }: {
   title: string;
   description?: string;
   imageUrl?: string | null;
+  imageAlt?: string;
   type?: 'website' | 'book' | 'profile';
 }): Pick<Metadata, 'openGraph' | 'twitter'> {
-  const images = imageUrl ? [{ url: imageUrl }] : undefined;
+  const images = imageUrl ? [{ url: imageUrl, ...(imageAlt ? { alt: imageAlt } : {}) }] : undefined;
 
   return {
     openGraph: {

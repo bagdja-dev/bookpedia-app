@@ -57,7 +57,13 @@ export async function generateMetadata({ params }: BookPageProps): Promise<Metad
     title: seo.title,
     description: seo.description,
     alternates: { canonical: `/book/${book.slug}` },
-    ...buildSocialMetadata({ title: seo.ogTitle, description: seo.ogDescription, imageUrl: book.coverUrl, type: seo.ogType }),
+    ...buildSocialMetadata({
+      title: seo.ogTitle,
+      description: seo.ogDescription,
+      imageUrl: book.coverUrl,
+      imageAlt: `Sampul novel ${book.judul}${bookTypeLabel ? ` ${bookTypeLabel}` : ''}`,
+      type: seo.ogType,
+    }),
   };
 }
 
@@ -127,7 +133,7 @@ export default async function BookDetailPage({ params }: BookPageProps) {
             {book.coverUrl ? (
               <SafeImage
                 src={book.coverUrl}
-                alt={book.judul}
+                alt={`Sampul novel ${book.judul}${bookTypeLabel ? ` ${bookTypeLabel}` : ''}`}
                 fill
                 priority
                 sizes="(min-width: 640px) 224px, 160px"
