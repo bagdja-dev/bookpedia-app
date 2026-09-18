@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { SeoTemplateField } from '@/components/seo-template-field';
 import { usePlatformContext } from '@/context/platform-context';
 import { slugify } from '@/lib/api-client';
 import { publicFetch, searchTags } from '@/lib/public-api';
@@ -51,6 +52,14 @@ export interface BookFormValues {
   maxFreeChapters: string;
   /** Fase 6 — Tag bebas (nama apa adanya, bukan slug/id). */
   tags: string[];
+  seoTitle: string;
+  seoDescription: string;
+  seoH1: string;
+  seoOgTitle: string;
+  seoOgDescription: string;
+  seoOgType: 'website' | 'book' | 'profile';
+  seoPrefix: string;
+  seoSuffix: string;
 }
 
 interface BookFormProps {
@@ -95,6 +104,14 @@ export function BookForm({ mode, initialValues, submitting, submitLabel, onSubmi
   const [status, setStatus] = useState<BookStatus>(initialValues?.status ?? 'draft');
   const [maxFreeChapters, setMaxFreeChapters] = useState(initialValues?.maxFreeChapters ?? '');
   const [tags, setTags] = useState<string[]>(initialValues?.tags ?? []);
+  const [seoTitle, setSeoTitle] = useState(initialValues?.seoTitle ?? '');
+  const [seoDescription, setSeoDescription] = useState(initialValues?.seoDescription ?? '');
+  const [seoH1, setSeoH1] = useState(initialValues?.seoH1 ?? '');
+  const [seoOgTitle, setSeoOgTitle] = useState(initialValues?.seoOgTitle ?? '');
+  const [seoOgDescription, setSeoOgDescription] = useState(initialValues?.seoOgDescription ?? '');
+  const [seoOgType, setSeoOgType] = useState<'website' | 'book' | 'profile'>(initialValues?.seoOgType ?? 'book');
+  const [seoPrefix, setSeoPrefix] = useState(initialValues?.seoPrefix ?? '');
+  const [seoSuffix, setSeoSuffix] = useState(initialValues?.seoSuffix ?? '');
   const [tagInput, setTagInput] = useState('');
   const [tagSuggestions, setTagSuggestions] = useState<TagDto[]>([]);
   const [tagSuggestionsOpen, setTagSuggestionsOpen] = useState(false);
@@ -213,6 +230,14 @@ export function BookForm({ mode, initialValues, submitting, submitLabel, onSubmi
       status,
       maxFreeChapters,
       tags,
+      seoTitle,
+      seoDescription,
+      seoH1,
+      seoOgTitle,
+      seoOgDescription,
+      seoOgType,
+      seoPrefix,
+      seoSuffix,
     });
   }
 
@@ -457,6 +482,27 @@ export function BookForm({ mode, initialValues, submitting, submitLabel, onSubmi
         previewWidth={96}
         previewHeight={144}
       />
+
+      <div className="space-y-3 border-t pt-4">
+        <div>
+          <Label>SEO Override</Label>
+          <p className="text-xs text-muted-foreground">Kosongkan untuk memakai default Platform/Library. Token: {'{{title}}'}, {'{{platform}}'}, {'{{library}}'}, {'{{author}}'}, {'{{bookType}}'}, {'{{prefix}}'}, {'{{suffix}}'}.</p>
+        </div>
+        <SeoTemplateField id="book-seo-h1" label="H1" value={seoH1} onChange={setSeoH1} placeholder="H1" disabled={submitting} />
+        <SeoTemplateField id="book-seo-title" label="Title" value={seoTitle} onChange={setSeoTitle} placeholder="Title" disabled={submitting} />
+        <SeoTemplateField id="book-seo-description" label="Description" value={seoDescription} onChange={setSeoDescription} placeholder="Description" multiline disabled={submitting} />
+        <SeoTemplateField id="book-seo-og-title" label="OG title" value={seoOgTitle} onChange={setSeoOgTitle} placeholder="OG title (opsional)" disabled={submitting} />
+        <SeoTemplateField id="book-seo-og-description" label="OG description" value={seoOgDescription} onChange={setSeoOgDescription} placeholder="OG description (opsional)" multiline disabled={submitting} />
+        <select value={seoOgType} onChange={(e) => setSeoOgType(e.target.value as typeof seoOgType)} className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm" aria-label="SEO OG type" disabled={submitting}>
+          <option value="book">book</option>
+          <option value="website">website</option>
+          <option value="profile">profile</option>
+        </select>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <SeoTemplateField id="book-seo-prefix" label="Prefix" value={seoPrefix} onChange={setSeoPrefix} placeholder="Prefix" disabled={submitting} />
+          <SeoTemplateField id="book-seo-suffix" label="Suffix" value={seoSuffix} onChange={setSeoSuffix} placeholder="Suffix" disabled={submitting} />
+        </div>
+      </div>
 
       <Button type="submit" disabled={submitting || coverUploading} className="mt-2">
         {submitting ? 'Menyimpan…' : coverUploading ? 'Menunggu upload cover…' : submitLabel}

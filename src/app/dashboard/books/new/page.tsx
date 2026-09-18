@@ -32,6 +32,14 @@ export default function NewBookPage() {
         ...(values.originalAuthor ? { originalAuthor: values.originalAuthor } : {}),
         ...(values.maxFreeChapters.trim() !== '' ? { maxFreeChapters: Number(values.maxFreeChapters) } : {}),
         ...(values.tags.length > 0 ? { tags: values.tags } : {}),
+        ...(values.seoTitle ? { seoTitle: values.seoTitle } : {}),
+        ...(values.seoDescription ? { seoDescription: values.seoDescription } : {}),
+        ...(values.seoH1 ? { seoH1: values.seoH1 } : {}),
+        ...(values.seoOgTitle ? { seoOgTitle: values.seoOgTitle } : {}),
+        ...(values.seoOgDescription ? { seoOgDescription: values.seoOgDescription } : {}),
+        seoOgType: values.seoOgType,
+        ...(values.seoPrefix ? { seoPrefix: values.seoPrefix } : {}),
+        ...(values.seoSuffix ? { seoSuffix: values.seoSuffix } : {}),
       };
       const book = await apiClient<Book>('/books', {
         method: 'POST',

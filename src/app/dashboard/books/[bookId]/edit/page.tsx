@@ -52,6 +52,14 @@ export default function EditBookPage({ params }: { params: Promise<{ bookId: str
         status: values.status,
         maxFreeChapters: values.maxFreeChapters.trim() === '' ? null : Number(values.maxFreeChapters),
         tags: values.tags,
+        seoTitle: values.seoTitle || null,
+        seoDescription: values.seoDescription || null,
+        seoH1: values.seoH1 || null,
+        seoOgTitle: values.seoOgTitle || null,
+        seoOgDescription: values.seoOgDescription || null,
+        seoOgType: values.seoOgType,
+        seoPrefix: values.seoPrefix || null,
+        seoSuffix: values.seoSuffix || null,
       };
       await apiClient<Book>(`/books/${bookId}`, {
         method: 'PATCH',
@@ -99,6 +107,14 @@ export default function EditBookPage({ params }: { params: Promise<{ bookId: str
               status: book.status,
               maxFreeChapters: book.maxFreeChapters === null ? '' : String(book.maxFreeChapters),
               tags: book.tags.map((t) => t.nama),
+              seoTitle: book.seoTitle ?? '',
+              seoDescription: book.seoDescription ?? '',
+              seoH1: book.seoH1 ?? '',
+              seoOgTitle: book.seoOgTitle ?? '',
+              seoOgDescription: book.seoOgDescription ?? '',
+              seoOgType: book.seoOgType ?? 'book',
+              seoPrefix: book.seoPrefix ?? '',
+              seoSuffix: book.seoSuffix ?? '',
             }}
           />
         </CardContent>

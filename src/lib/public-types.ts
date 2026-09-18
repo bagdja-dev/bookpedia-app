@@ -111,6 +111,14 @@ export interface PlatformProfileDto {
   enableComment: boolean;
   /** Fase 8 — nyala/mati tombol Share di ChapterEngagementBar. Kalau enableLike, enableComment, DAN enableShare ketiganya false, seluruh bar disembunyikan. */
   enableShare: boolean;
+  seoDefaultH1: string | null;
+  seoDefaultTitle: string | null;
+  seoDefaultDescription: string | null;
+  seoDefaultOgTitle: string | null;
+  seoDefaultOgDescription: string | null;
+  seoDefaultOgType: 'website' | 'book' | 'profile' | null;
+  seoPrefix: string | null;
+  seoSuffix: string | null;
 }
 
 export interface BookCatalogDto {
@@ -158,6 +166,14 @@ export interface LibraryProfileDto {
   slug: string;
   deskripsi: string | null;
   coverUrl: string | null;
+  seoTitle: string | null;
+  seoDescription: string | null;
+  seoH1: string | null;
+  seoOgTitle: string | null;
+  seoOgDescription: string | null;
+  seoOgType: 'website' | 'book' | 'profile' | null;
+  seoPrefix: string | null;
+  seoSuffix: string | null;
   createdAt: string;
   books: BookCatalogDto[];
 }
@@ -192,6 +208,14 @@ export interface BookDetailDto {
   bookType: BookType;
   /** Nama penulis asli — relevan kalau `bookType` bukan 'original'. */
   originalAuthor: string | null;
+  seoTitle: string | null;
+  seoDescription: string | null;
+  seoH1: string | null;
+  seoOgTitle: string | null;
+  seoOgDescription: string | null;
+  seoOgType: 'website' | 'book' | 'profile' | null;
+  seoPrefix: string | null;
+  seoSuffix: string | null;
   library: {
     /** Susulan Inbox/DM, 16 Sep 2026 — dipakai tombol "Kirim Pesan ke Penulis" (POST /messages/direct/libraries/:libraryId). */
     id: string;

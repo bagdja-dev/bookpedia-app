@@ -5,7 +5,7 @@ import { BookMasonryGrid } from '@/components/reader/book-masonry-grid';
 import { SafeImage } from '@/components/safe-image';
 import { getPlatformSlug } from '@/lib/platform';
 import { getPlatformConfig, publicFetch } from '@/lib/public-api';
-import { buildSocialMetadata } from '@/lib/seo';
+import { buildSocialMetadata, resolveSeoTemplates } from '@/lib/seo';
 import type { LibraryProfileDto } from '@/lib/public-types';
 
 interface LibraryPageProps {
@@ -22,13 +22,19 @@ export async function generateMetadata({ params }: LibraryPageProps): Promise<Me
   if (!library) {
     return { title: `Library tidak ditemukan — ${config.nama}` };
   }
-  const title = `${library.nama} — ${config.nama}`;
-  const description = library.deskripsi ?? `Karya-karya dari ${library.nama} di ${config.nama}.`;
+  const seo = resolveSeoTemplates(
+    [
+      { h1: library.seoH1, title: library.seoTitle, description: library.seoDescription, ogTitle: library.seoOgTitle, ogDescription: library.seoOgDescription, ogType: library.seoOgType, prefix: library.seoPrefix, suffix: library.seoSuffix },
+      { h1: config.seoDefaultH1, title: config.seoDefaultTitle, description: config.seoDefaultDescription, ogTitle: config.seoDefaultOgTitle, ogDescription: config.seoDefaultOgDescription, ogType: config.seoDefaultOgType, prefix: config.seoPrefix, suffix: config.seoSuffix },
+    ],
+    { title: library.nama, platform: config.nama, library: library.nama, author: library.nama },
+    { title: `${library.nama} — ${config.nama}`, description: library.deskripsi ?? `Karya-karya dari ${library.nama} di ${config.nama}.`, h1: library.nama, ogType: 'profile' },
+  );
   return {
-    title,
-    description,
+    title: seo.title,
+    description: seo.description,
     alternates: { canonical: `/library/${library.slug}` },
-    ...buildSocialMetadata({ title, description, imageUrl: library.coverUrl }),
+    ...buildSocialMetadata({ title: seo.ogTitle, description: seo.ogDescription, imageUrl: library.coverUrl, type: seo.ogType }),
   };
 }
 
@@ -43,6 +49,15 @@ export default async function LibraryProfilePage({ params }: LibraryPageProps) {
   if (!library) {
     notFound();
   }
+
+  const pageSeo = resolveSeoTemplates(
+    [
+      { h1: library.seoH1, prefix: library.seoPrefix, suffix: library.seoSuffix },
+      { h1: config.seoDefaultH1, prefix: config.seoPrefix, suffix: config.seoSuffix },
+    ],
+    { title: library.nama, platform: config.nama, library: library.nama, author: library.nama },
+    { title: library.nama, description: library.deskripsi ?? '', h1: library.nama, ogType: 'profile' },
+  );
 
   return (
     <div>
@@ -72,7 +87,7 @@ export default async function LibraryProfilePage({ params }: LibraryPageProps) {
               className="text-2xl font-semibold text-[var(--reader-foreground)] sm:text-3xl"
               style={{ fontFamily: 'var(--font-source-serif)' }}
             >
-              {library.nama}
+              {pageSeo.h1}
             </h1>
             {library.deskripsi && (
               <p className="mt-2 max-w-2xl text-sm text-[var(--reader-muted)]">{library.deskripsi}</p>

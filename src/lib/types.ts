@@ -13,6 +13,14 @@ export interface Library {
   slug: string;
   deskripsi: string | null;
   coverUrl: string | null;
+  seoTitle: string | null;
+  seoDescription: string | null;
+  seoH1: string | null;
+  seoOgTitle: string | null;
+  seoOgDescription: string | null;
+  seoOgType: 'website' | 'book' | 'profile' | null;
+  seoPrefix: string | null;
+  seoSuffix: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -32,6 +40,14 @@ export interface UpdateLibraryPayload {
   nama?: string;
   deskripsi?: string;
   coverUrl?: string;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
+  seoH1?: string | null;
+  seoOgTitle?: string | null;
+  seoOgDescription?: string | null;
+  seoOgType?: 'website' | 'book' | 'profile' | null;
+  seoPrefix?: string | null;
+  seoSuffix?: string | null;
 }
 
 export type BookStatus = 'draft' | 'ongoing' | 'completed';
@@ -58,6 +74,14 @@ export interface Book {
   publishedAt: string | null;
   /** Fase 5 (SEO) — override "Maximum Free Chapter" Platform. null = ikut kebijakan Platform. */
   maxFreeChapters: number | null;
+  seoTitle: string | null;
+  seoDescription: string | null;
+  seoH1: string | null;
+  seoOgTitle: string | null;
+  seoOgDescription: string | null;
+  seoOgType: 'website' | 'book' | 'profile' | null;
+  seoPrefix: string | null;
+  seoSuffix: string | null;
   /** Fase 7 — total dibaca (SUM view_count semua Chapter Book ini), read-only. */
   viewCount: number;
   /** Total komentar pada semua Chapter Book ini, termasuk balasan. */
@@ -82,6 +106,14 @@ export interface CreateBookPayload {
   maxFreeChapters?: number;
   /** Fase 6 — Tag bebas (nama apa adanya, find-or-create di backend). */
   tags?: string[];
+  seoTitle?: string;
+  seoDescription?: string;
+  seoH1?: string;
+  seoOgTitle?: string;
+  seoOgDescription?: string;
+  seoOgType?: 'website' | 'book' | 'profile';
+  seoPrefix?: string;
+  seoSuffix?: string;
 }
 
 // Catatan: `PATCH /books/:id` TIDAK menerima `slug` (kontrak backend) — slug
@@ -99,6 +131,14 @@ export interface UpdateBookPayload {
   maxFreeChapters?: number | null;
   /** Fase 6 — ganti SELURUH Tag Book ini. [] menghapus semua. */
   tags?: string[];
+  seoTitle?: string | null;
+  seoDescription?: string | null;
+  seoH1?: string | null;
+  seoOgTitle?: string | null;
+  seoOgDescription?: string | null;
+  seoOgType?: 'website' | 'book' | 'profile' | null;
+  seoPrefix?: string | null;
+  seoSuffix?: string | null;
 }
 
 export interface Chapter {

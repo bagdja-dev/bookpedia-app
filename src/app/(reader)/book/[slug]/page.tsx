@@ -16,7 +16,7 @@ import { buildSimilarBooksHref } from '@/lib/book-filter-href';
 import { getPlatformSlug } from '@/lib/platform';
 import { getPlatformConfig, publicFetch } from '@/lib/public-api';
 import { resolveOriginFromHeaders } from '@/lib/resolve-origin';
-import { buildSocialMetadata, toJsonLdScript } from '@/lib/seo';
+import { buildSocialMetadata, resolveSeoTemplates, toAbsoluteUrl, toJsonLdScript } from '@/lib/seo';
 import type { BookDetailDto } from '@/lib/public-types';
 
 interface BookPageProps {
@@ -37,18 +37,27 @@ export async function generateMetadata({ params }: BookPageProps): Promise<Metad
   // badge "Terjemahan"/"Adaptasi" di body SAJA sinyalnya terlalu lemah buat
   // query gabungan (mis. "terjemahan The Early Spring") dibanding title/meta
   // description, yang jauh lebih dipentingkan Google.
-  const bookTypeLabel = book.bookType !== 'original' ? BOOK_TYPE_BADGE_LABEL[book.bookType] : null;
-  const title = `${book.judul}${bookTypeLabel ? ` (${bookTypeLabel})` : ''} — ${config.nama}`;
-  const description = book.sinopsis
+  const bookTypeLabel = book.bookType === 'original' ? 'Original' : BOOK_TYPE_BADGE_LABEL[book.bookType];
+  const fallbackTitle = `${book.judul}${bookTypeLabel ? ` (${bookTypeLabel})` : ''} — ${config.nama}`;
+  const fallbackDescription = book.sinopsis
     ? bookTypeLabel
       ? `${bookTypeLabel} — ${book.sinopsis}`
       : book.sinopsis
     : `Baca ${book.judul} (${formatBookByline(book)}) di ${config.nama}.`;
+  const seo = resolveSeoTemplates(
+    [
+      { h1: book.seoH1, title: book.seoTitle, description: book.seoDescription, ogTitle: book.seoOgTitle, ogDescription: book.seoOgDescription, ogType: book.seoOgType, prefix: book.seoPrefix, suffix: book.seoSuffix },
+      { prefix: book.library.nama, h1: book.library.nama },
+      { h1: config.seoDefaultH1, title: config.seoDefaultTitle, description: config.seoDefaultDescription, ogTitle: config.seoDefaultOgTitle, ogDescription: config.seoDefaultOgDescription, ogType: config.seoDefaultOgType, prefix: config.seoPrefix, suffix: config.seoSuffix },
+    ],
+    { title: book.judul, platform: config.nama, library: book.library.nama, author: book.library.nama, bookType: bookTypeLabel },
+    { title: fallbackTitle, description: fallbackDescription, h1: book.judul, ogType: 'book' },
+  );
   return {
-    title,
-    description,
+    title: seo.title,
+    description: seo.description,
     alternates: { canonical: `/book/${book.slug}` },
-    ...buildSocialMetadata({ title, description, imageUrl: book.coverUrl }),
+    ...buildSocialMetadata({ title: seo.ogTitle, description: seo.ogDescription, imageUrl: book.coverUrl, type: seo.ogType }),
   };
 }
 
@@ -68,6 +77,17 @@ export default async function BookDetailPage({ params }: BookPageProps) {
   if (!book) {
     notFound();
   }
+
+  const bookTypeLabel = book.bookType === 'original' ? 'Original' : BOOK_TYPE_BADGE_LABEL[book.bookType];
+  const pageSeo = resolveSeoTemplates(
+    [
+      { h1: book.seoH1, title: book.seoTitle, description: book.seoDescription, ogType: book.seoOgType, prefix: book.seoPrefix, suffix: book.seoSuffix },
+      { h1: book.library.nama },
+      { h1: config.seoDefaultH1, title: config.seoDefaultTitle, description: config.seoDefaultDescription, ogType: config.seoDefaultOgType, prefix: config.seoPrefix, suffix: config.seoSuffix },
+    ],
+    { title: book.judul, platform: config.nama, library: book.library.nama, author: book.library.nama, bookType: bookTypeLabel },
+    { title: book.judul, description: book.sinopsis ?? '', h1: book.judul, ogType: 'book' },
+  );
 
   const firstChapter = book.chapters[0];
   const similarHref = buildSimilarBooksHref(book);
@@ -91,7 +111,7 @@ export default async function BookDetailPage({ params }: BookPageProps) {
     '@type': 'Book',
     name: book.judul,
     url: `${origin}/book/${book.slug}`,
-    ...(book.coverUrl ? { image: book.coverUrl } : {}),
+    ...(toAbsoluteUrl(book.coverUrl, origin) ? { image: toAbsoluteUrl(book.coverUrl, origin) } : {}),
     ...(book.sinopsis ? { description: book.sinopsis } : {}),
     author: { '@type': 'Person', name: book.library.nama },
     ...(book.genre ? { genre: book.genre.nama } : {}),
@@ -129,7 +149,7 @@ export default async function BookDetailPage({ params }: BookPageProps) {
             className="text-2xl font-semibold text-[var(--reader-foreground)] sm:text-3xl"
             style={{ fontFamily: 'var(--font-source-serif)' }}
           >
-            {book.judul}
+            {pageSeo.h1}
           </h1>
 
           <p className="w-fit text-sm text-[var(--reader-muted)]">

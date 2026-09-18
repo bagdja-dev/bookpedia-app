@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { SeoTemplateField } from '@/components/seo-template-field';
 import { useLibraryContext } from '@/context/library-context';
 import { apiClient, ApiError } from '@/lib/api-client';
 import type { Library, UpdateLibraryPayload } from '@/lib/types';
@@ -19,6 +20,14 @@ export default function SettingsPage() {
   const [nama, setNama] = useState(library.nama);
   const [deskripsi, setDeskripsi] = useState(library.deskripsi ?? '');
   const [coverUrl, setCoverUrl] = useState(library.coverUrl ?? '');
+  const [seoTitle, setSeoTitle] = useState(library.seoTitle ?? '');
+  const [seoDescription, setSeoDescription] = useState(library.seoDescription ?? '');
+  const [seoH1, setSeoH1] = useState(library.seoH1 ?? '');
+  const [seoOgTitle, setSeoOgTitle] = useState(library.seoOgTitle ?? '');
+  const [seoOgDescription, setSeoOgDescription] = useState(library.seoOgDescription ?? '');
+  const [seoOgType, setSeoOgType] = useState<NonNullable<Library['seoOgType']>>(library.seoOgType ?? 'profile');
+  const [seoPrefix, setSeoPrefix] = useState(library.seoPrefix ?? '');
+  const [seoSuffix, setSeoSuffix] = useState(library.seoSuffix ?? '');
   const [coverUploading, setCoverUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -36,6 +45,14 @@ export default function SettingsPage() {
         nama: nama.trim(),
         deskripsi: deskripsi.trim(),
         coverUrl: coverUrl.trim(),
+        seoTitle: seoTitle.trim() || null,
+        seoDescription: seoDescription.trim() || null,
+        seoH1: seoH1.trim() || null,
+        seoOgTitle: seoOgTitle.trim() || null,
+        seoOgDescription: seoOgDescription.trim() || null,
+        seoOgType,
+        seoPrefix: seoPrefix.trim() || null,
+        seoSuffix: seoSuffix.trim() || null,
       };
       await apiClient<Library>('/libraries/me', {
         method: 'PATCH',
@@ -103,6 +120,27 @@ export default function SettingsPage() {
               previewWidth={144}
               previewHeight={96}
             />
+
+            <div className="space-y-3 border-t pt-4">
+              <div>
+                <Label>SEO Override</Label>
+                <p className="text-xs text-muted-foreground">Kosongkan field untuk memakai default Platform. Token: {'{{title}}'}, {'{{platform}}'}, {'{{library}}'}, {'{{author}}'}, {'{{bookType}}'}, {'{{prefix}}'}, {'{{suffix}}'}.</p>
+              </div>
+              <SeoTemplateField id="library-seo-h1" label="H1" value={seoH1} onChange={setSeoH1} placeholder="H1, mis. {{library}}" disabled={submitting} />
+              <SeoTemplateField id="library-seo-title" label="Title" value={seoTitle} onChange={setSeoTitle} placeholder="Title, mis. {{library}} — {{platform}}" disabled={submitting} />
+              <SeoTemplateField id="library-seo-description" label="Description" value={seoDescription} onChange={setSeoDescription} placeholder="Description" multiline disabled={submitting} />
+              <SeoTemplateField id="library-seo-og-title" label="OG title" value={seoOgTitle} onChange={setSeoOgTitle} placeholder="OG title (opsional)" disabled={submitting} />
+              <SeoTemplateField id="library-seo-og-description" label="OG description" value={seoOgDescription} onChange={setSeoOgDescription} placeholder="OG description (opsional)" multiline disabled={submitting} />
+              <select value={seoOgType} onChange={(e) => setSeoOgType(e.target.value as NonNullable<Library['seoOgType']>)} className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm" aria-label="SEO OG type">
+                <option value="profile">profile</option>
+                <option value="website">website</option>
+                <option value="book">book</option>
+              </select>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <SeoTemplateField id="library-seo-prefix" label="Prefix" value={seoPrefix} onChange={setSeoPrefix} placeholder="Prefix" disabled={submitting} />
+                <SeoTemplateField id="library-seo-suffix" label="Suffix" value={seoSuffix} onChange={setSeoSuffix} placeholder="Suffix" disabled={submitting} />
+              </div>
+            </div>
 
             <Button type="submit" disabled={submitting || coverUploading} className="mt-2 w-fit">
               {submitting ? 'Menyimpan…' : coverUploading ? 'Menunggu upload cover…' : 'Simpan Perubahan'}

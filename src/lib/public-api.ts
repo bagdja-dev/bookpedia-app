@@ -49,6 +49,14 @@ const PLATFORM_CONFIG_FALLBACK: PlatformProfileDto = {
   enableLike: true,
   enableComment: true,
   enableShare: true,
+  seoDefaultH1: '{{title}}',
+  seoDefaultTitle: '{{title}} — {{platform}}',
+  seoDefaultDescription: 'Baca {{title}} di {{platform}}.',
+  seoDefaultOgTitle: null,
+  seoDefaultOgDescription: null,
+  seoDefaultOgType: 'website',
+  seoPrefix: null,
+  seoSuffix: null,
 };
 
 /**
@@ -112,6 +120,14 @@ export const getPlatformConfig = cache(async (platformSlug: string): Promise<Pla
     enableLike: config.enableLike ?? PLATFORM_CONFIG_FALLBACK.enableLike,
     enableComment: config.enableComment ?? PLATFORM_CONFIG_FALLBACK.enableComment,
     enableShare: config.enableShare ?? PLATFORM_CONFIG_FALLBACK.enableShare,
+    seoDefaultH1: config.seoDefaultH1 ?? PLATFORM_CONFIG_FALLBACK.seoDefaultH1,
+    seoDefaultTitle: config.seoDefaultTitle ?? PLATFORM_CONFIG_FALLBACK.seoDefaultTitle,
+    seoDefaultDescription: config.seoDefaultDescription ?? PLATFORM_CONFIG_FALLBACK.seoDefaultDescription,
+    seoDefaultOgTitle: config.seoDefaultOgTitle ?? PLATFORM_CONFIG_FALLBACK.seoDefaultOgTitle,
+    seoDefaultOgDescription: config.seoDefaultOgDescription ?? PLATFORM_CONFIG_FALLBACK.seoDefaultOgDescription,
+    seoDefaultOgType: config.seoDefaultOgType ?? PLATFORM_CONFIG_FALLBACK.seoDefaultOgType,
+    seoPrefix: config.seoPrefix ?? PLATFORM_CONFIG_FALLBACK.seoPrefix,
+    seoSuffix: config.seoSuffix ?? PLATFORM_CONFIG_FALLBACK.seoSuffix,
   };
 });
 
