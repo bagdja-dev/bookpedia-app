@@ -484,22 +484,28 @@ export function BookForm({ mode, initialValues, submitting, submitLabel, onSubmi
         previewHeight={144}
       />
 
-      <AccordionSection title="SEO Override" className="mt-2">
+      <AccordionSection title="Tingkatkan keterlihatan di Google" className="mt-2">
         <div className="space-y-3">
-          <p className="text-xs text-muted-foreground">Kosongkan untuk memakai default Platform/Library. Token: {'{{title}}'}, {'{{platform}}'}, {'{{library}}'}, {'{{author}}'}, {'{{bookType}}'}, {'{{prefix}}'}, {'{{suffix}}'}.</p>
-          <SeoTemplateField id="book-seo-h1" label="H1" value={seoH1} onChange={setSeoH1} placeholder="H1" disabled={submitting} />
-          <SeoTemplateField id="book-seo-title" label="Title" value={seoTitle} onChange={setSeoTitle} placeholder="Title" disabled={submitting} />
-          <SeoTemplateField id="book-seo-description" label="Description" value={seoDescription} onChange={setSeoDescription} placeholder="Description" multiline disabled={submitting} />
-          <SeoTemplateField id="book-seo-og-title" label="OG title" value={seoOgTitle} onChange={setSeoOgTitle} placeholder="OG title (opsional)" disabled={submitting} />
-          <SeoTemplateField id="book-seo-og-description" label="OG description" value={seoOgDescription} onChange={setSeoOgDescription} placeholder="OG description (opsional)" multiline disabled={submitting} />
+          <p className="text-xs text-muted-foreground">
+            SEO adalah cara supaya halaman buku kamu lebih mudah ditemukan di Google. Kalau tidak diisi, sistem akan memakai teks bawaan otomatis. Kamu bisa menulis dengan bahasa yang lebih sederhana dan lebih gampang dimengerti.
+          </p>
+          <div className="rounded-md border border-dashed border-muted-foreground/30 bg-muted/20 p-2 text-[11px] text-muted-foreground">
+            <p className="font-medium text-foreground">Shortcut otomatis:</p>
+            <p className="mt-1">{{title}} = judul buku, {{library}} = nama library, {{platform}} = nama platform, {{author}} = penulis, {{bookType}} = tipe buku.</p>
+          </div>
+          <SeoTemplateField id="book-seo-h1" label="Judul utama halaman" value={seoH1} onChange={setSeoH1} placeholder="Contoh: {{title}} — cerita yang bikin penasaran" disabled={submitting} />
+          <SeoTemplateField id="book-seo-title" label="Judul browser / tab" value={seoTitle} onChange={setSeoTitle} placeholder="Contoh: {{title}} — baca sekarang" disabled={submitting} />
+          <SeoTemplateField id="book-seo-description" label="Ringkasan singkat" value={seoDescription} onChange={setSeoDescription} placeholder="Contoh: Baca {{title}} dari {{library}} di {{platform}}" multiline disabled={submitting} />
+          <SeoTemplateField id="book-seo-og-title" label="Judul saat dibagikan" value={seoOgTitle} onChange={setSeoOgTitle} placeholder="Opsional" disabled={submitting} />
+          <SeoTemplateField id="book-seo-og-description" label="Deskripsi saat dibagikan" value={seoOgDescription} onChange={setSeoOgDescription} placeholder="Opsional" multiline disabled={submitting} />
           <select value={seoOgType} onChange={(e) => setSeoOgType(e.target.value as typeof seoOgType)} className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm" aria-label="SEO OG type" disabled={submitting}>
-            <option value="book">book</option>
+            <option value="book">buku</option>
             <option value="website">website</option>
-            <option value="profile">profile</option>
+            <option value="profile">profil</option>
           </select>
           <div className="grid gap-4 sm:grid-cols-2">
-            <SeoTemplateField id="book-seo-prefix" label="Prefix" value={seoPrefix} onChange={setSeoPrefix} placeholder="Prefix" disabled={submitting} />
-            <SeoTemplateField id="book-seo-suffix" label="Suffix" value={seoSuffix} onChange={setSeoSuffix} placeholder="Suffix" disabled={submitting} />
+            <SeoTemplateField id="book-seo-prefix" label="Awalan" value={seoPrefix} onChange={setSeoPrefix} placeholder="Contoh: Baca" disabled={submitting} />
+            <SeoTemplateField id="book-seo-suffix" label="Akhiran" value={seoSuffix} onChange={setSeoSuffix} placeholder="Contoh: Gratis" disabled={submitting} />
           </div>
         </div>
       </AccordionSection>
