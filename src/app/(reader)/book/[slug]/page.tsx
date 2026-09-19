@@ -44,10 +44,21 @@ export async function generateMetadata({ params }: BookPageProps): Promise<Metad
       ? `${bookTypeLabel} — ${book.sinopsis}`
       : book.sinopsis
     : `Baca ${book.judul} (${formatBookByline(book)}) di ${config.nama}.`;
+  const explicitBookSeo = {
+    h1: book.seoH1 || book.judul,
+    title: book.seoTitle || book.judul,
+    description: book.seoDescription || fallbackDescription,
+    ogTitle: book.seoOgTitle || book.judul,
+    ogDescription: book.seoOgDescription || fallbackDescription,
+    ogType: book.seoOgType || 'book',
+    prefix: book.seoPrefix,
+    suffix: book.seoSuffix,
+  };
+
   const seo = resolveSeoTemplates(
     [
-      { h1: book.seoH1, title: book.seoTitle, description: book.seoDescription, ogTitle: book.seoOgTitle, ogDescription: book.seoOgDescription, ogType: book.seoOgType, prefix: book.seoPrefix, suffix: book.seoSuffix },
-      { prefix: book.library.nama, h1: book.library.nama },
+      explicitBookSeo,
+      { h1: book.library.nama, title: `${book.judul} — ${book.library.nama}`, description: fallbackDescription, ogType: 'book', prefix: book.seoPrefix, suffix: book.seoSuffix },
       { h1: config.seoDefaultH1, title: config.seoDefaultTitle, description: config.seoDefaultDescription, ogTitle: config.seoDefaultOgTitle, ogDescription: config.seoDefaultOgDescription, ogType: config.seoDefaultOgType, prefix: config.seoPrefix, suffix: config.seoSuffix },
     ],
     { title: book.judul, platform: config.nama, library: book.library.nama, author: book.library.nama, bookType: bookTypeLabel },
@@ -85,10 +96,21 @@ export default async function BookDetailPage({ params }: BookPageProps) {
   }
 
   const bookTypeLabel = book.bookType === 'original' ? 'Original' : BOOK_TYPE_BADGE_LABEL[book.bookType];
+  const explicitBookSeo = {
+    h1: book.seoH1 || book.judul,
+    title: book.seoTitle || book.judul,
+    description: book.seoDescription || book.sinopsis || '',
+    ogTitle: book.seoOgTitle || book.judul,
+    ogDescription: book.seoOgDescription || book.sinopsis || '',
+    ogType: book.seoOgType || 'book',
+    prefix: book.seoPrefix,
+    suffix: book.seoSuffix,
+  };
+
   const pageSeo = resolveSeoTemplates(
     [
-      { h1: book.seoH1, title: book.seoTitle, description: book.seoDescription, ogType: book.seoOgType, prefix: book.seoPrefix, suffix: book.seoSuffix },
-      { h1: book.library.nama },
+      explicitBookSeo,
+      { h1: book.library.nama, title: `${book.judul} — ${book.library.nama}`, description: book.sinopsis ?? '', ogType: 'book', prefix: book.seoPrefix, suffix: book.seoSuffix },
       { h1: config.seoDefaultH1, title: config.seoDefaultTitle, description: config.seoDefaultDescription, ogType: config.seoDefaultOgType, prefix: config.seoPrefix, suffix: config.seoSuffix },
     ],
     { title: book.judul, platform: config.nama, library: book.library.nama, author: book.library.nama, bookType: bookTypeLabel },
