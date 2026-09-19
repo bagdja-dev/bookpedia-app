@@ -129,7 +129,7 @@ export default function SettingsPage() {
                 </p>
                 <div className="rounded-md border border-dashed border-muted-foreground/30 bg-muted/20 p-2 text-[11px] text-muted-foreground">
                   <p className="font-medium text-foreground">Contoh shortcut otomatis:</p>
-                  <p className="mt-1">{{library}} = nama library, {{platform}} = nama platform, {{title}} = judul buku, {{author}} = penulis, {{bookType}} = tipe buku.</p>
+                  <p className="mt-1">{'{{library}} = nama library, {{platform}} = nama platform, {{title}} = judul buku, {{author}} = penulis, {{bookType}} = tipe buku.'}</p>
                 </div>
                 <SeoTemplateField id="library-seo-h1" label="Judul utama halaman" value={seoH1} onChange={setSeoH1} placeholder="Contoh: {{library}} — cerita yang bikin nagih" disabled={submitting} />
                 <SeoTemplateField id="library-seo-title" label="Judul browser / tab" value={seoTitle} onChange={setSeoTitle} placeholder="Contoh: {{library}} — Cerita seru untuk dibaca" disabled={submitting} />

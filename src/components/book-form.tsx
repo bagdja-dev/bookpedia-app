@@ -491,7 +491,7 @@ export function BookForm({ mode, initialValues, submitting, submitLabel, onSubmi
           </p>
           <div className="rounded-md border border-dashed border-muted-foreground/30 bg-muted/20 p-2 text-[11px] text-muted-foreground">
             <p className="font-medium text-foreground">Shortcut otomatis:</p>
-            <p className="mt-1">{{title}} = judul buku, {{library}} = nama library, {{platform}} = nama platform, {{author}} = penulis, {{bookType}} = tipe buku.</p>
+            <p className="mt-1">{'{{title}} = judul buku, {{library}} = nama library, {{platform}} = nama platform, {{author}} = penulis, {{bookType}} = tipe buku.'}</p>
           </div>
           <SeoTemplateField id="book-seo-h1" label="Judul utama halaman" value={seoH1} onChange={setSeoH1} placeholder="Contoh: {{title}} — cerita yang bikin penasaran" disabled={submitting} />
           <SeoTemplateField id="book-seo-title" label="Judul browser / tab" value={seoTitle} onChange={setSeoTitle} placeholder="Contoh: {{title}} — baca sekarang" disabled={submitting} />
