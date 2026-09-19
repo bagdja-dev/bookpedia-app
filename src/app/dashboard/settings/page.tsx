@@ -4,6 +4,7 @@ import { useState, type FormEvent } from 'react';
 import { toast } from 'sonner';
 
 import { CoverImageUpload } from '@/components/cover-image-upload';
+import { AccordionSection } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -121,26 +122,25 @@ export default function SettingsPage() {
               previewHeight={96}
             />
 
-            <div className="space-y-3 border-t pt-4">
-              <div>
-                <Label>SEO Override</Label>
+            <AccordionSection title="SEO Override" className="mt-2">
+              <div className="space-y-3">
                 <p className="text-xs text-muted-foreground">Kosongkan field untuk memakai default Platform. Token: {'{{title}}'}, {'{{platform}}'}, {'{{library}}'}, {'{{author}}'}, {'{{bookType}}'}, {'{{prefix}}'}, {'{{suffix}}'}.</p>
+                <SeoTemplateField id="library-seo-h1" label="H1" value={seoH1} onChange={setSeoH1} placeholder="H1, mis. {{library}}" disabled={submitting} />
+                <SeoTemplateField id="library-seo-title" label="Title" value={seoTitle} onChange={setSeoTitle} placeholder="Title, mis. {{library}} — {{platform}}" disabled={submitting} />
+                <SeoTemplateField id="library-seo-description" label="Description" value={seoDescription} onChange={setSeoDescription} placeholder="Description" multiline disabled={submitting} />
+                <SeoTemplateField id="library-seo-og-title" label="OG title" value={seoOgTitle} onChange={setSeoOgTitle} placeholder="OG title (opsional)" disabled={submitting} />
+                <SeoTemplateField id="library-seo-og-description" label="OG description" value={seoOgDescription} onChange={setSeoOgDescription} placeholder="OG description (opsional)" multiline disabled={submitting} />
+                <select value={seoOgType} onChange={(e) => setSeoOgType(e.target.value as NonNullable<Library['seoOgType']>)} className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm" aria-label="SEO OG type">
+                  <option value="profile">profile</option>
+                  <option value="website">website</option>
+                  <option value="book">book</option>
+                </select>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <SeoTemplateField id="library-seo-prefix" label="Prefix" value={seoPrefix} onChange={setSeoPrefix} placeholder="Prefix" disabled={submitting} />
+                  <SeoTemplateField id="library-seo-suffix" label="Suffix" value={seoSuffix} onChange={setSeoSuffix} placeholder="Suffix" disabled={submitting} />
+                </div>
               </div>
-              <SeoTemplateField id="library-seo-h1" label="H1" value={seoH1} onChange={setSeoH1} placeholder="H1, mis. {{library}}" disabled={submitting} />
-              <SeoTemplateField id="library-seo-title" label="Title" value={seoTitle} onChange={setSeoTitle} placeholder="Title, mis. {{library}} — {{platform}}" disabled={submitting} />
-              <SeoTemplateField id="library-seo-description" label="Description" value={seoDescription} onChange={setSeoDescription} placeholder="Description" multiline disabled={submitting} />
-              <SeoTemplateField id="library-seo-og-title" label="OG title" value={seoOgTitle} onChange={setSeoOgTitle} placeholder="OG title (opsional)" disabled={submitting} />
-              <SeoTemplateField id="library-seo-og-description" label="OG description" value={seoOgDescription} onChange={setSeoOgDescription} placeholder="OG description (opsional)" multiline disabled={submitting} />
-              <select value={seoOgType} onChange={(e) => setSeoOgType(e.target.value as NonNullable<Library['seoOgType']>)} className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm" aria-label="SEO OG type">
-                <option value="profile">profile</option>
-                <option value="website">website</option>
-                <option value="book">book</option>
-              </select>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <SeoTemplateField id="library-seo-prefix" label="Prefix" value={seoPrefix} onChange={setSeoPrefix} placeholder="Prefix" disabled={submitting} />
-                <SeoTemplateField id="library-seo-suffix" label="Suffix" value={seoSuffix} onChange={setSeoSuffix} placeholder="Suffix" disabled={submitting} />
-              </div>
-            </div>
+            </AccordionSection>
 
             <Button type="submit" disabled={submitting || coverUploading} className="mt-2 w-fit">
               {submitting ? 'Menyimpan…' : coverUploading ? 'Menunggu upload cover…' : 'Simpan Perubahan'}
