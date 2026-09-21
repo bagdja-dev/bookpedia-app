@@ -4,7 +4,7 @@ import { Placeholder } from '@tiptap/extension-placeholder';
 import { Underline } from '@tiptap/extension-underline';
 import { EditorContent, useEditor, type Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 
 import { cn } from '@/lib/utils';
 
@@ -21,8 +21,13 @@ const EDITOR_CONTENT_CLASS =
   '[&_p.is-editor-empty:first-child]:before:pointer-events-none [&_p.is-editor-empty:first-child]:before:float-left ' +
   '[&_p.is-editor-empty:first-child]:before:h-0 [&_p.is-editor-empty:first-child]:before:text-muted-foreground ' +
   '[&_p.is-editor-empty:first-child]:before:content-[attr(data-placeholder)] ' +
-  '[&_h2]:mb-2 [&_h2]:mt-4 [&_h2]:text-xl [&_h2]:font-bold [&_h3]:mb-1 [&_h3]:mt-3 [&_h3]:text-lg [&_h3]:font-semibold ' +
+  '[&_h1]:mb-3 [&_h1]:mt-5 [&_h1]:text-2xl [&_h1]:font-bold [&_h2]:mb-2 [&_h2]:mt-4 [&_h2]:text-xl [&_h2]:font-bold [&_h3]:mb-1 [&_h3]:mt-3 [&_h3]:text-lg [&_h3]:font-semibold ' +
   '[&_li]:ml-4 [&_ol]:list-decimal [&_p]:mb-3 [&_ul]:list-disc';
+
+function countWords(text: string): number {
+  const normalized = text.trim();
+  return normalized ? normalized.split(/\s+/u).length : 0;
+}
 
 interface RichTextEditorProps {
   value: string;
@@ -80,9 +85,20 @@ function ToolbarButtons({ editor, disabled }: { editor: Editor; disabled: boolea
       <ToolbarButton title="Underline" disabled={disabled} active={editor.isActive('underline')} onClick={() => editor.chain().focus().toggleUnderline().run()}>
         U
       </ToolbarButton>
+      <ToolbarButton title="Strikethrough" disabled={disabled} active={editor.isActive('strike')} onClick={() => editor.chain().focus().toggleStrike().run()}>
+        S
+      </ToolbarButton>
 
       <ToolbarSeparator />
 
+      <ToolbarButton
+        title="Heading 1"
+        disabled={disabled}
+        active={editor.isActive('heading', { level: 1 })}
+        onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+      >
+        H1
+      </ToolbarButton>
       <ToolbarButton
         title="Heading 2"
         disabled={disabled}
@@ -119,6 +135,32 @@ function ToolbarButtons({ editor, disabled }: { editor: Editor; disabled: boolea
         1.
       </ToolbarButton>
 
+      <ToolbarButton
+        title="Quote"
+        disabled={disabled}
+        active={editor.isActive('blockquote')}
+        onClick={() => editor.chain().focus().toggleBlockquote().run()}
+      >
+        “ ”
+      </ToolbarButton>
+      <ToolbarButton
+        title="Code"
+        disabled={disabled}
+        active={editor.isActive('code')}
+        onClick={() => editor.chain().focus().toggleCode().run()}
+      >
+        {'</>'}
+      </ToolbarButton>
+
+      <ToolbarSeparator />
+
+      <ToolbarButton title="Horizontal rule" disabled={disabled} onClick={() => editor.chain().focus().setHorizontalRule().run()}>
+        ―
+      </ToolbarButton>
+      <ToolbarButton title="Clear formatting" disabled={disabled} onClick={() => editor.chain().focus().clearNodes().unsetAllMarks().run()}>
+        Tx
+      </ToolbarButton>
+
       <ToolbarSeparator />
 
       <ToolbarButton title="Undo" disabled={disabled} onClick={() => editor.chain().focus().undo().run()}>
@@ -132,16 +174,24 @@ function ToolbarButtons({ editor, disabled }: { editor: Editor; disabled: boolea
 }
 
 export function RichTextEditor({ value, onChange, disabled = false, placeholder, className }: RichTextEditorProps) {
+  const [wordCount, setWordCount] = useState(() => countWords(value));
+  const [characterCount, setCharacterCount] = useState(() => value.replace(/<[^>]*>/g, '').length);
+
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({ heading: { levels: [2, 3] } }),
+      StarterKit.configure({ heading: { levels: [1, 2, 3] } }),
       Underline,
       Placeholder.configure({ placeholder: placeholder ?? 'Mulai menulis chapter di sini…' }),
     ],
     content: value || '',
     editable: !disabled,
     immediatelyRender: false,
-    onUpdate: ({ editor: updated }) => onChange(updated.getHTML()),
+    onUpdate: ({ editor: updated }) => {
+      const text = updated.getText();
+      setWordCount(countWords(text));
+      setCharacterCount(text.length);
+      onChange(updated.getHTML());
+    },
     editorProps: {
       attributes: { class: EDITOR_CONTENT_CLASS },
     },
@@ -159,6 +209,9 @@ export function RichTextEditor({ value, onChange, disabled = false, placeholder,
     if (value !== editor.getHTML()) {
       editor.commands.setContent(value || '', { emitUpdate: false });
     }
+    const text = editor.getText();
+    setWordCount(countWords(text));
+    setCharacterCount(text.length);
   }, [value, editor]);
 
   return (
@@ -168,6 +221,10 @@ export function RichTextEditor({ value, onChange, disabled = false, placeholder,
       </div>
       <div className="flex-1 overflow-y-auto">
         <EditorContent editor={editor} />
+      </div>
+      <div className="flex shrink-0 items-center justify-end gap-3 border-t bg-muted/20 px-3 py-1.5 text-xs text-muted-foreground">
+        <span>{wordCount.toLocaleString('id-ID')} kata</span>
+        <span>{characterCount.toLocaleString('id-ID')} karakter</span>
       </div>
     </div>
   );

@@ -338,7 +338,7 @@ export default function ChapterEditorPage({
 
   if (distractionFree) {
     return (
-      <div className="fixed inset-0 z-40 flex flex-col bg-background">
+      <div className="fixed inset-0 z-60 flex flex-col bg-background">
         {header}
         <div className="flex flex-1 flex-col overflow-y-auto">
           {titleInput}

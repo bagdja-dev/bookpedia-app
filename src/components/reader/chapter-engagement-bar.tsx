@@ -6,7 +6,6 @@ import { toast } from 'sonner';
 
 import { apiClient } from '@/lib/api-client';
 import { useAuth } from '@/hooks/use-auth';
-import { useScrollDirection } from '@/hooks/use-scroll-direction';
 import { CommentSheet } from './comment-sheet';
 
 interface ToggleLikeResponse {
@@ -27,8 +26,9 @@ interface ChapterEngagementBarProps {
 }
 
 /**
- * Fase 8 (14 Sep 2026) — bottom bar ala TikTok/Shorts (Like/Comment/Share),
- * auto-hide saat scroll aktif (`useScrollDirection`). SENGAJA tanpa ikon
+ * Fase 8 (14 Sep 2026) — bottom bar ala TikTok/Shorts (Like/Comment/Share).
+ * Bar selalu terlihat di bagian bawah viewport supaya kontrol engagement mudah
+ * dijangkau selama membaca. SENGAJA tanpa ikon
  * Publisher (dibatalkan, ditunda ke fase berikutnya — overview.md §14.2).
  *
  * Layout CLUSTERED (satu pill di tengah, bukan `justify-between` merentang
@@ -52,7 +52,6 @@ export function ChapterEngagementBar({
   const [likeCount, setLikeCount] = useState(initialLikeCount);
   const [submitting, setSubmitting] = useState(false);
   const [commentOpen, setCommentOpen] = useState(false);
-  const hidden = useScrollDirection();
 
   useEffect(() => {
     if (!enableLike || loading || !isLoggedIn) return;
@@ -120,9 +119,7 @@ export function ChapterEngagementBar({
   return (
     <>
       <div
-        className={`fixed inset-x-0 bottom-0 z-40 flex justify-center px-4 transition-transform duration-200 ${
-          hidden ? 'translate-y-[150%]' : 'translate-y-0'
-        }`}
+        className="fixed inset-x-0 bottom-0 z-40 flex justify-center px-4"
       >
         <div className="mb-4 flex items-center gap-1 rounded-full border border-[var(--reader-border)] bg-[var(--reader-surface)]/95 px-2 py-2 shadow-lg backdrop-blur">
           {enableLike && (
