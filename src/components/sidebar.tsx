@@ -2,11 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BookOpen, ChevronLeft, ChevronRight, Library, MessageCircle, Settings } from 'lucide-react';
+import { BookOpen, ChevronLeft, ChevronRight, LayoutDashboard, Library, MessageCircle, Settings } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 
 const NAV_ITEMS = [
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/dashboard/books', label: 'Book & Chapter', icon: Library },
   { href: '/dashboard/inbox', label: 'Inbox', icon: MessageCircle },
 ];

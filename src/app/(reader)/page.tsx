@@ -3,10 +3,11 @@ import Link from 'next/link';
 import { X } from 'lucide-react';
 
 import { BookMasonryGrid } from '@/components/reader/book-masonry-grid';
+import { BookSlider } from '@/components/reader/book-slider';
 import { getPlatformSlug } from '@/lib/platform';
 import { getPlatformConfig, publicFetch } from '@/lib/public-api';
 import { buildSocialMetadata } from '@/lib/seo';
-import type { CategoryDto, CatalogResponse, GenreDto } from '@/lib/public-types';
+import type { CategoryDto, CatalogHomeResponse, CatalogResponse, GenreDto } from '@/lib/public-types';
 import { cn } from '@/lib/utils';
 
 /**
@@ -54,7 +55,7 @@ function resolveCatalogSeo(params: {
 export async function generateMetadata({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string; genre?: string; category?: string; tag?: string; page?: string }>;
+  searchParams: Promise<{ search?: string; genre?: string; category?: string; tag?: string; page?: string; view?: string }>;
 }): Promise<Metadata> {
   const { search = '', genre = '', category = '', tag = '', page: pageParam = '1' } = await searchParams;
   const page = Math.max(1, Number.parseInt(pageParam, 10) || 1);
@@ -91,6 +92,7 @@ interface CatalogSearchParams {
   category?: string;
   tag?: string;
   page?: string;
+  view?: string;
 }
 
 // Katalog pusat = root `/` (route group `(reader)` tidak menambah segmen
@@ -109,6 +111,7 @@ export default async function CatalogPage({
     category = '',
     tag = '',
     page: pageParam = '1',
+    view = '',
   } = await searchParams;
   const page = Math.max(1, Number.parseInt(pageParam, 10) || 1);
   const searchBy: CatalogSearchBy = VALID_SEARCH_BY.includes(searchByParam as CatalogSearchBy)
@@ -125,16 +128,19 @@ export default async function CatalogPage({
   query.set('limit', String(PAGE_LIMIT));
 
   const slug = await getPlatformSlug();
-  const [config, catalog, genres, categories] = await Promise.all([
+  const isHomepage = !search && !genre && !category && !tag && page === 1 && view !== 'all';
+  const [config, catalog, genres, categories, homepage] = await Promise.all([
     getPlatformConfig(slug),
     publicFetch<CatalogResponse>(`/public/platforms/${slug}/catalog?${query.toString()}`),
     publicFetch<GenreDto[]>(`/public/platforms/${slug}/genres`),
     publicFetch<CategoryDto[]>(`/public/platforms/${slug}/categories`),
+    isHomepage ? publicFetch<CatalogHomeResponse>(`/public/platforms/${slug}/home`) : Promise.resolve(null),
   ]);
   const items = catalog?.items ?? [];
   const genreList = genres ?? [];
   const categoryList = categories ?? [];
   const total = catalog?.total ?? 0;
+  const showHomepageSections = isHomepage && homepage !== null;
   const totalPages = catalog ? Math.max(1, Math.ceil(total / (catalog.limit || PAGE_LIMIT))) : 1;
 
   function pageHref(targetPage: number) {
@@ -197,6 +203,41 @@ export default async function CatalogPage({
             : 'Temukan cerita baru untuk dibaca.'}
         </p>
       </div>
+
+      {isHomepage && homepage?.sections.map((section) => (
+        <section key={section.key} className="mb-10" aria-labelledby={`section-${section.key}`}>
+          <div className="mb-4 flex items-end justify-between gap-4">
+            <h2
+              id={`section-${section.key}`}
+              className="text-2xl font-semibold text-[var(--reader-foreground)]"
+              style={{ fontFamily: 'var(--font-source-serif)' }}
+            >
+              {section.title}
+            </h2>
+            <Link
+              href="/?view=all"
+              className="shrink-0 text-xs font-medium text-[var(--reader-muted)] hover:text-[var(--reader-terracotta)]"
+            >
+              Lihat semua
+            </Link>
+          </div>
+          {section.items.length > 0 ? (
+            <BookSlider
+              books={section.items}
+              platformSlug={slug}
+              layout={section.layout}
+              showStatus={config.showBookStatus}
+              showRating={config.enableRating}
+              showLike={config.enableLike}
+              showComment={config.enableComment}
+            />
+          ) : (
+            <p className="rounded-lg border border-[var(--reader-border)] bg-[var(--reader-surface)] px-4 py-6 text-sm text-[var(--reader-muted)]">
+              Belum ada cerita di section ini.
+            </p>
+          )}
+        </section>
+      ))}
 
       {categoryList.length > 0 && (
         <div className="mb-3 flex flex-wrap items-center gap-2">
@@ -268,7 +309,7 @@ export default async function CatalogPage({
         </div>
       )}
 
-      {catalog === null ? (
+      {showHomepageSections ? null : catalog === null ? (
         <p className="rounded-lg border border-[var(--reader-border)] bg-[var(--reader-surface)] px-4 py-8 text-center text-sm text-[var(--reader-muted)]">
           Katalog belum bisa dimuat saat ini. Coba muat ulang halaman sebentar lagi.
         </p>
@@ -287,7 +328,7 @@ export default async function CatalogPage({
         />
       )}
 
-      {totalPages > 1 && (
+      {!showHomepageSections && totalPages > 1 && (
         <div className="mt-8 flex items-center justify-center gap-3 text-sm">
           <Link
             href={pageHref(page - 1)}

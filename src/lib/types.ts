@@ -50,6 +50,40 @@ export interface UpdateLibraryPayload {
   seoSuffix?: string | null;
 }
 
+export interface LibraryAnalyticsBook {
+  bookId: string;
+  title: string;
+  views: number;
+  published: boolean;
+}
+
+export interface LibraryAnalyticsDay {
+  date: string;
+  views: number;
+  readers: number;
+  readingSessions: number;
+  readerGrowth: number;
+  readingGrowth: number;
+}
+
+export interface LibraryAnalyticsResponse {
+  totalBooks: number;
+  publishedBooks: number;
+  totalReaders: number;
+  totalViews: number;
+  totalLikes: number;
+  totalComments: number;
+  averageRating: number;
+  topBooks: LibraryAnalyticsBook[];
+  daily: LibraryAnalyticsDay[];
+  recentActivities: Array<{
+    title: string;
+    detail: string;
+    activityAt: string;
+    type: string;
+  }>;
+}
+
 export type BookStatus = 'draft' | 'ongoing' | 'completed';
 export type ChapterStatus = 'draft' | 'published';
 /** original (default) / translation / adaptation — Book terjemahan/adaptasi karya orang lain. */

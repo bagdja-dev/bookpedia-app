@@ -32,6 +32,22 @@ export interface CategoryDto {
   genres: GenreDto[];
 }
 
+export interface CatalogHomeSectionDto {
+  key: string;
+  type?: 'top' | 'new_updated';
+  title: string;
+  layout: 'grid' | 'slider';
+  page: number;
+  pageSize: number;
+  total: number;
+  lazyLoad?: boolean;
+  items: BookCatalogDto[];
+}
+
+export interface CatalogHomeResponse {
+  sections: CatalogHomeSectionDto[];
+}
+
 /** Bentuk ringkas Category yang di-embed di Book (§4.5) — tanpa nested `genres`. */
 export interface CategorySummaryDto {
   id: string;
