@@ -77,13 +77,13 @@ function ToolbarButtons({ editor, disabled }: { editor: Editor; disabled: boolea
   return (
     <>
       <ToolbarButton title="Bold" disabled={disabled} active={editor.isActive('bold')} onClick={() => editor.chain().focus().toggleBold().run()}>
-        B
+        <span className="font-bold">B</span>
       </ToolbarButton>
       <ToolbarButton title="Italic" disabled={disabled} active={editor.isActive('italic')} onClick={() => editor.chain().focus().toggleItalic().run()}>
-        I
+        <span className="italic">I</span>
       </ToolbarButton>
       <ToolbarButton title="Underline" disabled={disabled} active={editor.isActive('underline')} onClick={() => editor.chain().focus().toggleUnderline().run()}>
-        U
+        <span className="underline underline-offset-2">U</span>
       </ToolbarButton>
       <ToolbarButton title="Strikethrough" disabled={disabled} active={editor.isActive('strike')} onClick={() => editor.chain().focus().toggleStrike().run()}>
         S
