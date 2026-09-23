@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { BookOpen, LogOut, Menu } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { NotificationBell } from '@/components/reader/notification-bell';
 import { useAuth } from '@/hooks/use-auth';
 import type { Library } from '@/lib/types';
 
@@ -52,6 +53,7 @@ export function Topbar({ library, title, icon, onMenuToggle }: TopbarProps) {
       </div>
 
       <div className="flex items-center gap-3">
+        <NotificationBell />
         {user?.email && (
           <span className="hidden text-sm text-muted-foreground sm:inline">{user.email}</span>
         )}

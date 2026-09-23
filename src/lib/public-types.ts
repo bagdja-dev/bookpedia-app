@@ -105,6 +105,8 @@ export interface PlatformProfileDto {
   logoUrl: string | null;
   /** URL favicon browser tab — terpisah dari `logoUrl` (dipakai di header). */
   faviconUrl: string | null;
+  /** Suara toast notifikasi in-app; null = pakai nada default sintesis client-side (lihat RealtimeProvider). */
+  notificationSoundUrl: string | null;
   colors: PlatformColors;
   lockStudio: boolean;
   rendererKey: string;

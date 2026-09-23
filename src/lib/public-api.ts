@@ -26,6 +26,7 @@ const PLATFORM_CONFIG_FALLBACK: PlatformProfileDto = {
   slug: 'bookpedia',
   logoUrl: null,
   faviconUrl: null,
+  notificationSoundUrl: null,
   colors: {
     bg: '#fbf6ee',
     surface: '#fffdf8',
@@ -107,6 +108,7 @@ export const getPlatformConfig = cache(async (platformSlug: string): Promise<Pla
     slug: config.slug || platformSlug,
     logoUrl: config.logoUrl ?? PLATFORM_CONFIG_FALLBACK.logoUrl,
     faviconUrl: config.faviconUrl ?? PLATFORM_CONFIG_FALLBACK.faviconUrl,
+    notificationSoundUrl: config.notificationSoundUrl ?? PLATFORM_CONFIG_FALLBACK.notificationSoundUrl,
     colors: { ...PLATFORM_CONFIG_FALLBACK.colors, ...config.colors },
     lockStudio: config.lockStudio ?? PLATFORM_CONFIG_FALLBACK.lockStudio,
     rendererKey: config.rendererKey || PLATFORM_CONFIG_FALLBACK.rendererKey,

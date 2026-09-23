@@ -27,7 +27,7 @@ function InboxPageInner() {
   const { isLoggedIn, loading: authLoading, user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { subscribe } = useRealtime();
+  const { subscribe, refreshUnreadCount } = useRealtime();
   const chromeHeight = useReaderChromeHeight();
 
   const [conversations, setConversations] = useState<ConversationSummaryDto[] | null>(null);
@@ -66,10 +66,11 @@ function InboxPageInner() {
     );
     try {
       await apiClient(`/inbox/${encodeURIComponent(topicId)}/read`, { method: 'POST' });
+      void refreshUnreadCount().catch(() => undefined);
     } catch (error) {
       console.error('[InboxPage] gagal menandai percakapan sudah dibaca:', error);
     }
-  }, []);
+  }, [refreshUnreadCount]);
 
   const selectConversation = useCallback(
     (topicId: string) => {

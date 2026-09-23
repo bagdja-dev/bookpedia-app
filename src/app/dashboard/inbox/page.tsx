@@ -34,7 +34,7 @@ function EmptyState() {
  */
 export default function DashboardInboxPage() {
   const { user } = useAuth();
-  const { subscribe } = useRealtime();
+  const { subscribe, refreshUnreadCount } = useRealtime();
   const [conversations, setConversations] = useState<LibraryConversationSummaryDto[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
@@ -82,10 +82,11 @@ export default function DashboardInboxPage() {
     );
     try {
       await apiClient(`/library/inbox/${encodeURIComponent(topicId)}/read`, { method: 'POST' });
+      void refreshUnreadCount().catch(() => undefined);
     } catch (err) {
       console.error('[DashboardInboxPage] gagal menandai percakapan sudah dibaca:', err);
     }
-  }, []);
+  }, [refreshUnreadCount]);
 
   const selectConversation = useCallback(
     (topicId: string) => {

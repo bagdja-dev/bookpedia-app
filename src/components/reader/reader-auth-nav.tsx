@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { apiClient } from '@/lib/api-client';
 import type { Library } from '@/lib/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { NotificationBell } from '@/components/reader/notification-bell';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -97,7 +98,9 @@ export function ReaderAuthNav({ lockStudio }: ReaderAuthNavProps) {
     const ownProfileHref = `/u/${encodeURIComponent(user?.userId ?? '')}${ownProfileQuery ? `?${ownProfileQuery}` : ''}`;
 
     return (
-      <DropdownMenu>
+      <div className="flex items-center gap-2">
+        <NotificationBell />
+        <DropdownMenu>
         <DropdownMenuTrigger className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-[var(--reader-terracotta)]">
           <Avatar className="h-9 w-9 border border-[var(--reader-border)]">
             {user?.avatar && <AvatarImage src={user.avatar} alt={displayName} />}
@@ -160,7 +163,8 @@ export function ReaderAuthNav({ lockStudio }: ReaderAuthNavProps) {
             </a>
           </DropdownMenuItem>
         </DropdownMenuContent>
-      </DropdownMenu>
+        </DropdownMenu>
+      </div>
     );
   }
 
