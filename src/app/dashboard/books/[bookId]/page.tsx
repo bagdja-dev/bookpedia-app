@@ -324,7 +324,13 @@ export default function BookDetailPage({ params }: { params: Promise<{ bookId: s
               )}
             </div>
             {book.sinopsis && (
-              <p className="max-w-2xl text-sm text-muted-foreground">{book.sinopsis}</p>
+              <div className="max-w-2xl space-y-3 text-sm text-muted-foreground">
+                {book.sinopsis.split(/\n\s*\n/).map((paragraph, index) => (
+                  <p key={`${index}-${paragraph.slice(0, 20)}`} className="whitespace-pre-line">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
             )}
           </div>
           <div className="flex shrink-0 items-center gap-2">

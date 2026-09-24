@@ -312,7 +312,13 @@ export default async function BookDetailPage({ params }: BookPageProps) {
           )}
 
           {book.sinopsis && (
-            <p className="text-sm leading-relaxed text-[var(--reader-foreground)]/90">{book.sinopsis}</p>
+            <div className="space-y-3 text-sm leading-relaxed text-[var(--reader-foreground)]/90">
+              {book.sinopsis.split(/\n\s*\n/).map((paragraph, index) => (
+                <p key={`${index}-${paragraph.slice(0, 20)}`} className="whitespace-pre-line">
+                  {paragraph}
+                </p>
+              ))}
+            </div>
           )}
 
           {firstChapter && (
