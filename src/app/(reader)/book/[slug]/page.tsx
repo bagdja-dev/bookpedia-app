@@ -9,6 +9,7 @@ import { SendMessageToLibraryButton } from '@/components/reader/send-message-to-
 import { StarRatingDisplay } from '@/components/reader/star-rating-display';
 import { BookCommentsButton } from '@/components/reader/book-comments-button';
 import { ChapterCommentsButton } from '@/components/reader/chapter-comments-button';
+import { BookSlider } from '@/components/reader/book-slider';
 import { Badge } from '@/components/ui/badge';
 import { BOOK_STATUS_LABEL, BOOK_STATUS_VARIANT } from '@/lib/status';
 import { BOOK_TYPE_BADGE_LABEL, formatBookByline, formatBookBylinePrefix } from '@/lib/book-byline';
@@ -17,7 +18,7 @@ import { getPlatformSlug } from '@/lib/platform';
 import { getPlatformConfig, publicFetch } from '@/lib/public-api';
 import { resolveOriginFromHeaders } from '@/lib/resolve-origin';
 import { buildSocialMetadata, resolveSeoTemplates, toAbsoluteUrl, toJsonLdScript } from '@/lib/seo';
-import type { BookDetailDto } from '@/lib/public-types';
+import type { BookDetailDto, SimilarBooksResponse } from '@/lib/public-types';
 
 interface BookPageProps {
   params: Promise<{ slug: string }>;
@@ -86,9 +87,10 @@ function formatDate(iso: string | null): string {
 export default async function BookDetailPage({ params }: BookPageProps) {
   const { slug: bookSlug } = await params;
   const platformSlug = await getPlatformSlug();
-  const [config, book] = await Promise.all([
+  const [config, book, similarBooks] = await Promise.all([
     getPlatformConfig(platformSlug),
     publicFetch<BookDetailDto>(`/public/platforms/${platformSlug}/books/${bookSlug}`),
+    publicFetch<SimilarBooksResponse>(`/public/platforms/${platformSlug}/books/${bookSlug}/similar`),
   ]);
 
   if (!book) {
@@ -384,6 +386,42 @@ export default async function BookDetailPage({ params }: BookPageProps) {
           </ul>
         )}
       </div>
+
+      {similarBooks && similarBooks.promoted.length > 0 && (
+        <div className="mt-10">
+          <h2
+            className="mb-3 text-lg font-semibold text-[var(--reader-foreground)]"
+            style={{ fontFamily: 'var(--font-source-serif)' }}
+          >
+            Rekomendasi Penulis
+          </h2>
+          <BookSlider books={similarBooks.promoted} platformSlug={platformSlug} />
+        </div>
+      )}
+
+      {similarBooks && similarBooks.related.length > 0 && (
+        <div className="mt-10">
+          <h2
+            className="mb-3 text-lg font-semibold text-[var(--reader-foreground)]"
+            style={{ fontFamily: 'var(--font-source-serif)' }}
+          >
+            Cerita Serupa
+          </h2>
+          <BookSlider books={similarBooks.related} platformSlug={platformSlug} />
+        </div>
+      )}
+
+      {similarBooks && similarBooks.others.length > 0 && (
+        <div className="mt-10">
+          <h2
+            className="mb-3 text-lg font-semibold text-[var(--reader-foreground)]"
+            style={{ fontFamily: 'var(--font-source-serif)' }}
+          >
+            Cerita Lainnya
+          </h2>
+          <BookSlider books={similarBooks.others} platformSlug={platformSlug} />
+        </div>
+      )}
     </div>
   );
 }

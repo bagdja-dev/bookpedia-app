@@ -214,3 +214,20 @@ export interface ReorderChapterItem {
 export interface ReorderChapterPayload {
   items: ReorderChapterItem[];
 }
+
+/**
+ * "Rekomendasi Penulis" — kurasi manual Book yang tampil di halaman publik
+ * Book milik sendiri, BEBAS dipilih dari Library manapun di Platform yang
+ * sama (bukan cuma Library sendiri). Lihat `PromotionsService` bookpedia-api.
+ */
+export interface PromotedBookSummary {
+  id: string;
+  judul: string;
+  slug: string;
+  coverUrl: string | null;
+  libraryNama: string;
+}
+
+export interface ReplacePromotionsPayload {
+  promotedBookIds: string[];
+}

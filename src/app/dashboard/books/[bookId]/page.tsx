@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { ArrowLeft, ArrowUp, ArrowDown, Eye, EyeOff, FileText, Pencil, Plus, Trash2 } from 'lucide-react';
 
+import { BookPromotionsEditor } from '@/components/book-promotions-editor';
 import { LoadingSpinner } from '@/components/loading-spinner';
 import { StarRatingDisplay } from '@/components/reader/star-rating-display';
 import { Badge } from '@/components/ui/badge';
@@ -393,6 +394,8 @@ export default function BookDetailPage({ params }: { params: Promise<{ bookId: s
           </div>
         )}
       </div>
+
+      <BookPromotionsEditor bookId={bookId} platformSlug={platformSlug} />
     </div>
   );
 }

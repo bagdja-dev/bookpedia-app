@@ -178,6 +178,13 @@ export interface CatalogResponse {
   limit: number;
 }
 
+/** Grup slider "Rekomendasi Penulis"/"Cerita Serupa"/"Cerita Lainnya" di halaman detail Book (SEO) — lihat `PublicService.getSimilarBooks`. */
+export interface SimilarBooksResponse {
+  promoted: BookCatalogDto[];
+  related: BookCatalogDto[];
+  others: BookCatalogDto[];
+}
+
 export interface LibraryProfileDto {
   id: string;
   nama: string;
