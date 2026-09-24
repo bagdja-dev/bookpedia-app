@@ -109,6 +109,7 @@ export interface PlatformProfileDto {
   notificationSoundUrl: string | null;
   colors: PlatformColors;
   lockStudio: boolean;
+  studioEditMode: 'auto' | 'manual';
   rendererKey: string;
   /** Fase 5 (SEO) — jumlah Chapter pertama tiap Book yang bisa dibaca tanpa login. 0 = SEMUA Chapter gratis (bukan "nol Chapter gratis"). */
   maxFreeChapters: number;

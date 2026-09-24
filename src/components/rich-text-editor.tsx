@@ -17,7 +17,7 @@ import { cn } from '@/lib/utils';
  * tabel/link (lihat plan/bookpedia/overview.md §8.1).
  */
 const EDITOR_CONTENT_CLASS =
-  'min-h-[60vh] px-4 py-4 sm:px-8 sm:py-6 text-base leading-loose text-foreground outline-none ' +
+  'min-h-[60vh] px-4 pt-4 pb-[35rem] sm:px-8 sm:pt-6 sm:pb-[35rem] text-base leading-loose text-foreground outline-none ' +
   '[&_p.is-editor-empty:first-child]:before:pointer-events-none [&_p.is-editor-empty:first-child]:before:float-left ' +
   '[&_p.is-editor-empty:first-child]:before:h-0 [&_p.is-editor-empty:first-child]:before:text-muted-foreground ' +
   '[&_p.is-editor-empty:first-child]:before:content-[attr(data-placeholder)] ' +

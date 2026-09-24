@@ -12,7 +12,9 @@ import {
   Loader2,
   Maximize2,
   Minimize2,
+  Pencil,
   Plus,
+  Save,
   Trash2,
 } from 'lucide-react';
 
@@ -24,6 +26,7 @@ import { apiClient, ApiError } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
 import { CHAPTER_STATUS_LABEL, CHAPTER_STATUS_VARIANT } from '@/lib/status';
 import type { Chapter } from '@/lib/types';
+import { usePlatformContext } from '@/context/platform-context';
 
 const AUTOSAVE_DELAY_MS = 2000;
 
@@ -64,6 +67,8 @@ export default function ChapterEditorPage({
 }) {
   const { bookId, chapterId } = use(params);
   const router = useRouter();
+  const { config } = usePlatformContext();
+  const isManualMode = config.studioEditMode === 'manual';
 
   const [chapters, setChapters] = useState<Chapter[] | null>(null);
   const [chapter, setChapter] = useState<Chapter | null>(null);
@@ -71,6 +76,7 @@ export default function ChapterEditorPage({
   const [konten, setKonten] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  const [isEditing, setIsEditing] = useState(!isManualMode);
   const [publishing, setPublishing] = useState(false);
   const [distractionFree, setDistractionFree] = useState(false);
   const [creatingChapter, setCreatingChapter] = useState(false);
@@ -101,6 +107,7 @@ export default function ChapterEditorPage({
     skipAutosaveRef.current = true;
     setError(null);
     setSaveStatus('idle');
+    setIsEditing(!isManualMode);
     (async () => {
       try {
         const data = await apiClient<Chapter>(`/books/${bookId}/chapters/${chapterId}`);
@@ -117,12 +124,13 @@ export default function ChapterEditorPage({
     return () => {
       cancelled = true;
     };
-  }, [bookId, chapterId]);
+  }, [bookId, chapterId, isManualMode]);
 
   // Autosave draft — debounce ~2 detik setelah user berhenti mengetik.
   // TIDAK mengirim `status` (tetap draft), lihat plan/bookpedia/execution-plan.md
   // Fase 1 & overview.md §8.1 (autosave draft + tombol Publish terpisah).
   useEffect(() => {
+    if (isManualMode) return;
     if (skipAutosaveRef.current) {
       skipAutosaveRef.current = false;
       return;
@@ -150,6 +158,25 @@ export default function ChapterEditorPage({
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [judul, konten]);
+
+  async function handleManualSave() {
+    if (!chapter) return;
+    setSaveStatus('saving');
+    try {
+      const updated = await apiClient<Chapter>(`/books/${bookId}/chapters/${chapterId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ judul, konten }),
+      });
+      setChapter(updated);
+      setChapters((prev) => prev?.map((c) => (c.id === updated.id ? updated : c)) ?? prev);
+      setSaveStatus('saved');
+      setIsEditing(false);
+      toast.success('Draft berhasil disimpan.');
+    } catch (err) {
+      setSaveStatus('error');
+      toast.error(err instanceof ApiError ? err.message : 'Gagal menyimpan draft.');
+    }
+  }
 
   async function handlePublishToggle() {
     if (!chapter) return;
@@ -248,6 +275,26 @@ export default function ChapterEditorPage({
       </div>
 
       <div className="flex items-center gap-2">
+        {isManualMode && (
+          <Button
+            variant={isEditing ? 'default' : 'outline'}
+            size="sm"
+            disabled={saveStatus === 'saving'}
+            onClick={isEditing ? handleManualSave : () => setIsEditing(true)}
+          >
+            {isEditing ? (
+              <>
+                <Save className="mr-1.5 h-3.5 w-3.5" />
+                {saveStatus === 'saving' ? 'Menyimpan…' : 'Simpan'}
+              </>
+            ) : (
+              <>
+                <Pencil className="mr-1.5 h-3.5 w-3.5" />
+                Edit
+              </>
+            )}
+          </Button>
+        )}
         <Button
           variant={isPublished ? 'outline' : 'default'}
           size="sm"
@@ -271,6 +318,7 @@ export default function ChapterEditorPage({
   const titleInput = (
     <input
       value={judul}
+      disabled={!isEditing}
       onChange={(e) => setJudul(e.target.value)}
       placeholder="Judul Chapter"
       className="w-full border-0 bg-transparent px-4 pt-4 text-xl font-semibold outline-none placeholder:text-muted-foreground sm:px-8"
@@ -279,7 +327,7 @@ export default function ChapterEditorPage({
 
   const editorArea = (
     <div className="flex flex-1 flex-col gap-3 overflow-hidden px-4 pb-4 sm:px-8 sm:pb-8">
-      <RichTextEditor value={konten} onChange={setKonten} className="flex-1" />
+      <RichTextEditor value={konten} onChange={setKonten} disabled={!isEditing} className="flex-1" />
     </div>
   );
 
