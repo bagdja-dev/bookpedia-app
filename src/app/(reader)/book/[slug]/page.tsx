@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { BookOpen, Eye, Heart, ListFilter, MessageCircle, User } from 'lucide-react';
+import { BookOpen, BookOpenText, Eye, Heart, ListFilter, MessageCircle, User } from 'lucide-react';
 import { ContinueReadingButton } from '@/components/reader/continue-reading-button';
 import { BookRatingWidget } from '@/components/reader/book-rating-widget';
 import { SafeImage } from '@/components/safe-image';
@@ -286,6 +286,18 @@ export default async function BookDetailPage({ params }: BookPageProps) {
             <div className="flex items-center gap-3">
               <StarRatingDisplay average={book.ratingAverage} count={book.ratingCount} size="md" />
               {config.ratingMode === 'book' && <BookRatingWidget bookId={book.id} />}
+            </div>
+          )}
+
+          {book.series && (
+            <div className="flex flex-wrap items-center gap-1.5">
+              <Link
+                href={`/series/${book.series.id}`}
+                className="inline-flex max-w-full items-center gap-1 overflow-hidden rounded-full border border-[var(--reader-border)] bg-[var(--reader-bg)] px-2 py-0.5 text-xs text-[var(--reader-muted)] hover:border-[var(--reader-terracotta)] hover:text-[var(--reader-terracotta)]"
+              >
+                <BookOpenText className="h-3.5 w-3.5 shrink-0" />
+                <span className="truncate">{book.series.nama}</span>
+              </Link>
             </div>
           )}
 

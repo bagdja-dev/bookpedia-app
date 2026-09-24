@@ -99,6 +99,11 @@ export interface Book {
   category: CategorySummaryDto | null;
   /** Fase 6 — Tag bebas milik Book ini. */
   tags: TagDto[];
+  /** Series milik Book ini, opsional. */
+  series: {
+    id: string;
+    nama: string;
+  } | null;
   coverUrl: string | null;
   status: BookStatus;
   bookType: BookType;
@@ -230,4 +235,42 @@ export interface PromotedBookSummary {
 
 export interface ReplacePromotionsPayload {
   promotedBookIds: string[];
+}
+
+export interface SeriesBookSummary {
+  id: string;
+  judul: string;
+  slug: string;
+  coverUrl: string | null;
+  libraryNama: string;
+  publishedAt: string | null;
+  status: BookStatus;
+}
+
+export interface SeriesSummary {
+  id: string;
+  nama: string;
+  bookCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SeriesDetail {
+  id: string;
+  nama: string;
+  platformId: string;
+  bookCount: number;
+  books: SeriesBookSummary[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateSeriesPayload {
+  nama: string;
+  bookIds?: string[];
+}
+
+export interface UpdateSeriesPayload {
+  nama?: string;
+  bookIds?: string[];
 }

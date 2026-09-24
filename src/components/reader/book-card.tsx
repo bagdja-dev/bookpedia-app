@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Eye, Heart, ListFilter } from 'lucide-react';
+import { BookOpenText, Eye, Heart, ListFilter } from 'lucide-react';
 
 import { BOOK_STATUS_LABEL } from '@/lib/status';
 import { BOOK_TYPE_BADGE_LABEL, formatBookByline } from '@/lib/book-byline';
@@ -133,6 +133,15 @@ export function BookCard({
             className="rounded-full bg-[var(--reader-bg)] px-2 py-0.5 text-[11px] text-[var(--reader-muted)] hover:text-[var(--reader-terracotta)]"
           >
             {book.genre.nama}
+          </Link>
+        )}
+        {book.series && (
+          <Link
+            href={`/series/${book.series.id}`}
+            className="inline-flex items-center gap-1 rounded-full border border-[var(--reader-border)] bg-[var(--reader-bg)] px-2 py-0.5 text-[11px] text-[var(--reader-muted)] hover:border-[var(--reader-terracotta)] hover:text-[var(--reader-terracotta)]"
+          >
+            <BookOpenText className="h-3 w-3" />
+            {book.series.nama}
           </Link>
         )}
         {book.tags.slice(0, 3).map((tag) => (

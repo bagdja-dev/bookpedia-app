@@ -149,6 +149,11 @@ export interface BookCatalogDto {
   category: CategorySummaryDto | null;
   /** Fase 6 — Tag bebas milik Book ini. */
   tags: TagDto[];
+  /** Series milik Book ini, opsional. */
+  series: {
+    id: string;
+    nama: string;
+  } | null;
   coverUrl: string | null;
   status: BookStatus;
   /** Nama Chapter published terakhir berdasarkan orderIndex. */
@@ -220,6 +225,12 @@ export interface BookChapterSummary {
   commentCount: number;
 }
 
+export interface SeriesPublicDetailDto {
+  id: string;
+  nama: string;
+  books: BookCatalogDto[];
+}
+
 export interface BookDetailDto {
   id: string;
   judul: string;
@@ -229,6 +240,11 @@ export interface BookDetailDto {
   category: CategorySummaryDto | null;
   /** Fase 6 — Tag bebas milik Book ini. */
   tags: TagDto[];
+  /** Series milik Book ini, opsional. */
+  series: {
+    id: string;
+    nama: string;
+  } | null;
   coverUrl: string | null;
   status: BookStatus;
   bookType: BookType;
