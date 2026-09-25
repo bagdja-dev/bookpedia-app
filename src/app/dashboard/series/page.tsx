@@ -62,6 +62,7 @@ function toCatalogBook(book: Book): BookCatalogDto {
     ratingAverage: book.ratingAverage,
     ratingCount: book.ratingCount,
     likeCount: 0,
+    uniqueReaderCount: 0,
     commentCount: book.commentCount,
   };
 }

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { BookOpenText, Eye, Heart, ListFilter } from 'lucide-react';
+import { BookOpenText, Eye, Heart, ListFilter, UserRound } from 'lucide-react';
 
 import { BOOK_STATUS_LABEL } from '@/lib/status';
 import { BOOK_TYPE_BADGE_LABEL, formatBookByline } from '@/lib/book-byline';
@@ -91,6 +91,10 @@ export function BookCard({
             <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">
               <Eye className="h-3 w-3" />
               {formatCompactCount(book.viewCount)}
+            </span>
+            <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">
+              <UserRound className="h-3 w-3" />
+              {formatCompactCount(book.uniqueReaderCount ?? 0)}
             </span>
             {showLike && (
               <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">

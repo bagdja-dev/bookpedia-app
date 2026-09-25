@@ -173,6 +173,8 @@ export interface BookCatalogDto {
   ratingCount: number;
   /** Fase 8 (susulan) — total Like (SUM like_count semua Chapter Book ini). */
   likeCount: number;
+  /** Jumlah reader unik yang pernah menyimpan progress baca pada Book ini. */
+  uniqueReaderCount: number;
   /** Jumlah komentar sungguhan pada semua Chapter published Book ini. */
   commentCount: number;
 }
@@ -277,6 +279,8 @@ export interface BookDetailDto {
   ratingCount: number;
   /** Fase 8 — total Like (SUM like_count semua Chapter Book ini). */
   likeCount: number;
+  /** Jumlah reader unik yang pernah menyimpan progress baca pada Book ini. */
+  uniqueReaderCount: number;
   /** Jumlah komentar sungguhan pada semua Chapter published Book ini. */
   commentCount: number;
 }

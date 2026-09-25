@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { BookOpen, BookOpenText, Eye, Heart, ListFilter, MessageCircle, User } from 'lucide-react';
+import { BookOpen, BookOpenText, Eye, Heart, ListFilter, MessageCircle, User, UserRound } from 'lucide-react';
 import { ContinueReadingButton } from '@/components/reader/continue-reading-button';
 import { BookRatingWidget } from '@/components/reader/book-rating-widget';
 import { SafeImage } from '@/components/safe-image';
@@ -266,6 +266,10 @@ export default async function BookDetailPage({ params }: BookPageProps) {
             )}
             <span className="text-xs text-[var(--reader-muted)]">{book.chapters.length} chapter</span>
             <span className="text-xs text-[var(--reader-muted)]">{book.viewCount.toLocaleString('id-ID')}x dibaca</span>
+            <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">
+              <UserRound className="h-3.5 w-3.5" />
+              {(book.uniqueReaderCount ?? 0).toLocaleString('id-ID')} reader
+            </span>
             {config.enableLike && (
               <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">
                 <Heart className="h-3.5 w-3.5" />
