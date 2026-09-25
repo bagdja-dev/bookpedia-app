@@ -85,7 +85,7 @@ export function HighlightableChapter({ chapterId, konten, className, style }: Hi
     // Ambil ulang & narrow `container` di dalam handler itu sendiri (bukan
     // pakai `!` non-null assertion ke closure di atas) supaya TS bisa
     // menyempitkan tipenya di scope yang sama dengan pemakaiannya.
-    function handleMouseUp() {
+    function handleSelectionEnd() {
       const el = containerRef.current;
       if (!el) return;
 
@@ -97,6 +97,7 @@ export function HighlightableChapter({ chapterId, konten, className, style }: Hi
 
       const selectionRange = selection.getRangeAt(0);
       if (!el.contains(selectionRange.commonAncestorContainer)) {
+        setPending(null);
         return;
       }
 
@@ -124,8 +125,18 @@ export function HighlightableChapter({ chapterId, konten, className, style }: Hi
       });
     }
 
-    container.addEventListener('mouseup', handleMouseUp);
-    return () => container.removeEventListener('mouseup', handleMouseUp);
+    const events = ['mouseup', 'touchend', 'pointerup'] as const;
+    for (const eventName of events) {
+      container.addEventListener(eventName, handleSelectionEnd);
+    }
+    document.addEventListener('selectionchange', handleSelectionEnd);
+
+    return () => {
+      for (const eventName of events) {
+        container.removeEventListener(eventName, handleSelectionEnd);
+      }
+      document.removeEventListener('selectionchange', handleSelectionEnd);
+    };
   }, [isLoggedIn]);
 
   async function handleSaveHighlight() {
