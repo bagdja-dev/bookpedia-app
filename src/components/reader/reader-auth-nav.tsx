@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BookOpen, Highlighter, LayoutDashboard, LogOut, MessageCircle, User } from 'lucide-react';
+import { BookOpen, Bookmark, Highlighter, LayoutDashboard, LogOut, MessageCircle, User } from 'lucide-react';
 
 import { useAuth } from '@/hooks/use-auth';
 import { apiClient } from '@/lib/api-client';
@@ -133,6 +133,12 @@ export function ReaderAuthNav({ lockStudio }: ReaderAuthNavProps) {
             <Link href="/my/continue-reading">
               <BookOpen />
               Lanjutkan Baca
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild className="focus:bg-[#fbf6ee] focus:text-[#c1502e]">
+            <Link href="/my/collections">
+              <Bookmark />
+              Koleksi Saya
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild className="focus:bg-[#fbf6ee] focus:text-[#c1502e]">

@@ -186,6 +186,50 @@ export interface CatalogResponse {
   limit: number;
 }
 
+export interface MyCollectionItemBookDto {
+  id: string;
+  judul: string;
+  slug: string;
+  sinopsis: string | null;
+  genre: GenreDto | null;
+  category: CategorySummaryDto | null;
+  tags: TagDto[];
+  series: { id: string; nama: string } | null;
+  coverUrl: string | null;
+  status: BookStatus;
+  latestChapterTitle: string | null;
+  bookType: BookType;
+  originalAuthor: string | null;
+  library: { nama: string; slug: string };
+  viewCount: number;
+  ratingAverage: number;
+  ratingCount: number;
+  likeCount: number;
+  uniqueReaderCount: number;
+  commentCount: number;
+}
+
+export interface MyCollectionItemDto {
+  id: string;
+  collectionId: string;
+  bookId: string;
+  notifyOnAuthorUpdate: boolean;
+  note: string | null;
+  status: 'saved' | 'want_to_read' | 'reading' | 'finished';
+  addedAt: string;
+  book: MyCollectionItemBookDto | null;
+}
+
+export interface MyCollectionDto {
+  id: string;
+  user_id?: string;
+  name: string;
+  description?: string | null;
+  is_public?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
 /** Grup slider "Rekomendasi Penulis"/"Cerita Serupa"/"Cerita Lainnya" di halaman detail Book (SEO) — lihat `PublicService.getSimilarBooks`. */
 export interface SimilarBooksResponse {
   promoted: BookCatalogDto[];

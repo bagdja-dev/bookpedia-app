@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, type ReactNode } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { BookCard } from '@/components/reader/book-card';
@@ -14,6 +14,8 @@ export function BookSlider({
   showLike,
   showComment,
   layout = 'slider',
+  showCollectionActions = true,
+  renderBookActions,
 }: {
   books: BookCatalogDto[];
   platformSlug: string;
@@ -22,6 +24,8 @@ export function BookSlider({
   showLike?: boolean;
   showComment?: boolean;
   layout?: 'grid' | 'slider';
+  showCollectionActions?: boolean;
+  renderBookActions?: (book: BookCatalogDto) => ReactNode;
 }) {
   const scrollerRef = useRef<HTMLDivElement>(null);
 
@@ -34,7 +38,18 @@ export function BookSlider({
       {layout === 'grid' ? (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
           {books.map((book) => (
-            <BookCard key={book.id} book={book} platformSlug={platformSlug} showStatus={showStatus} showRating={showRating} showLike={showLike} showComment={showComment} />
+            <div key={book.id} className="relative">
+              {renderBookActions ? <div className="absolute right-2 top-2 z-20">{renderBookActions(book)}</div> : null}
+              <BookCard
+                book={book}
+                platformSlug={platformSlug}
+                showStatus={showStatus}
+                showRating={showRating}
+                showLike={showLike}
+                showComment={showComment}
+                showCollectionAction={showCollectionActions}
+              />
+            </div>
           ))}
         </div>
       ) : (
@@ -44,7 +59,8 @@ export function BookSlider({
         aria-label="Daftar buku"
       >
         {books.map((book) => (
-          <div key={book.id} className="w-[min(68vw,210px)] shrink-0 snap-start sm:w-[210px]">
+          <div key={book.id} className="relative w-[min(68vw,210px)] shrink-0 snap-start sm:w-[210px]">
+            {renderBookActions ? <div className="absolute right-2 top-2 z-20">{renderBookActions(book)}</div> : null}
             <BookCard
               book={book}
               platformSlug={platformSlug}
@@ -52,6 +68,7 @@ export function BookSlider({
               showRating={showRating}
               showLike={showLike}
               showComment={showComment}
+              showCollectionAction={showCollectionActions}
             />
           </div>
         ))}

@@ -8,6 +8,7 @@ import { formatCompactCount } from '@/lib/format';
 import { SafeImage } from '@/components/safe-image';
 import { StarRatingDisplay } from '@/components/reader/star-rating-display';
 import { BookCommentsButton } from '@/components/reader/book-comments-button';
+import { BookCollectionAction } from '@/components/reader/book-collection-action';
 import type { BookCatalogDto } from '@/lib/public-types';
 
 const STATUS_DOT: Record<BookCatalogDto['status'], string> = {
@@ -34,6 +35,7 @@ export function BookCard({
   showRating = true,
   showLike = true,
   showComment = true,
+  showCollectionAction = true,
 }: {
   book: BookCatalogDto;
   platformSlug: string;
@@ -44,6 +46,7 @@ export function BookCard({
   showLike?: boolean;
   /** Fase 8 (susulan) — ikut `platform.enableComment`. */
   showComment?: boolean;
+  showCollectionAction?: boolean;
 }) {
   const similarHref = buildSimilarBooksHref(book);
 
@@ -110,6 +113,14 @@ export function BookCard({
       </Link>
 
       <div className="mt-auto flex flex-wrap items-center gap-1.5 px-3 pb-3 pt-1">
+        {showCollectionAction && (
+          <BookCollectionAction
+            bookId={book.id}
+            bookTitle={book.judul}
+            variant="icon"
+            className="inline-flex items-center gap-1 rounded-full bg-[var(--reader-bg)] px-2 py-0.5 text-[11px] text-[var(--reader-muted)] hover:text-[var(--reader-terracotta)]"
+          />
+        )}
         {showComment && (
           <BookCommentsButton
             platformSlug={platformSlug}
