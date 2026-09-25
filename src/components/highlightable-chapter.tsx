@@ -44,6 +44,7 @@ export function HighlightableChapter({ chapterId, konten, className, style }: Hi
   const [highlights, setHighlights] = useState<HighlightDto[]>([]);
   const [pending, setPending] = useState<PendingSelection | null>(null);
   const [saving, setSaving] = useState(false);
+  const isTouchDevice = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
 
   const loadHighlights = useCallback(async () => {
     if (!isLoggedIn) return;
@@ -157,6 +158,11 @@ export function HighlightableChapter({ chapterId, konten, className, style }: Hi
     }
   }
 
+  function handleCancelHighlight() {
+    window.getSelection()?.removeAllRanges();
+    setPending(null);
+  }
+
   return (
     <>
       <div
@@ -170,14 +176,42 @@ export function HighlightableChapter({ chapterId, konten, className, style }: Hi
       />
 
       {pending && (
-        <div
-          className="fixed z-20 -translate-x-1/2 -translate-y-full rounded-md bg-[var(--reader-foreground)] px-3 py-1.5 text-xs font-medium text-[var(--reader-surface)] shadow-lg"
-          style={{ top: pending.top - 8, left: pending.left }}
-        >
-          <button type="button" onClick={handleSaveHighlight} disabled={saving} className="disabled:opacity-60">
-            {saving ? 'Menyimpan…' : 'Highlight'}
-          </button>
-        </div>
+        isTouchDevice ? (
+          <div
+            className="fixed inset-x-0 bottom-0 z-30 px-4 pb-[max(16px,env(safe-area-inset-bottom))]"
+            style={{ left: 0, right: 0 }}
+          >
+            <div className="mx-auto max-w-md rounded-t-2xl border border-[var(--reader-border)] bg-[var(--reader-surface)] p-3 shadow-[0_-12px_30px_rgba(0,0,0,0.18)]">
+              <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-[var(--reader-border)]" />
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleCancelHighlight}
+                  className="flex-1 rounded-full border border-[var(--reader-border)] px-4 py-2.5 text-sm font-medium text-[var(--reader-foreground)]"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveHighlight}
+                  disabled={saving}
+                  className="flex-1 rounded-full bg-[var(--reader-terracotta)] px-4 py-2.5 text-sm font-medium text-[var(--reader-terracotta-foreground)] disabled:opacity-60"
+                >
+                  {saving ? 'Menyimpan…' : 'Highlight'}
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div
+            className="fixed z-20 -translate-x-1/2 -translate-y-full rounded-md bg-[var(--reader-foreground)] px-3 py-1.5 text-xs font-medium text-[var(--reader-surface)] shadow-lg"
+            style={{ top: pending.top - 8, left: pending.left }}
+          >
+            <button type="button" onClick={handleSaveHighlight} disabled={saving} className="disabled:opacity-60">
+              {saving ? 'Menyimpan…' : 'Highlight'}
+            </button>
+          </div>
+        )
       )}
     </>
   );
