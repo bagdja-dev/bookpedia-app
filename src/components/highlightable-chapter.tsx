@@ -46,6 +46,14 @@ export function HighlightableChapter({ chapterId, konten, className, style }: Hi
   const [saving, setSaving] = useState(false);
   const isTouchDevice = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
 
+  const containerStyle = {
+    ...style,
+    userSelect: 'text' as const,
+    WebkitUserSelect: 'text' as const,
+    WebkitTouchCallout: 'default' as const,
+    touchAction: 'text' as const,
+  } satisfies CSSProperties;
+
   const loadHighlights = useCallback(async () => {
     if (!isLoggedIn) return;
     try {
@@ -91,7 +99,7 @@ export function HighlightableChapter({ chapterId, konten, className, style }: Hi
       if (!el) return;
 
       const selection = window.getSelection();
-      if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
+      if (!selection || selection.rangeCount === 0 || selection.isCollapsed || selection.toString().trim().length === 0) {
         setPending(null);
         return;
       }
@@ -126,16 +134,21 @@ export function HighlightableChapter({ chapterId, konten, className, style }: Hi
       });
     }
 
+    const clearPopupOnStart = () => setPending(null);
     const events = ['mouseup', 'touchend', 'pointerup'] as const;
     for (const eventName of events) {
       container.addEventListener(eventName, handleSelectionEnd);
     }
+    container.addEventListener('touchstart', clearPopupOnStart);
+    container.addEventListener('mousedown', clearPopupOnStart);
     document.addEventListener('selectionchange', handleSelectionEnd);
 
     return () => {
       for (const eventName of events) {
         container.removeEventListener(eventName, handleSelectionEnd);
       }
+      container.removeEventListener('touchstart', clearPopupOnStart);
+      container.removeEventListener('mousedown', clearPopupOnStart);
       document.removeEventListener('selectionchange', handleSelectionEnd);
     };
   }, [isLoggedIn]);
@@ -168,7 +181,7 @@ export function HighlightableChapter({ chapterId, konten, className, style }: Hi
       <div
         ref={containerRef}
         className={className}
-        style={style}
+        style={containerStyle}
         // Konten awal dari SSR — di-reset & di-overlay ulang lewat effect di
         // atas, string ini tidak berubah antar render (React tidak akan
         // menimpa manipulasi DOM manual kita selama nilainya sama).
@@ -176,42 +189,40 @@ export function HighlightableChapter({ chapterId, konten, className, style }: Hi
       />
 
       {pending && (
-        isTouchDevice ? (
-          <div
-            className="fixed inset-x-0 bottom-0 z-30 px-4 pb-[max(16px,env(safe-area-inset-bottom))]"
-            style={{ left: 0, right: 0 }}
-          >
-            <div className="mx-auto max-w-md rounded-t-2xl border border-[var(--reader-border)] bg-[var(--reader-surface)] p-3 shadow-[0_-12px_30px_rgba(0,0,0,0.18)]">
-              <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-[var(--reader-border)]" />
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={handleCancelHighlight}
-                  className="flex-1 rounded-full border border-[var(--reader-border)] px-4 py-2.5 text-sm font-medium text-[var(--reader-foreground)]"
-                >
-                  Batal
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSaveHighlight}
-                  disabled={saving}
-                  className="flex-1 rounded-full bg-[var(--reader-terracotta)] px-4 py-2.5 text-sm font-medium text-[var(--reader-terracotta-foreground)] disabled:opacity-60"
-                >
-                  {saving ? 'Menyimpan…' : 'Highlight'}
-                </button>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div
-            className="fixed z-20 -translate-x-1/2 -translate-y-full rounded-md bg-[var(--reader-foreground)] px-3 py-1.5 text-xs font-medium text-[var(--reader-surface)] shadow-lg"
-            style={{ top: pending.top - 8, left: pending.left }}
-          >
-            <button type="button" onClick={handleSaveHighlight} disabled={saving} className="disabled:opacity-60">
+        <div
+          className="pointer-events-none fixed z-20"
+          style={
+            isTouchDevice
+              ? {
+                  top: Math.max(20, pending.top - 56),
+                  left: Math.min(window.innerWidth - 120, Math.max(30, pending.left - 10)),
+                }
+              : {
+                  top: pending.top - 8,
+                  left: pending.left,
+                }
+          }
+        >
+          <div className="pointer-events-auto flex items-center gap-2 rounded-full border border-[var(--reader-border)] bg-[var(--reader-surface)] px-2 py-1.5 shadow-lg">
+            {isTouchDevice && (
+              <button
+                type="button"
+                onClick={handleCancelHighlight}
+                className="rounded-full border border-[var(--reader-border)] px-3 py-1.5 text-[11px] font-medium text-[var(--reader-foreground)]"
+              >
+                Batal
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={handleSaveHighlight}
+              disabled={saving}
+              className="rounded-full bg-[var(--reader-terracotta)] px-3 py-1.5 text-[11px] font-medium text-[var(--reader-terracotta-foreground)] disabled:opacity-60"
+            >
               {saving ? 'Menyimpan…' : 'Highlight'}
             </button>
           </div>
-        )
+        </div>
       )}
     </>
   );
