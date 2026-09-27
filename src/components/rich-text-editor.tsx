@@ -1,6 +1,7 @@
 'use client';
 
 import { Placeholder } from '@tiptap/extension-placeholder';
+import TextAlign from '@tiptap/extension-text-align';
 import { Underline } from '@tiptap/extension-underline';
 import { EditorContent, useEditor, type Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -119,6 +120,41 @@ function ToolbarButtons({ editor, disabled }: { editor: Editor; disabled: boolea
       <ToolbarSeparator />
 
       <ToolbarButton
+        title="Align left"
+        disabled={disabled}
+        active={editor.isActive({ textAlign: 'left' })}
+        onClick={() => editor.chain().focus().setTextAlign('left').run()}
+      >
+        <span className="text-left">≡</span>
+      </ToolbarButton>
+      <ToolbarButton
+        title="Align center"
+        disabled={disabled}
+        active={editor.isActive({ textAlign: 'center' })}
+        onClick={() => editor.chain().focus().setTextAlign('center').run()}
+      >
+        <span className="text-center">≡</span>
+      </ToolbarButton>
+      <ToolbarButton
+        title="Align right"
+        disabled={disabled}
+        active={editor.isActive({ textAlign: 'right' })}
+        onClick={() => editor.chain().focus().setTextAlign('right').run()}
+      >
+        <span className="text-right">≡</span>
+      </ToolbarButton>
+      <ToolbarButton
+        title="Justify"
+        disabled={disabled}
+        active={editor.isActive({ textAlign: 'justify' })}
+        onClick={() => editor.chain().focus().setTextAlign('justify').run()}
+      >
+        <span className="text-justify">≡</span>
+      </ToolbarButton>
+
+      <ToolbarSeparator />
+
+      <ToolbarButton
         title="Bullet list"
         disabled={disabled}
         active={editor.isActive('bulletList')}
@@ -180,6 +216,7 @@ export function RichTextEditor({ value, onChange, disabled = false, placeholder,
   const editor = useEditor({
     extensions: [
       StarterKit.configure({ heading: { levels: [1, 2, 3] } }),
+      TextAlign.configure({ types: ['heading', 'paragraph'] }),
       Underline,
       Placeholder.configure({ placeholder: placeholder ?? 'Mulai menulis chapter di sini…' }),
     ],
