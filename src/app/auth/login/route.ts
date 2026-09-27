@@ -29,15 +29,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL('/?error=server_misconfigured', resolveOrigin(request)));
   }
 
-  // TIDAK pakai forceLogin — dicoba sebelumnya (prompt=login) tapi ternyata
-  // (a) auction-web/website-admin/pos-admin juga tidak pakainya (silent-SSO
-  // memang pola standar ekosistem, lihat "Masuk"/"Mulai Sekarang" di
-  // bagdja-pos-admin — keduanya cuma link polos ke /auth/login, sama
-  // persis), dan (b) parameter `prompt` toh di-drop oleh bagdja-auth
-  // (core/bagdja-auth/src/auth/oauth.controller.ts method authorize() —
-  // tidak diteruskan ke bagdja-login) jadi tidak pernah benar-benar
-  // berfungsi. Silent-SSO across produk Bagdja adalah perilaku yang
-  // diharapkan, bukan bug.
+  // Bookpedia intentionally keeps silent SSO: account selection is not
+  // required when a user already has an active Bagdja Login session.
   const authorizeUrl = buildAuthorizeUrl(stateId, codeChallenge);
   return NextResponse.redirect(authorizeUrl);
 }
