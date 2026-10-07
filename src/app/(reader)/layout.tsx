@@ -80,7 +80,12 @@ export default async function ReaderLayout({ children }: { children: ReactNode }
       <main className="flex-1">{children}</main>
 
       <footer className="border-t border-[var(--reader-border)] px-4 py-6 text-center text-xs text-[var(--reader-muted)] sm:px-6">
-        {config.nama} — Baca &amp; tulis cerita, oleh Bagdja.
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
+          <span>{config.nama} — Baca &amp; tulis cerita, oleh Bagdja.</span>
+          <Link href="/terms-and-conditions" className="underline underline-offset-2 hover:text-[var(--reader-foreground)]">
+            Terms &amp; Conditions
+          </Link>
+        </div>
       </footer>
       </div>
     </RealtimeProvider>

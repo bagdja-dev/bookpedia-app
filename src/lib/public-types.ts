@@ -138,6 +138,7 @@ export interface PlatformProfileDto {
   seoDefaultOgType: 'website' | 'book' | 'profile' | null;
   seoPrefix: string | null;
   seoSuffix: string | null;
+  termsAndConditions: string | null;
 }
 
 export interface BookCatalogDto {
@@ -235,6 +236,11 @@ export interface SimilarBooksResponse {
   promoted: BookCatalogDto[];
   related: BookCatalogDto[];
   others: BookCatalogDto[];
+}
+
+export interface OriginalAuthorProfileDto {
+  nama: string;
+  books: BookCatalogDto[];
 }
 
 export interface LibraryProfileDto {

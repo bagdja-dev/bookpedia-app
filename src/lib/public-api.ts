@@ -59,6 +59,7 @@ const PLATFORM_CONFIG_FALLBACK: PlatformProfileDto = {
   seoDefaultOgType: 'website',
   seoPrefix: null,
   seoSuffix: null,
+  termsAndConditions: null,
 };
 
 /**
@@ -132,6 +133,7 @@ export const getPlatformConfig = cache(async (platformSlug: string): Promise<Pla
     seoDefaultOgType: config.seoDefaultOgType ?? PLATFORM_CONFIG_FALLBACK.seoDefaultOgType,
     seoPrefix: config.seoPrefix ?? PLATFORM_CONFIG_FALLBACK.seoPrefix,
     seoSuffix: config.seoSuffix ?? PLATFORM_CONFIG_FALLBACK.seoSuffix,
+    termsAndConditions: config.termsAndConditions ?? PLATFORM_CONFIG_FALLBACK.termsAndConditions,
   };
 });
 

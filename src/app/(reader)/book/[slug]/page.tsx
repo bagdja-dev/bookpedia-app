@@ -193,6 +193,18 @@ export default async function BookDetailPage({ params }: BookPageProps) {
             </Link>
           </p>
 
+          {book.bookType !== 'original' && book.originalAuthor && (
+            <p className="w-fit text-sm text-[var(--reader-muted)]">
+              Penulis asli:{' '}
+              <Link
+                href={`/author/${encodeURIComponent(book.originalAuthor)}`}
+                className="font-medium underline-offset-2 hover:text-[var(--reader-terracotta)] hover:underline"
+              >
+                {book.originalAuthor}
+              </Link>
+            </p>
+          )}
+
           <div className="flex items-center gap-2.5">
             <Link
               href={`/library/${book.library.slug}`}
