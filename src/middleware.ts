@@ -104,6 +104,43 @@ async function getPlatformVerificationFile(slug: string): Promise<{ filename: st
   }
 }
 
+/**
+ * TWA Digital Asset Links per-Platform (7 Okt 2026) — Chrome memverifikasi app
+ * TWA (Android) lewat `/.well-known/assetlinks.json` di origin target URL.
+ * Tanpa file ini (atau fingerprint tidak cocok) TWA tetap menampilkan URL bar.
+ * Dibalas dari `androidPackageName` + `androidSha256CertFingerprints` milik
+ * Platform yang resolve dari Host request (diisi Owner di Platform Settings),
+ * sama seperti verifikasi Search Console di atas. Belum diisi = 404.
+ */
+const ASSET_LINKS_PATH = '/.well-known/assetlinks.json';
+
+async function getPlatformAssetLinks(slug: string): Promise<unknown[] | null> {
+  try {
+    const res = await fetch(`${API_URL}/public/platforms/${encodeURIComponent(slug)}`, {
+      next: { revalidate: 300 },
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as {
+      androidPackageName?: string | null;
+      androidSha256CertFingerprints?: string[] | null;
+    };
+    const fingerprints = data.androidSha256CertFingerprints ?? [];
+    if (!data.androidPackageName || fingerprints.length === 0) return null;
+    return [
+      {
+        relation: ['delegate_permission/common.handle_all_urls'],
+        target: {
+          namespace: 'android_app',
+          package_name: data.androidPackageName,
+          sha256_cert_fingerprints: fingerprints,
+        },
+      },
+    ];
+  } catch {
+    return null;
+  }
+}
+
 export async function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith('/auth/')) {
     return NextResponse.next();
@@ -137,6 +174,16 @@ export async function middleware(request: NextRequest) {
     if (file && `/${file.filename}` === request.nextUrl.pathname) {
       return new NextResponse(file.content, { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
     }
+  }
+
+  if (request.nextUrl.pathname === ASSET_LINKS_PATH) {
+    const statements = await getPlatformAssetLinks(slug);
+    if (!statements) {
+      return NextResponse.json([], { status: 404 });
+    }
+    return NextResponse.json(statements, {
+      headers: { 'Cache-Control': 'public, max-age=300' },
+    });
   }
 
   return withPlatformSlug(request, slug);
