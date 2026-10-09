@@ -42,7 +42,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   const chapterEntries: MetadataRoute.Sitemap = entries.chapters.map((chapter) => ({
-    url: `${origin}/book/${chapter.bookSlug}/chapter/${chapter.orderIndex}`,
+    // Chapter terkunci: crawler hanya bisa membaca halaman preview share-nya.
+    url: `${origin}/book/${chapter.bookSlug}/chapter/${chapter.orderIndex}${chapter.isFree === false ? '/preview' : ''}`,
     lastModified: chapter.updatedAt,
     changeFrequency: 'monthly',
     priority: 0.5,

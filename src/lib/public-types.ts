@@ -96,7 +96,8 @@ export interface PlatformColors {
 export interface SitemapEntriesDto {
   books: { slug: string; updatedAt: string }[];
   libraries: { slug: string; updatedAt: string }[];
-  chapters: { bookSlug: string; orderIndex: number; updatedAt: string }[];
+  /** `isFree` false = Chapter perlu login → sitemap memakai URL preview share. */
+  chapters: { bookSlug: string; orderIndex: number; updatedAt: string; isFree: boolean }[];
 }
 
 export interface PlatformProfileDto {
@@ -136,6 +137,8 @@ export interface PlatformProfileDto {
   copyAttributionEnabled: boolean;
   /** Panjang maksimal potongan yang tersalin saat atribusi aktif. */
   copyAttributionMaxChars: number;
+  /** Share Chapter — panjang maksimal potongan paragraf di halaman preview. */
+  chapterPreviewMaxChars: number;
   seoDefaultH1: string | null;
   seoDefaultTitle: string | null;
   seoDefaultDescription: string | null;
@@ -352,6 +355,21 @@ export interface UserProfileStatsDto {
   worksCount: number;
   librarySlug: string | null;
   readingList: BookCatalogDto[];
+}
+
+/**
+ * Preview share 1 Chapter (`GET .../chapters/:n/preview`) — paragraf pertama saja sebagai
+ * teks polos, bisa diambil tanpa login. Dipakai halaman /book/{slug}/chapter/{n}/preview
+ * dan metadata SEO halaman Chapter.
+ */
+export interface ChapterPreviewDto {
+  id: string;
+  judul: string;
+  orderIndex: number;
+  publishedAt: string | null;
+  book: { id: string; judul: string; slug: string; coverUrl: string | null };
+  excerpt: string;
+  isFree: boolean;
 }
 
 export interface ChapterReadDto {
