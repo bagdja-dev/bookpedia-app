@@ -235,8 +235,11 @@ export function RichTextEditor({ value, onChange, disabled = false, placeholder,
   });
 
   useEffect(() => {
-    if (!editor) return;
-    editor.setEditable(!disabled);
+    if (!editor || editor.isEditable === !disabled) return;
+    // `emitUpdate: false` WAJIB — default TipTap memicu event `update`, yang lewat `onUpdate`
+    // menimpa `value` dengan isi editor saat itu (bisa masih kosong bila editor dibuat sebelum
+    // konten Chapter termuat), sehingga isi Chapter bisa terhapus saat disimpan.
+    editor.setEditable(!disabled, false);
   }, [editor, disabled]);
 
   // Sync balik value->editor (mis. saat pindah chapter lain lewat sidebar)
