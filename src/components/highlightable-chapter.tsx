@@ -1,14 +1,24 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useRef, useState, type ClipboardEvent, type CSSProperties, type MouseEvent } from 'react';
+import { toast } from 'sonner';
 
 import { apiClient } from '@/lib/api-client';
 import { useAuth } from '@/hooks/use-auth';
+import { buildCopyAttribution } from '@/lib/copy-attribution';
 import type { HighlightDto } from '@/lib/reader-types';
 
 interface HighlightableChapterProps {
   chapterId: string;
   konten: string;
+  /** Label sumber di atribusi saat menyalin, mis. "Judul Book — Nama Platform". */
+  copySourceLabel: string;
+  /** Pengaturan perlindungan konten Platform (Platform Settings). */
+  copyProtection: {
+    blockCopy: boolean;
+    attributionEnabled: boolean;
+    attributionMaxChars: number;
+  };
   className?: string;
   style?: CSSProperties;
 }
@@ -38,7 +48,7 @@ interface PendingSelection {
  * component) utuh sampai ke client sebelum hydration — highlight overlay
  * baru menyusul lewat `useEffect` setelah mount.
  */
-export function HighlightableChapter({ chapterId, konten, className, style }: HighlightableChapterProps) {
+export function HighlightableChapter({ chapterId, konten, copySourceLabel, copyProtection, className, style }: HighlightableChapterProps) {
   const { isLoggedIn } = useAuth();
   const containerRef = useRef<HTMLDivElement>(null);
   const [highlights, setHighlights] = useState<HighlightDto[]>([]);
@@ -50,7 +60,8 @@ export function HighlightableChapter({ chapterId, konten, className, style }: Hi
     ...style,
     userSelect: 'text' as const,
     WebkitUserSelect: 'text' as const,
-    WebkitTouchCallout: 'default' as const,
+    // Seleksi tetap aktif (highlight); callout tekan-lama iOS disembunyikan saat salin diblokir.
+    WebkitTouchCallout: copyProtection.blockCopy ? 'none' as const : 'default' as const,
     touchAction: 'text' as const,
   } satisfies CSSProperties;
 
@@ -176,12 +187,37 @@ export function HighlightableChapter({ chapterId, konten, className, style }: Hi
     setPending(null);
   }
 
+  /**
+   * Copy/cut di isi Chapter: diblokir (blockCopy), atau clipboard diganti potongan +
+   * tautan sumber (atribusi), atau dibiarkan normal bila keduanya nonaktif.
+   */
+  function handleCopy(event: ClipboardEvent<HTMLDivElement>) {
+    if (copyProtection.blockCopy) {
+      event.preventDefault();
+      toast.info('Konten ini dilindungi dan tidak dapat disalin.');
+      return;
+    }
+    if (!copyProtection.attributionEnabled) return;
+    const selected = window.getSelection()?.toString() ?? '';
+    if (!selected.trim()) return;
+    const url = `${window.location.origin}${window.location.pathname}`;
+    const attribution = buildCopyAttribution(selected, copySourceLabel, url, copyProtection.attributionMaxChars);
+    event.clipboardData.setData('text/plain', attribution.text);
+    event.clipboardData.setData('text/html', attribution.html);
+    event.preventDefault();
+  }
+
   return (
     <>
       <div
         ref={containerRef}
         className={className}
         style={containerStyle}
+        onCopy={handleCopy}
+        onCut={handleCopy}
+        onContextMenu={(event: MouseEvent<HTMLDivElement>) => {
+          if (copyProtection.blockCopy) event.preventDefault();
+        }}
         // Konten awal dari SSR — di-reset & di-overlay ulang lewat effect di
         // atas, string ini tidak berubah antar render (React tidak akan
         // menimpa manipulasi DOM manual kita selama nilainya sama).

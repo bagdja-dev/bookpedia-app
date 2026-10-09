@@ -51,6 +51,10 @@ const PLATFORM_CONFIG_FALLBACK: PlatformProfileDto = {
   enableLike: true,
   enableComment: true,
   enableShare: true,
+  blockContentCopy: false,
+  copyAttributionEnabled: true,
+  copyAttributionMaxChars: 200,
+  chapterPreviewMaxChars: 400,
   seoDefaultH1: '{{title}}',
   seoDefaultTitle: '{{title}} — {{platform}}',
   seoDefaultDescription: 'Baca {{title}} di {{platform}}.',
@@ -94,6 +98,31 @@ export async function publicFetch<T>(path: string): Promise<T | null> {
 }
 
 /**
+ * GET ke `bookpedia-api` atas nama pembaca yang login (Bearer token dari cookie
+ * `ns_token`) — dipakai isi Chapter di luar jatah gratis, yang ditolak API (401) tanpa
+ * token. `no-store`: respons bergantung pada siapa yang login, tidak boleh masuk cache
+ * ISR bersama. Mengembalikan status supaya pemanggil bisa membedakan 401 dari 404.
+ */
+export async function authedFetch<T>(path: string, token: string): Promise<{ status: number; data: T | null }> {
+  try {
+    const res = await fetch(`${API_BASE}${path}`, {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: 'no-store',
+    });
+    if (!res.ok) {
+      if (res.status !== 401 && res.status !== 404) {
+        console.error(`[authedFetch] GET ${path} -> ${res.status}: ${res.statusText}`);
+      }
+      return { status: res.status, data: null };
+    }
+    return { status: res.status, data: (await res.json()) as T };
+  } catch (err) {
+    console.error(`[authedFetch] GET ${path} failed:`, err);
+    return { status: 0, data: null };
+  }
+}
+
+/**
  * Wrapper `publicFetch('/public/platforms/:platformSlug')` dengan fallback
  * aman (lihat `PLATFORM_CONFIG_FALLBACK` di atas) — pemanggil TIDAK PERLU
  * cek `null`, selalu dapat object lengkap. Dibungkus `cache()` (React) —
@@ -125,6 +154,10 @@ export const getPlatformConfig = cache(async (platformSlug: string): Promise<Pla
     enableLike: config.enableLike ?? PLATFORM_CONFIG_FALLBACK.enableLike,
     enableComment: config.enableComment ?? PLATFORM_CONFIG_FALLBACK.enableComment,
     enableShare: config.enableShare ?? PLATFORM_CONFIG_FALLBACK.enableShare,
+    blockContentCopy: config.blockContentCopy ?? PLATFORM_CONFIG_FALLBACK.blockContentCopy,
+    copyAttributionEnabled: config.copyAttributionEnabled ?? PLATFORM_CONFIG_FALLBACK.copyAttributionEnabled,
+    copyAttributionMaxChars: config.copyAttributionMaxChars ?? PLATFORM_CONFIG_FALLBACK.copyAttributionMaxChars,
+    chapterPreviewMaxChars: config.chapterPreviewMaxChars ?? PLATFORM_CONFIG_FALLBACK.chapterPreviewMaxChars,
     seoDefaultH1: config.seoDefaultH1 ?? PLATFORM_CONFIG_FALLBACK.seoDefaultH1,
     seoDefaultTitle: config.seoDefaultTitle ?? PLATFORM_CONFIG_FALLBACK.seoDefaultTitle,
     seoDefaultDescription: config.seoDefaultDescription ?? PLATFORM_CONFIG_FALLBACK.seoDefaultDescription,
