@@ -49,5 +49,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }));
 
-  return [...staticEntries, ...bookEntries, ...libraryEntries, ...chapterEntries];
+  const listEntries: MetadataRoute.Sitemap = (entries.lists ?? []).map((list) => ({
+    url: `${origin}/list/${list.slug}`,
+    lastModified: list.updatedAt,
+    changeFrequency: 'daily',
+    priority: 0.7,
+  }));
+
+  return [...staticEntries, ...listEntries, ...bookEntries, ...libraryEntries, ...chapterEntries];
 }

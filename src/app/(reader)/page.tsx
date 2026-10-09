@@ -215,7 +215,7 @@ export default async function CatalogPage({
               {section.title}
             </h2>
             <Link
-              href="/?view=all"
+              href={section.slug ? `/list/${section.slug}` : '/?view=all'}
               className="shrink-0 text-xs font-medium text-[var(--reader-muted)] hover:text-[var(--reader-terracotta)]"
             >
               Lihat semua

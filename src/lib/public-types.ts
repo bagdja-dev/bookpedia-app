@@ -34,6 +34,8 @@ export interface CategoryDto {
 
 export interface CatalogHomeSectionDto {
   key: string;
+  /** Slug halaman "Lihat semua" — /list/{slug}. */
+  slug: string;
   type?: 'top' | 'new_updated';
   title: string;
   layout: 'grid' | 'slider';
@@ -42,6 +44,32 @@ export interface CatalogHomeSectionDto {
   total: number;
   lazyLoad?: boolean;
   items: BookCatalogDto[];
+}
+
+/** Halaman list (section homepage) — `GET /public/platforms/:slug/lists/:listSlug`. */
+export interface ListPageDto {
+  section: {
+    id: string | null;
+    /** Slug sekarang — bila beda dari URL, redirect permanen. */
+    slug: string;
+    title: string;
+    description: string | null;
+    layout: 'grid' | 'slider';
+    seoH1: string | null;
+    seoTitle: string | null;
+    seoDescription: string | null;
+    seoOgTitle: string | null;
+    seoOgDescription: string | null;
+    seoOgType: 'website' | 'book' | 'profile' | null;
+    seoPrefix: string | null;
+    seoSuffix: string | null;
+    seoOgImageUrl: string | null;
+  };
+  items: BookCatalogDto[];
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
 }
 
 export interface CatalogHomeResponse {
@@ -98,6 +126,8 @@ export interface SitemapEntriesDto {
   libraries: { slug: string; updatedAt: string }[];
   /** `isFree` false = Chapter perlu login → sitemap memakai URL preview share. */
   chapters: { bookSlug: string; orderIndex: number; updatedAt: string; isFree: boolean }[];
+  /** Halaman list (section homepage aktif) — /list/{slug}. Opsional untuk API versi lama. */
+  lists?: { slug: string; updatedAt: string }[];
 }
 
 export interface PlatformProfileDto {
