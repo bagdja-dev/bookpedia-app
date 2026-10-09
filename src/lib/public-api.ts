@@ -64,6 +64,9 @@ const PLATFORM_CONFIG_FALLBACK: PlatformProfileDto = {
   seoPrefix: null,
   seoSuffix: null,
   termsAndConditions: null,
+  contactPhone: null,
+  contactWhatsapp: null,
+  contactEmail: null,
 };
 
 /**
@@ -167,6 +170,9 @@ export const getPlatformConfig = cache(async (platformSlug: string): Promise<Pla
     seoPrefix: config.seoPrefix ?? PLATFORM_CONFIG_FALLBACK.seoPrefix,
     seoSuffix: config.seoSuffix ?? PLATFORM_CONFIG_FALLBACK.seoSuffix,
     termsAndConditions: config.termsAndConditions ?? PLATFORM_CONFIG_FALLBACK.termsAndConditions,
+    contactPhone: config.contactPhone ?? PLATFORM_CONFIG_FALLBACK.contactPhone,
+    contactWhatsapp: config.contactWhatsapp ?? PLATFORM_CONFIG_FALLBACK.contactWhatsapp,
+    contactEmail: config.contactEmail ?? PLATFORM_CONFIG_FALLBACK.contactEmail,
   };
 });
 

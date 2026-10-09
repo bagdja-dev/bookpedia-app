@@ -85,6 +85,9 @@ export default async function ReaderLayout({ children }: { children: ReactNode }
           <Link href="/terms-and-conditions" className="underline underline-offset-2 hover:text-[var(--reader-foreground)]">
             Terms &amp; Conditions
           </Link>
+          <Link href="/contact" className="underline underline-offset-2 hover:text-[var(--reader-foreground)]">
+            Kontak
+          </Link>
         </div>
       </footer>
       </div>

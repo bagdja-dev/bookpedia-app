@@ -178,6 +178,10 @@ export interface PlatformProfileDto {
   seoPrefix: string | null;
   seoSuffix: string | null;
   termsAndConditions: string | null;
+  /** Halaman Kontak (/contact) — null = baris tidak ditampilkan. */
+  contactPhone: string | null;
+  contactWhatsapp: string | null;
+  contactEmail: string | null;
 }
 
 export interface BookCatalogDto {
