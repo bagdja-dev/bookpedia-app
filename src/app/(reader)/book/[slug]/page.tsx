@@ -11,6 +11,7 @@ import { BookCommentsButton } from '@/components/reader/book-comments-button';
 import { ChapterCommentsButton } from '@/components/reader/chapter-comments-button';
 import { BookSlider } from '@/components/reader/book-slider';
 import { BookCollectionAction } from '@/components/reader/book-collection-action';
+import { BookShareButton } from '@/components/reader/book-share-button';
 import { Badge } from '@/components/ui/badge';
 import { BOOK_STATUS_LABEL, BOOK_STATUS_VARIANT } from '@/lib/status';
 import { BOOK_TYPE_BADGE_LABEL, formatBookByline, formatBookBylinePrefix } from '@/lib/book-byline';
@@ -354,6 +355,7 @@ export default async function BookDetailPage({ params }: BookPageProps) {
 
           <div className="flex flex-wrap items-center gap-2">
             <BookCollectionAction bookId={book.id} bookTitle={book.judul} />
+            {config.enableShare && <BookShareButton bookSlug={book.slug} bookTitle={book.judul} />}
             {firstChapter && (
               <ContinueReadingButton
                 bookId={book.id}

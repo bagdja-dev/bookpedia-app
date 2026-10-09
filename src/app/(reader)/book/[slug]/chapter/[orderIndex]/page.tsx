@@ -4,10 +4,10 @@ import { notFound, redirect } from 'next/navigation';
 import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { getPlatformSlug } from '@/lib/platform';
-import { getPlatformConfig, publicFetch } from '@/lib/public-api';
+import { authedFetch, getPlatformConfig, publicFetch } from '@/lib/public-api';
 import { getSession } from '@/lib/session';
 import { buildSocialMetadata } from '@/lib/seo';
-import type { ChapterReadDto } from '@/lib/public-types';
+import type { ChapterPreviewDto, ChapterReadDto } from '@/lib/public-types';
 import { HighlightableChapter } from '@/components/highlightable-chapter';
 import { ReadingProgressTracker } from '@/components/reading-progress-tracker';
 import { ChapterViewTracker } from '@/components/reader/chapter-view-tracker';
@@ -22,18 +22,17 @@ interface ChapterPageProps {
 export async function generateMetadata({ params }: ChapterPageProps): Promise<Metadata> {
   const { slug, orderIndex } = await params;
   const platformSlug = await getPlatformSlug();
+  // Metadata dari endpoint PREVIEW (paragraf pertama saja) — isi Chapter utuh tidak
+  // dibutuhkan di sini dan untuk Chapter terkunci memang tidak boleh diambil tanpa login.
   const [config, chapter] = await Promise.all([
     getPlatformConfig(platformSlug),
-    publicFetch<ChapterReadDto>(`/public/platforms/${platformSlug}/books/${slug}/chapters/${orderIndex}`),
+    publicFetch<ChapterPreviewDto>(`/public/platforms/${platformSlug}/books/${slug}/chapters/${orderIndex}/preview`),
   ]);
   if (!chapter) {
     return { title: `Chapter tidak ditemukan — ${config.nama}` };
   }
-  // Chapter yang butuh login diredirect di komponen halaman (bukan di sini)
-  // — respons redirect tidak pernah membawa tag metadata ini ke browser,
-  // jadi tidak perlu cabang isFree khusus di sini (lihat seo-execution-plan.md §1.2).
   const title = `${chapter.judul} — ${chapter.book.judul} — ${config.nama}`;
-  const description = `Baca ${chapter.judul} dari ${chapter.book.judul} di ${config.nama}.`;
+  const description = chapter.excerpt || `Baca ${chapter.judul} dari ${chapter.book.judul} di ${config.nama}.`;
   return {
     title,
     description,
@@ -57,24 +56,44 @@ export async function generateMetadata({ params }: ChapterPageProps): Promise<Me
 // SEBELUM fetch konten kalau memang perlu, supaya tidak ada flash konten ke
 // pengunjung yang belum login (beda dari pola client-side redirect di
 // reader-auth-nav.tsx).
+//
+// Share Chapter (10 Okt 2026): pengunjung tanpa login pada Chapter terkunci (termasuk
+// crawler) diarahkan ke halaman PREVIEW (/preview — paragraf pertama + tombol login),
+// bukan langsung ke /auth/login, supaya tetap ada halaman yang bisa diindeks. Isi Chapter
+// terkunci diambil dengan token pembaca; API menolak (401) tanpa token yang valid.
 export default async function ChapterPage({ params }: ChapterPageProps) {
   const { slug, orderIndex } = await params;
-
+  const chapterPath = `/book/${slug}/chapter/${orderIndex}`;
   const platformSlug = await getPlatformSlug();
-  const [config, chapter] = await Promise.all([
+  const apiPath = `/public/platforms/${platformSlug}/books/${slug}/chapters/${orderIndex}`;
+
+  const [config, preview] = await Promise.all([
     getPlatformConfig(platformSlug),
-    publicFetch<ChapterReadDto>(`/public/platforms/${platformSlug}/books/${slug}/chapters/${orderIndex}`),
+    publicFetch<ChapterPreviewDto>(`${apiPath}/preview`),
   ]);
 
-  if (!chapter) {
+  if (!preview) {
     notFound();
   }
 
-  if (!chapter.isFree) {
+  let chapter: ChapterReadDto | null;
+  if (preview.isFree) {
+    chapter = await publicFetch<ChapterReadDto>(apiPath);
+  } else {
     const { token } = await getSession();
     if (!token) {
-      redirect(`/auth/login?next=${encodeURIComponent(`/book/${slug}/chapter/${orderIndex}`)}`);
+      redirect(`${chapterPath}/preview`);
     }
+    const result = await authedFetch<ChapterReadDto>(apiPath, token);
+    if (result.status === 401) {
+      // Token kedaluwarsa/tidak valid — login ulang lalu kembali ke Chapter ini.
+      redirect(`/auth/login?next=${encodeURIComponent(chapterPath)}`);
+    }
+    chapter = result.data;
+  }
+
+  if (!chapter) {
+    notFound();
   }
 
   return (

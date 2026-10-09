@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Heart, MessageCircle, Share2 } from 'lucide-react';
-import { toast } from 'sonner';
+import { shareLink } from '@/lib/share-link';
 
 import { apiClient } from '@/lib/api-client';
 import { useAuth } from '@/hooks/use-auth';
@@ -97,23 +97,9 @@ export function ChapterEngagementBar({
   }
 
   async function share() {
-    const url = window.location.href;
-
-    if (navigator.share) {
-      try {
-        await navigator.share({ url });
-      } catch {
-        // Pembaca membatalkan share sheet native — bukan error.
-      }
-      return;
-    }
-
-    try {
-      await navigator.clipboard.writeText(url);
-      toast.success('Link disalin');
-    } catch (err) {
-      console.error('[ChapterEngagementBar] gagal menyalin link:', err);
-    }
+    // Yang dibagikan halaman preview (paragraf pertama + ajakan login) — terbaca crawler
+    // SEO & kartu sosmed, termasuk untuk Chapter yang perlu login.
+    await shareLink(`${window.location.origin}/book/${encodeURIComponent(bookSlug)}/chapter/${orderIndex}/preview`);
   }
 
   return (
