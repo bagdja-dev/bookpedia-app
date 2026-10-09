@@ -112,6 +112,12 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
         key={chapter.id}
         chapterId={chapter.id}
         konten={chapter.konten}
+        copySourceLabel={`${chapter.book.judul} — ${config.nama}`}
+        copyProtection={{
+          blockCopy: config.blockContentCopy,
+          attributionEnabled: config.copyAttributionEnabled,
+          attributionMaxChars: config.copyAttributionMaxChars,
+        }}
         className="chapter-content text-[1.0625rem] leading-[1.9] text-[var(--reader-foreground)]"
         style={{ fontFamily: 'var(--font-source-serif)' }}
       />

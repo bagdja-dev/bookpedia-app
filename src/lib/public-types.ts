@@ -130,6 +130,12 @@ export interface PlatformProfileDto {
   enableComment: boolean;
   /** Fase 8 — nyala/mati tombol Share di ChapterEngagementBar. Kalau enableLike, enableComment, DAN enableShare ketiganya false, seluruh bar disembunyikan. */
   enableShare: boolean;
+  /** Perlindungan konten — blok klik kanan + salin/potong di isi Chapter. */
+  blockContentCopy: boolean;
+  /** Perlindungan konten — atribusi (potongan + tautan sumber) saat isi Chapter disalin. */
+  copyAttributionEnabled: boolean;
+  /** Panjang maksimal potongan yang tersalin saat atribusi aktif. */
+  copyAttributionMaxChars: number;
   seoDefaultH1: string | null;
   seoDefaultTitle: string | null;
   seoDefaultDescription: string | null;
