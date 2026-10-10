@@ -52,7 +52,7 @@ export function ContinueReadingButton({ bookId, slug, firstChapterOrderIndex }: 
   return (
     <Link
       href={`/book/${slug}/chapter/${orderIndex}`}
-      className="mt-2 flex w-fit items-center gap-2 rounded-full bg-[var(--reader-terracotta)] px-5 py-2 text-sm font-medium text-[var(--reader-terracotta-foreground)] transition-opacity hover:opacity-90"
+      className="mt-2 flex w-fit items-center gap-2 rounded-full bg-[var(--reader-button-bg,var(--reader-terracotta))] px-5 py-2 text-sm font-medium text-[var(--reader-button-text,var(--reader-terracotta-foreground))] transition-opacity hover:opacity-90"
     >
       <BookOpen className="h-4 w-4" />
       {label}

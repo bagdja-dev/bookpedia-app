@@ -17,7 +17,7 @@ export function StarRatingDisplay({ average, count, size = 'sm' }: StarRatingDis
 
   return (
     <span className="inline-flex items-center gap-1 text-xs text-[var(--reader-muted)]">
-      <Star className={`${iconSize} fill-[var(--reader-mustard)] text-[var(--reader-mustard)]`} />
+      <Star className={`${iconSize} fill-[var(--reader-rating-star,var(--reader-mustard))] text-[var(--reader-rating-star,var(--reader-mustard))]`} />
       <span className="font-medium text-[var(--reader-foreground)]">{average.toFixed(1)}</span>
       <span>({count})</span>
     </span>

@@ -75,7 +75,7 @@ export function ChapterRatingWidget({ chapterId }: ChapterRatingWidgetProps) {
         >
           <Star
             className={`h-5 w-5 ${
-              star <= active ? 'fill-[var(--reader-mustard)] text-[var(--reader-mustard)]' : 'text-[var(--reader-border)]'
+              star <= active ? 'fill-[var(--reader-rating-star,var(--reader-mustard))] text-[var(--reader-rating-star,var(--reader-mustard))]' : 'text-[var(--reader-border)]'
             }`}
           />
         </button>

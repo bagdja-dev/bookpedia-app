@@ -187,14 +187,14 @@ export function ReaderAuthNav({ lockStudio }: ReaderAuthNavProps) {
     <nav className="flex items-center gap-3 text-sm">
       <a
         href={readerLoginHref}
-        className="text-[var(--reader-muted)] transition-colors hover:text-[var(--reader-terracotta)]"
+        className="text-[var(--reader-header-text,var(--reader-muted))] transition-colors hover:text-[var(--reader-terracotta)]"
       >
         Masuk
       </a>
       {!lockStudio && (
         <a
           href="/auth/login?next=/dashboard"
-          className="rounded-full bg-[var(--reader-terracotta)] px-4 py-1.5 font-medium text-[var(--reader-terracotta-foreground)] transition-opacity hover:opacity-90"
+          className="rounded-full bg-[var(--reader-button-bg,var(--reader-terracotta))] px-4 py-1.5 font-medium text-[var(--reader-button-text,var(--reader-terracotta-foreground))] transition-opacity hover:opacity-90"
         >
           Untuk Penulis
         </a>

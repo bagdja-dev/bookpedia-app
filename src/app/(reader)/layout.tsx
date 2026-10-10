@@ -9,6 +9,7 @@ import { SearchBar } from '@/components/reader/search-bar';
 import { getPlatformSlug } from '@/lib/platform';
 import { getPlatformConfig } from '@/lib/public-api';
 import { readingTypographyStyle } from '@/lib/reading-typography';
+import { specificColorDeclarations } from '@/lib/platform-colors';
 
 // Font serif jadi hero untuk judul & teks baca (wireframe Fase 2 yang sudah
 // disetujui) — beda dari font sans default Studio (`layout.tsx` root).
@@ -56,14 +57,16 @@ export default async function ReaderLayout({ children }: { children: ReactNode }
           --reader-terracotta-foreground: ${c.terracottaForeground};
           --reader-mustard: ${c.mustard};
           --reader-olive: ${c.olive};
+          --reader-foreground-base: ${c.foreground};
+          ${specificColorDeclarations(c)}
         }
       `}</style>
 
-      <header className="sticky top-0 z-10 border-b border-[var(--reader-border)] bg-[var(--reader-surface)]/95 backdrop-blur">
+      <header className="sticky top-0 z-10 border-b border-[var(--reader-header-border,var(--reader-border))] bg-[var(--reader-header-bg,var(--reader-surface))]/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3 sm:px-6">
           <Link
             href="/"
-            className="flex items-center gap-2 text-xl font-semibold tracking-tight text-[var(--reader-terracotta)]"
+            className="flex items-center gap-2 text-xl font-semibold tracking-tight text-[var(--reader-header-text,var(--reader-terracotta))]"
             style={{ fontFamily: 'var(--font-source-serif)' }}
           >
             {config.logoUrl ? (
@@ -83,13 +86,13 @@ export default async function ReaderLayout({ children }: { children: ReactNode }
 
       <main className="flex-1">{children}</main>
 
-      <footer className="border-t border-[var(--reader-border)] px-4 py-6 text-center text-xs text-[var(--reader-muted)] sm:px-6">
+      <footer className="border-t border-[var(--reader-border)] bg-[var(--reader-footer-bg,transparent)] px-4 py-6 text-center text-xs text-[var(--reader-footer-text,var(--reader-muted))] sm:px-6">
         <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
           <span>{config.nama} — Baca &amp; tulis cerita, oleh Bagdja.</span>
-          <Link href="/terms-and-conditions" className="underline underline-offset-2 hover:text-[var(--reader-foreground)]">
+          <Link href="/terms-and-conditions" className="underline underline-offset-2 hover:opacity-80">
             Terms &amp; Conditions
           </Link>
-          <Link href="/contact" className="underline underline-offset-2 hover:text-[var(--reader-foreground)]">
+          <Link href="/contact" className="underline underline-offset-2 hover:opacity-80">
             Kontak
           </Link>
         </div>

@@ -294,7 +294,7 @@ export function CommentSheet({ open, onClose, chapterId, platformSlug, bookSlug,
         {isLoggedIn ? (
           <form onSubmit={submit} className="flex shrink-0 items-center gap-2 border-t border-[var(--reader-border)] p-4">
             <input value={body} onChange={(event) => setBody(event.target.value)} disabled={submitting} placeholder="Tulis komentar..." className="min-w-0 flex-1 rounded-full border border-[var(--reader-border)] bg-transparent px-4 py-2 text-sm text-[var(--reader-foreground)] outline-none focus:border-[var(--reader-terracotta)] disabled:opacity-60" />
-            <button type="submit" disabled={submitting || !body.trim()} aria-label="Kirim komentar" className="rounded-full bg-[var(--reader-terracotta)] p-2 text-[var(--reader-terracotta-foreground)] disabled:opacity-50"><Send className="h-4 w-4" /></button>
+            <button type="submit" disabled={submitting || !body.trim()} aria-label="Kirim komentar" className="rounded-full bg-[var(--reader-button-bg,var(--reader-terracotta))] p-2 text-[var(--reader-button-text,var(--reader-terracotta-foreground))] disabled:opacity-50"><Send className="h-4 w-4" /></button>
           </form>
         ) : (
           <div className="flex shrink-0 justify-center border-t border-[var(--reader-border)] p-4">
@@ -409,7 +409,7 @@ function CommentNode({
             type="submit"
             disabled={replySubmitting || !replyBody.trim()}
             aria-label="Kirim balasan"
-            className="rounded-full bg-[var(--reader-terracotta)] p-1.5 text-[var(--reader-terracotta-foreground)] disabled:opacity-50"
+            className="rounded-full bg-[var(--reader-button-bg,var(--reader-terracotta))] p-1.5 text-[var(--reader-button-text,var(--reader-terracotta-foreground))] disabled:opacity-50"
           >
             <Send className="h-3.5 w-3.5" />
           </button>

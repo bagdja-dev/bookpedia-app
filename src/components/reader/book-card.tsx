@@ -12,9 +12,9 @@ import { BookCollectionAction } from '@/components/reader/book-collection-action
 import type { BookCatalogDto } from '@/lib/public-types';
 
 const STATUS_DOT: Record<BookCatalogDto['status'], string> = {
-  draft: 'bg-[var(--reader-muted)]',
-  ongoing: 'bg-[var(--reader-olive)]',
-  completed: 'bg-[var(--reader-terracotta)]',
+  draft: 'bg-[var(--reader-status-draft,var(--reader-muted))]',
+  ongoing: 'bg-[var(--reader-status-ongoing,var(--reader-olive))]',
+  completed: 'bg-[var(--reader-status-completed,var(--reader-terracotta))]',
 };
 
 /**
@@ -51,7 +51,7 @@ export function BookCard({
   const similarHref = buildSimilarBooksHref(book);
 
   return (
-    <div className="group flex flex-col overflow-hidden rounded-lg border border-[var(--reader-border)] bg-[var(--reader-surface)] transition-shadow hover:shadow-md">
+    <div className="group flex flex-col overflow-hidden rounded-lg border border-[var(--reader-card-border,var(--reader-border))] bg-[var(--reader-card-bg,var(--reader-surface))] transition-shadow hover:shadow-md">
       <Link href={`/book/${book.slug}`} className="flex flex-1 flex-col">
         <div className="relative aspect-[3/4] w-full overflow-hidden bg-[var(--reader-bg)]">
           {book.coverUrl ? (
@@ -63,44 +63,44 @@ export function BookCard({
               className="object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center text-3xl font-semibold text-[var(--reader-muted)]" style={{ fontFamily: 'var(--font-source-serif)' }}>
+            <div className="flex h-full w-full items-center justify-center text-3xl font-semibold text-[var(--reader-card-text,var(--reader-muted))]" style={{ fontFamily: 'var(--font-source-serif)' }}>
               {book.judul.charAt(0).toUpperCase()}
             </div>
           )}
         </div>
         <div className="flex flex-col gap-1 p-3 pb-0">
           <h3
-            className="line-clamp-2 text-sm font-semibold text-[var(--reader-foreground)]"
+            className="line-clamp-2 text-sm font-semibold text-[var(--reader-card-title,var(--reader-foreground))]"
             style={{ fontFamily: 'var(--font-source-serif)' }}
           >
             {book.judul}
           </h3>
-          <p className="text-xs text-[var(--reader-muted)]">{formatBookByline(book)}</p>
+          <p className="text-xs text-[var(--reader-card-text,var(--reader-muted))]">{formatBookByline(book)}</p>
           {showStatus && (
-            <span className="flex w-fit items-center gap-1 rounded-full bg-[var(--reader-bg)] px-2 py-0.5 text-[11px] text-[var(--reader-muted)]">
+            <span className="flex w-fit items-center gap-1 rounded-full bg-[var(--reader-card-chip-bg,var(--reader-bg))] px-2 py-0.5 text-[11px] text-[var(--reader-card-text,var(--reader-muted))]">
               <span className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[book.status]}`} />
               {BOOK_STATUS_LABEL[book.status]}
             </span>
           )}
           {book.latestChapterTitle && (
             <span
-              className="max-w-full truncate text-[11px] text-[var(--reader-muted)]"
+              className="max-w-full truncate text-[11px] text-[var(--reader-card-text,var(--reader-muted))]"
               title={book.latestChapterTitle}
             >
               {book.latestChapterTitle}
             </span>
           )}
           <div className="flex flex-wrap items-center gap-2">
-            <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">
+            <span className="flex items-center gap-1 text-xs text-[var(--reader-card-text,var(--reader-muted))]">
               <Eye className="h-3 w-3" />
               {formatCompactCount(book.viewCount)}
             </span>
-            <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">
+            <span className="flex items-center gap-1 text-xs text-[var(--reader-card-text,var(--reader-muted))]">
               <UserRound className="h-3 w-3" />
               {formatCompactCount(book.uniqueReaderCount ?? 0)}
             </span>
             {showLike && (
-              <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">
+              <span className="flex items-center gap-1 text-xs text-[var(--reader-card-text,var(--reader-muted))]">
                 <Heart className="h-3 w-3" />
                 {formatCompactCount(book.likeCount)}
               </span>
@@ -118,7 +118,7 @@ export function BookCard({
             bookId={book.id}
             bookTitle={book.judul}
             variant="icon"
-            className="inline-flex items-center gap-1 rounded-full bg-[var(--reader-bg)] px-2 py-0.5 text-[11px] text-[var(--reader-muted)] hover:text-[var(--reader-terracotta)]"
+            className="inline-flex items-center gap-1 rounded-full bg-[var(--reader-card-chip-bg,var(--reader-bg))] px-2 py-0.5 text-[11px] text-[var(--reader-card-text,var(--reader-muted))] hover:text-[var(--reader-terracotta)]"
           />
         )}
         {showComment && (
@@ -126,7 +126,7 @@ export function BookCard({
             platformSlug={platformSlug}
             bookSlug={book.slug}
             commentCount={book.commentCount ?? 0}
-            className="flex items-center gap-1 rounded-full bg-[var(--reader-bg)] px-2 py-0.5 text-[11px] text-[var(--reader-muted)] hover:text-[var(--reader-terracotta)]"
+            className="flex items-center gap-1 rounded-full bg-[var(--reader-card-chip-bg,var(--reader-bg))] px-2 py-0.5 text-[11px] text-[var(--reader-card-text,var(--reader-muted))] hover:text-[var(--reader-terracotta)]"
           />
         )}
         {book.bookType !== 'original' && (
@@ -137,7 +137,7 @@ export function BookCard({
         {book.category && (
           <Link
             href={`/?category=${encodeURIComponent(book.category.slug)}`}
-            className="rounded-full bg-[var(--reader-bg)] px-2 py-0.5 text-[11px] text-[var(--reader-muted)] hover:text-[var(--reader-terracotta)]"
+            className="rounded-full bg-[var(--reader-card-chip-bg,var(--reader-bg))] px-2 py-0.5 text-[11px] text-[var(--reader-card-text,var(--reader-muted))] hover:text-[var(--reader-terracotta)]"
           >
             {book.category.nama}
           </Link>
@@ -145,7 +145,7 @@ export function BookCard({
         {book.genre && (
           <Link
             href={`/?genre=${encodeURIComponent(book.genre.slug)}`}
-            className="rounded-full bg-[var(--reader-bg)] px-2 py-0.5 text-[11px] text-[var(--reader-muted)] hover:text-[var(--reader-terracotta)]"
+            className="rounded-full bg-[var(--reader-card-chip-bg,var(--reader-bg))] px-2 py-0.5 text-[11px] text-[var(--reader-card-text,var(--reader-muted))] hover:text-[var(--reader-terracotta)]"
           >
             {book.genre.nama}
           </Link>
@@ -153,7 +153,7 @@ export function BookCard({
         {book.series && (
           <Link
             href={`/series/${book.series.id}`}
-            className="inline-flex items-center gap-1 rounded-full border border-[var(--reader-border)] bg-[var(--reader-bg)] px-2 py-0.5 text-[11px] text-[var(--reader-muted)] hover:border-[var(--reader-terracotta)] hover:text-[var(--reader-terracotta)]"
+            className="inline-flex items-center gap-1 rounded-full border border-[var(--reader-border)] bg-[var(--reader-card-chip-bg,var(--reader-bg))] px-2 py-0.5 text-[11px] text-[var(--reader-card-text,var(--reader-muted))] hover:border-[var(--reader-terracotta)] hover:text-[var(--reader-terracotta)]"
           >
             <BookOpenText className="h-3 w-3" />
             {book.series.nama}
@@ -163,7 +163,7 @@ export function BookCard({
           <Link
             key={tag.id}
             href={`/?tag=${encodeURIComponent(tag.slug)}`}
-            className="rounded-full border border-[var(--reader-border)] px-2 py-0.5 text-[11px] text-[var(--reader-muted)] hover:border-[var(--reader-terracotta)] hover:text-[var(--reader-terracotta)]"
+            className="rounded-full border border-[var(--reader-border)] px-2 py-0.5 text-[11px] text-[var(--reader-card-text,var(--reader-muted))] hover:border-[var(--reader-terracotta)] hover:text-[var(--reader-terracotta)]"
           >
             #{tag.nama}
           </Link>
@@ -173,7 +173,7 @@ export function BookCard({
             href={similarHref}
             title="Cari cerita serupa (Category, Genre & Tag yang sama)"
             aria-label="Cari cerita serupa"
-            className="ml-auto shrink-0 rounded-full p-1 text-[var(--reader-muted)] hover:bg-[var(--reader-bg)] hover:text-[var(--reader-terracotta)]"
+            className="ml-auto shrink-0 rounded-full p-1 text-[var(--reader-card-text,var(--reader-muted))] hover:bg-[var(--reader-card-chip-bg,var(--reader-bg))] hover:text-[var(--reader-terracotta)]"
           >
             <ListFilter className="h-3.5 w-3.5" />
           </Link>

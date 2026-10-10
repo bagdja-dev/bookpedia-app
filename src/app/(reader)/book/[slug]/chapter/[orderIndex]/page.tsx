@@ -97,6 +97,8 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
   }
 
   return (
+    // Area baca: latar & warna teks bisa beda dari halaman lain (Platform Settings → Warna).
+    <div className="min-h-screen bg-[var(--reader-reading-bg,transparent)] [--reader-foreground:var(--reader-reading-text,var(--reader-foreground-base))]">
     <div className="mx-auto max-w-[680px] px-4 py-8 pb-28 sm:px-6">
       <ReadingProgressTracker bookId={chapter.book.id} chapterId={chapter.id} />
       <ChapterViewTracker platformSlug={platformSlug} bookSlug={slug} orderIndex={chapter.orderIndex} />
@@ -164,13 +166,14 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
         {chapter.nextOrderIndex !== null && (
           <Link
             href={`/book/${slug}/chapter/${chapter.nextOrderIndex}`}
-            className="flex items-center gap-1.5 rounded-full bg-[var(--reader-terracotta)] px-4 py-2 text-sm font-medium text-[var(--reader-terracotta-foreground)] transition-opacity hover:opacity-90"
+            className="flex items-center gap-1.5 rounded-full bg-[var(--reader-button-bg,var(--reader-terracotta))] px-4 py-2 text-sm font-medium text-[var(--reader-button-text,var(--reader-terracotta-foreground))] transition-opacity hover:opacity-90"
           >
             Berikutnya
             <ChevronRight className="h-4 w-4" />
           </Link>
         )}
       </nav>
+    </div>
     </div>
   );
 }

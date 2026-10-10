@@ -160,7 +160,7 @@ export function BookCollectionAction({ bookId, bookTitle, variant = 'default', c
         ) : (
           <button
             type="button"
-            className={className ?? 'mt-2 flex w-fit items-center gap-2 rounded-full bg-[var(--reader-terracotta)] px-5 py-2 text-sm font-medium text-[var(--reader-terracotta-foreground)] transition-opacity hover:opacity-90 disabled:opacity-60'}
+            className={className ?? 'mt-2 flex w-fit items-center gap-2 rounded-full bg-[var(--reader-button-bg,var(--reader-terracotta))] px-5 py-2 text-sm font-medium text-[var(--reader-button-text,var(--reader-terracotta-foreground))] transition-opacity hover:opacity-90 disabled:opacity-60'}
             disabled={loading || saving}
             onClick={() => {
               if (!isLoggedIn) {

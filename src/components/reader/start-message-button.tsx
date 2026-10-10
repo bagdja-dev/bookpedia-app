@@ -42,7 +42,7 @@ export function StartMessageButton({ targetUserId, targetDisplayName }: { target
       type="button"
       onClick={handleClick}
       disabled={loading}
-      className="inline-flex w-fit items-center gap-1.5 rounded-full bg-[var(--reader-terracotta)] px-4 py-1.5 text-sm font-medium text-[var(--reader-terracotta-foreground)] transition-opacity hover:opacity-90 disabled:opacity-60"
+      className="inline-flex w-fit items-center gap-1.5 rounded-full bg-[var(--reader-button-bg,var(--reader-terracotta))] px-4 py-1.5 text-sm font-medium text-[var(--reader-button-text,var(--reader-terracotta-foreground))] transition-opacity hover:opacity-90 disabled:opacity-60"
     >
       <MessageCircle className="h-4 w-4" />
       Kirim Pesan

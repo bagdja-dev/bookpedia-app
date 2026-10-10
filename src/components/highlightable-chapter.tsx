@@ -253,7 +253,7 @@ export function HighlightableChapter({ chapterId, konten, copySourceLabel, copyP
               type="button"
               onClick={handleSaveHighlight}
               disabled={saving}
-              className="rounded-full bg-[var(--reader-terracotta)] px-3 py-1.5 text-[11px] font-medium text-[var(--reader-terracotta-foreground)] disabled:opacity-60"
+              className="rounded-full bg-[var(--reader-button-bg,var(--reader-terracotta))] px-3 py-1.5 text-[11px] font-medium text-[var(--reader-button-text,var(--reader-terracotta-foreground))] disabled:opacity-60"
             >
               {saving ? 'Menyimpan…' : 'Highlight'}
             </button>

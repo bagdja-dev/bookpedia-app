@@ -89,6 +89,8 @@ export default async function ChapterPreviewPage({ params }: ChapterPreviewPageP
   });
 
   return (
+    // Area baca: latar & warna teks bisa beda dari halaman lain (Platform Settings → Warna).
+    <div className="min-h-screen bg-[var(--reader-reading-bg,transparent)] [--reader-foreground:var(--reader-reading-text,var(--reader-foreground-base))]">
     <div className="mx-auto max-w-[680px] px-4 py-8 pb-28 sm:px-6">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd }} />
 
@@ -135,7 +137,7 @@ export default async function ChapterPreviewPage({ params }: ChapterPreviewPageP
         </p>
         <Link
           href={continueHref}
-          className="inline-flex items-center gap-2 rounded-full bg-[var(--reader-terracotta)] px-6 py-2.5 text-sm font-medium text-[var(--reader-terracotta-foreground)] transition-opacity hover:opacity-90"
+          className="inline-flex items-center gap-2 rounded-full bg-[var(--reader-button-bg,var(--reader-terracotta))] px-6 py-2.5 text-sm font-medium text-[var(--reader-button-text,var(--reader-terracotta-foreground))] transition-opacity hover:opacity-90"
         >
           {canContinue ? <BookOpen className="h-4 w-4" /> : <LogIn className="h-4 w-4" />}
           {canContinue ? 'Lanjut membaca' : 'Masuk untuk lanjut membaca'}
@@ -144,6 +146,7 @@ export default async function ChapterPreviewPage({ params }: ChapterPreviewPageP
           Lihat detail buku
         </Link>
       </div>
+    </div>
     </div>
   );
 }

@@ -207,7 +207,7 @@ export default async function ListPage({ params, searchParams }: ListPageProps) 
             <Link
               href={pageHref(list.section.slug, page + 1)}
               rel="next"
-              className="flex items-center gap-1 rounded-full bg-[var(--reader-terracotta)] px-4 py-2 text-sm font-medium text-[var(--reader-terracotta-foreground)] hover:opacity-90"
+              className="flex items-center gap-1 rounded-full bg-[var(--reader-button-bg,var(--reader-terracotta))] px-4 py-2 text-sm font-medium text-[var(--reader-button-text,var(--reader-terracotta-foreground))] hover:opacity-90"
             >
               Berikutnya
               <ChevronRight className="h-4 w-4" />

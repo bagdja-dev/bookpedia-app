@@ -308,7 +308,7 @@ function InboxPageInner() {
                   type="submit"
                   disabled={sending || !body.trim()}
                   aria-label="Kirim pesan"
-                  className="rounded-full bg-[var(--reader-terracotta)] p-2 text-[var(--reader-terracotta-foreground)] disabled:opacity-50"
+                  className="rounded-full bg-[var(--reader-button-bg,var(--reader-terracotta))] p-2 text-[var(--reader-button-text,var(--reader-terracotta-foreground))] disabled:opacity-50"
                 >
                   <Send className="h-4 w-4" />
                 </button>

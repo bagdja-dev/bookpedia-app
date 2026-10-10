@@ -106,6 +106,25 @@ export interface PlatformColors {
   terracottaForeground: string;
   mustard: string;
   olive: string;
+  // Warna spesifik per bagian — opsional, kosong = ikut palet umum di atas.
+  headerBg?: string;
+  headerText?: string;
+  headerBorder?: string;
+  cardBg?: string;
+  cardBorder?: string;
+  cardTitle?: string;
+  cardText?: string;
+  cardChipBg?: string;
+  footerBg?: string;
+  footerText?: string;
+  buttonBg?: string;
+  buttonText?: string;
+  statusOngoing?: string;
+  statusCompleted?: string;
+  statusDraft?: string;
+  ratingStar?: string;
+  readingBg?: string;
+  readingText?: string;
 }
 
 /**
@@ -137,9 +156,18 @@ export type ReadingFontFamily =
   | 'lora'
   | 'literata'
   | 'noto-serif'
+  | 'georgia'
+  | 'pt-serif'
+  | 'crimson-pro'
+  | 'eb-garamond'
+  | 'libre-baskerville'
   | 'inter'
   | 'nunito'
-  | 'noto-sans';
+  | 'noto-sans'
+  | 'roboto'
+  | 'open-sans'
+  | 'plus-jakarta-sans'
+  | 'atkinson-hyperlegible';
 
 export interface ReadingTypography {
   fontFamily: ReadingFontFamily;
