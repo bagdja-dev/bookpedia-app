@@ -1,6 +1,10 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
+import { getPlatformSlug } from '@/lib/platform';
+import { getPlatformConfig } from '@/lib/public-api';
+import { readingTypographyStyle } from '@/lib/reading-typography';
+
 import { DashboardClientLayout } from './dashboard-client-layout';
 
 /**
@@ -20,6 +24,16 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function DashboardLayout({ children }: { children: ReactNode }) {
-  return <DashboardClientLayout>{children}</DashboardClientLayout>;
+/**
+ * Tipografi bacaan Platform juga dipasang di Studio supaya editor Chapter menampilkan teks
+ * persis seperti yang dibaca pembaca. `display: contents` — pembungkus ini hanya membawa
+ * CSS variable, tidak mengubah layout Studio.
+ */
+export default async function DashboardLayout({ children }: { children: ReactNode }) {
+  const config = await getPlatformConfig(await getPlatformSlug());
+  return (
+    <div style={{ display: 'contents', ...readingTypographyStyle(config.readingTypography) }}>
+      <DashboardClientLayout>{children}</DashboardClientLayout>
+    </div>
+  );
 }

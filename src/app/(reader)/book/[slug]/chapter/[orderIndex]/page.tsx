@@ -137,8 +137,7 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
           attributionEnabled: config.copyAttributionEnabled,
           attributionMaxChars: config.copyAttributionMaxChars,
         }}
-        className="chapter-content text-[1.0625rem] leading-[1.9] text-[var(--reader-foreground)]"
-        style={{ fontFamily: 'var(--font-source-serif)' }}
+        className="reading-text chapter-content text-[var(--reader-foreground)]"
       />
 
       {config.enableRating && config.ratingMode === 'chapter' && (

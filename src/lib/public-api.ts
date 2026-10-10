@@ -67,6 +67,7 @@ const PLATFORM_CONFIG_FALLBACK: PlatformProfileDto = {
   contactPhone: null,
   contactWhatsapp: null,
   contactEmail: null,
+  readingTypography: { fontFamily: 'source-serif-4', fontSize: 17, lineHeight: 1.9, paragraphSpacing: 1.25, firstLineIndent: 0 },
 };
 
 /**
@@ -173,6 +174,7 @@ export const getPlatformConfig = cache(async (platformSlug: string): Promise<Pla
     contactPhone: config.contactPhone ?? PLATFORM_CONFIG_FALLBACK.contactPhone,
     contactWhatsapp: config.contactWhatsapp ?? PLATFORM_CONFIG_FALLBACK.contactWhatsapp,
     contactEmail: config.contactEmail ?? PLATFORM_CONFIG_FALLBACK.contactEmail,
+    readingTypography: { ...PLATFORM_CONFIG_FALLBACK.readingTypography, ...(config.readingTypography ?? {}) },
   };
 });
 

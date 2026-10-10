@@ -18,12 +18,13 @@ import { cn } from '@/lib/utils';
  * tabel/link (lihat plan/bookpedia/overview.md §8.1).
  */
 const EDITOR_CONTENT_CLASS =
-  'min-h-[60vh] px-4 pt-4 pb-[35rem] sm:px-8 sm:pt-6 sm:pb-[35rem] text-base leading-loose text-foreground outline-none ' +
+  // `reading-text` = tipografi bacaan Platform, supaya yang ditulis penulis sama dengan yang dibaca.
+  'reading-text min-h-[60vh] px-4 pt-4 pb-[35rem] sm:px-8 sm:pt-6 sm:pb-[35rem] text-foreground outline-none ' +
   '[&_p.is-editor-empty:first-child]:before:pointer-events-none [&_p.is-editor-empty:first-child]:before:float-left ' +
   '[&_p.is-editor-empty:first-child]:before:h-0 [&_p.is-editor-empty:first-child]:before:text-muted-foreground ' +
   '[&_p.is-editor-empty:first-child]:before:content-[attr(data-placeholder)] ' +
   '[&_h1]:mb-3 [&_h1]:mt-5 [&_h1]:text-2xl [&_h1]:font-bold [&_h2]:mb-2 [&_h2]:mt-4 [&_h2]:text-xl [&_h2]:font-bold [&_h3]:mb-1 [&_h3]:mt-3 [&_h3]:text-lg [&_h3]:font-semibold ' +
-  '[&_li]:ml-4 [&_ol]:list-decimal [&_p]:mb-3 [&_ul]:list-disc';
+  '[&_li]:ml-4 [&_ol]:list-decimal [&_ul]:list-disc';
 
 function countWords(text: string): number {
   const normalized = text.trim();

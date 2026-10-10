@@ -147,12 +147,26 @@
   color: var(--reader-foreground);
 }
 
+/* Teks bacaan (isi Chapter, sinopsis, preview share, editor Studio) — tipografi diatur per
+ * Platform (Platform Settings → Tipografi bacaan) lewat CSS variable yang dipasang layout
+ * reader & Studio (`readingTypographyStyle`). Fallback = tampilan sebelum fitur ini. */
+.reading-text {
+  font-family: var(--reading-font, var(--font-source-serif, serif));
+  font-size: var(--reading-font-size, 1.0625rem);
+  line-height: var(--reading-line-height, 1.9);
+}
+.reading-text p {
+  margin-bottom: var(--reading-paragraph-spacing, 1.25em);
+  text-indent: var(--reading-first-line-indent, 0);
+}
+
 /* Konten Chapter — HTML mentah dari TipTap (lihat rich-text-editor.tsx),
  * belum ada @tailwindcss/typography di project ini, jadi styling dasar
  * paragraf/heading/list ditulis manual di sini (sama pola dengan
  * EDITOR_CONTENT_CLASS di rich-text-editor.tsx). */
+/* Jarak paragraf & indentasi mengikuti `.reading-text` (tipografi Platform). */
 .chapter-content p {
-  margin-bottom: 1.25em;
+  margin-bottom: var(--reading-paragraph-spacing, 1.25em);
 }
 .chapter-content h2 {
   margin-top: 1.5em;

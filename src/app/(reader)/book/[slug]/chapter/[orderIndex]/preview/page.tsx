@@ -119,12 +119,9 @@ export default async function ChapterPreviewPage({ params }: ChapterPreviewPageP
 
       {chapter.excerpt && (
         <div className="relative">
-          <p
-            className="text-[1.0625rem] leading-[1.9] text-[var(--reader-foreground)]"
-            style={{ fontFamily: 'var(--font-source-serif)' }}
-          >
-            {chapter.excerpt}
-          </p>
+          <div className="reading-text text-[var(--reader-foreground)]">
+            <p>{chapter.excerpt}</p>
+          </div>
           {/* Fade di bawah paragraf: tanda bahwa cerita berlanjut. */}
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[var(--reader-bg)] to-transparent" />
         </div>

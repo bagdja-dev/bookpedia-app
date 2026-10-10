@@ -8,6 +8,7 @@ import { SafeImage } from '@/components/safe-image';
 import { SearchBar } from '@/components/reader/search-bar';
 import { getPlatformSlug } from '@/lib/platform';
 import { getPlatformConfig } from '@/lib/public-api';
+import { readingTypographyStyle } from '@/lib/reading-typography';
 
 // Font serif jadi hero untuk judul & teks baca (wireframe Fase 2 yang sudah
 // disetujui) — beda dari font sans default Studio (`layout.tsx` root).
@@ -40,7 +41,10 @@ export default async function ReaderLayout({ children }: { children: ReactNode }
 
   return (
     <RealtimeProvider>
-      <div className={`bookpedia-reader ${sourceSerif.variable} flex min-h-screen flex-col`}>
+      <div
+        className={`bookpedia-reader ${sourceSerif.variable} flex min-h-screen flex-col`}
+        style={readingTypographyStyle(config.readingTypography)}
+      >
       <style>{`
         .bookpedia-reader {
           --reader-bg: ${c.bg};

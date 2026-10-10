@@ -130,6 +130,28 @@ export interface SitemapEntriesDto {
   lists?: { slug: string; updatedAt: string }[];
 }
 
+/** Key font kurasi teks bacaan — sama dengan `READING_FONT_FAMILIES` di API. */
+export type ReadingFontFamily =
+  | 'source-serif-4'
+  | 'merriweather'
+  | 'lora'
+  | 'literata'
+  | 'noto-serif'
+  | 'inter'
+  | 'nunito'
+  | 'noto-sans';
+
+export interface ReadingTypography {
+  fontFamily: ReadingFontFamily;
+  /** px */
+  fontSize: number;
+  lineHeight: number;
+  /** em */
+  paragraphSpacing: number;
+  /** em, 0 = tanpa indentasi */
+  firstLineIndent: number;
+}
+
 export interface PlatformProfileDto {
   nama: string;
   slug: string;
@@ -182,6 +204,8 @@ export interface PlatformProfileDto {
   contactPhone: string | null;
   contactWhatsapp: string | null;
   contactEmail: string | null;
+  /** Tipografi teks bacaan (selalu lengkap dari API; fallback default). */
+  readingTypography: ReadingTypography;
 }
 
 export interface BookCatalogDto {
