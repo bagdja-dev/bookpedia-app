@@ -92,6 +92,9 @@ export default async function ReaderLayout({ children }: { children: ReactNode }
           <Link href="/terms-and-conditions" className="underline underline-offset-2 hover:opacity-80">
             Terms &amp; Conditions
           </Link>
+          <Link href="/privacy-policy" className="underline underline-offset-2 hover:opacity-80">
+            Kebijakan Privasi
+          </Link>
           <Link href="/contact" className="underline underline-offset-2 hover:opacity-80">
             Kontak
           </Link>
