@@ -23,29 +23,31 @@ import type { ReadingFontFamily } from '@/lib/public-types';
 // Font kurasi teks bacaan (Platform Settings → Tipografi bacaan). Semua dideklarasikan di
 // sini supaya bisa dipilih per Platform, tapi `preload: false` — browser hanya mengunduh
 // file font yang benar-benar dipakai halaman. Key sama dengan `READING_FONT_FAMILIES` API.
-const common = { subsets: ['latin' as const], display: 'swap' as const, preload: false };
-const withItalic = { ...common, style: ['normal' as const, 'italic' as const] };
+// Opsi SENGAJA ditulis literal per pemanggilan (bukan variabel/spread bersama): compiler
+// `next/font` menganalisis opsi secara statis dan menolak non-literal saat `next build`
+// ("Font loader values must be explicitly written literals") — dev server tidak selalu
+// menangkapnya.
 
 // Serif
-const sourceSerif = Source_Serif_4(common);
-const merriweather = Merriweather({ ...withItalic, weight: ['400', '700'] });
-const lora = Lora(withItalic);
-const literata = Literata(withItalic);
-const notoSerif = Noto_Serif(withItalic);
+const sourceSerif = Source_Serif_4({ subsets: ['latin'], display: 'swap', preload: false });
+const merriweather = Merriweather({ weight: ['400', '700'], subsets: ['latin'], display: 'swap', preload: false, style: ['normal', 'italic'] });
+const lora = Lora({ subsets: ['latin'], display: 'swap', preload: false, style: ['normal', 'italic'] });
+const literata = Literata({ subsets: ['latin'], display: 'swap', preload: false, style: ['normal', 'italic'] });
+const notoSerif = Noto_Serif({ subsets: ['latin'], display: 'swap', preload: false, style: ['normal', 'italic'] });
 /** Ditampilkan sebagai "Georgia" — Gelasio setara metrik Georgia dan tersedia di Android. */
-const gelasio = Gelasio(withItalic);
-const ptSerif = PT_Serif({ ...withItalic, weight: ['400', '700'] });
-const crimsonPro = Crimson_Pro(withItalic);
-const ebGaramond = EB_Garamond(withItalic);
-const libreBaskerville = Libre_Baskerville({ ...withItalic, weight: ['400', '700'] });
+const gelasio = Gelasio({ subsets: ['latin'], display: 'swap', preload: false, style: ['normal', 'italic'] });
+const ptSerif = PT_Serif({ weight: ['400', '700'], subsets: ['latin'], display: 'swap', preload: false, style: ['normal', 'italic'] });
+const crimsonPro = Crimson_Pro({ subsets: ['latin'], display: 'swap', preload: false, style: ['normal', 'italic'] });
+const ebGaramond = EB_Garamond({ subsets: ['latin'], display: 'swap', preload: false, style: ['normal', 'italic'] });
+const libreBaskerville = Libre_Baskerville({ weight: ['400', '700'], subsets: ['latin'], display: 'swap', preload: false, style: ['normal', 'italic'] });
 // Sans
-const inter = Inter(common);
-const nunito = Nunito(withItalic);
-const notoSans = Noto_Sans(withItalic);
-const roboto = Roboto(withItalic);
-const openSans = Open_Sans(withItalic);
-const plusJakartaSans = Plus_Jakarta_Sans(withItalic);
-const atkinsonHyperlegible = Atkinson_Hyperlegible({ ...withItalic, weight: ['400', '700'] });
+const inter = Inter({ subsets: ['latin'], display: 'swap', preload: false });
+const nunito = Nunito({ subsets: ['latin'], display: 'swap', preload: false, style: ['normal', 'italic'] });
+const notoSans = Noto_Sans({ subsets: ['latin'], display: 'swap', preload: false, style: ['normal', 'italic'] });
+const roboto = Roboto({ subsets: ['latin'], display: 'swap', preload: false, style: ['normal', 'italic'] });
+const openSans = Open_Sans({ subsets: ['latin'], display: 'swap', preload: false, style: ['normal', 'italic'] });
+const plusJakartaSans = Plus_Jakarta_Sans({ subsets: ['latin'], display: 'swap', preload: false, style: ['normal', 'italic'] });
+const atkinsonHyperlegible = Atkinson_Hyperlegible({ weight: ['400', '700'], subsets: ['latin'], display: 'swap', preload: false, style: ['normal', 'italic'] });
 
 const READING_FONT_STACKS: Record<ReadingFontFamily, string> = {
   'source-serif-4': sourceSerif.style.fontFamily,
