@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Source_Serif_4 } from 'next/font/google';
 
 import { ReaderAuthNav } from '@/components/reader/reader-auth-nav';
+import { GooglePlayLink } from '@/components/reader/google-play-link';
 import { RealtimeProvider } from '@/components/reader/realtime-provider';
 import { SafeImage } from '@/components/safe-image';
 import { SearchBar } from '@/components/reader/search-bar';
@@ -96,14 +97,12 @@ export default async function ReaderLayout({ children }: { children: ReactNode }
             Kontak
           </Link>
           {config.playStoreUrl && (
-            <a
+            <GooglePlayLink
               href={config.playStoreUrl}
-              target="_blank"
-              rel="noopener noreferrer"
               className="underline underline-offset-2 hover:opacity-80"
             >
               Download di Google Play
-            </a>
+            </GooglePlayLink>
           )}
         </div>
       </footer>

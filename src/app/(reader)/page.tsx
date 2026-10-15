@@ -6,6 +6,7 @@ import { X } from 'lucide-react';
 import { BookMasonryGrid } from '@/components/reader/book-masonry-grid';
 import { BookSlider } from '@/components/reader/book-slider';
 import { AdSlot } from '@/components/reader/ad-slot';
+import { GooglePlayLink } from '@/components/reader/google-play-link';
 import { getPlatformSlug } from '@/lib/platform';
 import { getPlatformConfig, publicFetch } from '@/lib/public-api';
 import { buildSocialMetadata } from '@/lib/seo';
@@ -207,10 +208,8 @@ export default async function CatalogPage({
           </p>
         </div>
         {config.playStoreUrl && (
-          <a
+          <GooglePlayLink
             href={config.playStoreUrl}
-            target="_blank"
-            rel="noopener noreferrer"
             className="w-28 max-w-full shrink transition-opacity hover:opacity-80 sm:w-40"
             aria-label="Download di Google Play"
           >
@@ -219,7 +218,7 @@ export default async function CatalogPage({
               alt="Download di Google Play"
               className="h-auto w-full"
             />
-          </a>
+          </GooglePlayLink>
         )}
       </div>
 
