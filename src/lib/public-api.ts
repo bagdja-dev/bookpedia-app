@@ -24,6 +24,8 @@ const API_BASE = process.env.NEXT_PUBLIC_BOOKPEDIA_API_URL ?? 'http://localhost:
 const PLATFORM_CONFIG_FALLBACK: PlatformProfileDto = {
   nama: 'Bookpedia',
   slug: 'bookpedia',
+  tagline: null,
+  motto: null,
   logoUrl: null,
   faviconUrl: null,
   notificationSoundUrl: null,
@@ -46,6 +48,7 @@ const PLATFORM_CONFIG_FALLBACK: PlatformProfileDto = {
   maxTagsPerBook: 5,
   searchConsoleVerificationFilename: null,
   searchConsoleVerificationContent: null,
+  playStoreUrl: null,
   enableRating: true,
   ratingMode: 'book',
   enableLike: true,
@@ -141,6 +144,8 @@ export const getPlatformConfig = cache(async (platformSlug: string): Promise<Pla
   return {
     nama: config.nama || PLATFORM_CONFIG_FALLBACK.nama,
     slug: config.slug || platformSlug,
+    tagline: config.tagline ?? null,
+    motto: config.motto ?? null,
     logoUrl: config.logoUrl ?? PLATFORM_CONFIG_FALLBACK.logoUrl,
     faviconUrl: config.faviconUrl ?? PLATFORM_CONFIG_FALLBACK.faviconUrl,
     notificationSoundUrl: config.notificationSoundUrl ?? PLATFORM_CONFIG_FALLBACK.notificationSoundUrl,
@@ -153,6 +158,7 @@ export const getPlatformConfig = cache(async (platformSlug: string): Promise<Pla
     maxTagsPerBook: config.maxTagsPerBook ?? PLATFORM_CONFIG_FALLBACK.maxTagsPerBook,
     searchConsoleVerificationFilename: config.searchConsoleVerificationFilename ?? null,
     searchConsoleVerificationContent: config.searchConsoleVerificationContent ?? null,
+    playStoreUrl: config.playStoreUrl ?? null,
     enableRating: config.enableRating ?? PLATFORM_CONFIG_FALLBACK.enableRating,
     ratingMode: config.ratingMode ?? PLATFORM_CONFIG_FALLBACK.ratingMode,
     enableLike: config.enableLike ?? PLATFORM_CONFIG_FALLBACK.enableLike,

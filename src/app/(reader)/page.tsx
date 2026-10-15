@@ -190,18 +190,35 @@ export default async function CatalogPage({
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-      <div className="mb-6">
-        <h1
-          className="text-3xl font-semibold text-[var(--reader-foreground)] sm:text-4xl"
-          style={{ fontFamily: 'var(--font-source-serif)' }}
-        >
-          Jelajahi Cerita
-        </h1>
-        <p className="mt-2 text-sm text-[var(--reader-muted)]">
-          {total > 0
-            ? `${total} cerita dari para penulis ${config.nama}${search ? ` untuk ${SEARCH_BY_DESCRIPTION[searchBy]} "${search}"` : ''}.`
-            : 'Temukan cerita baru untuk dibaca.'}
-        </p>
+      <div className="mb-6 flex items-start justify-between gap-3 sm:items-center">
+        <div className="min-w-0 flex-1">
+          <h1
+            className="text-3xl font-semibold text-[var(--reader-foreground)] sm:text-4xl"
+            style={{ fontFamily: 'var(--font-source-serif)' }}
+          >
+            {config.tagline || 'Jelajahi Cerita'}
+          </h1>
+          <p className="mt-2 text-sm text-[var(--reader-muted)]">
+            {config.motto || (total > 0
+              ? `${total} cerita dari para penulis ${config.nama}${search ? ` untuk ${SEARCH_BY_DESCRIPTION[searchBy]} "${search}"` : ''}.`
+              : 'Temukan cerita baru untuk dibaca.')}
+          </p>
+        </div>
+        {config.playStoreUrl && (
+          <a
+            href={config.playStoreUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-28 max-w-full shrink transition-opacity hover:opacity-80 sm:w-40"
+            aria-label="Download di Google Play"
+          >
+            <img
+              src="https://play.google.com/intl/id/badges/static/images/badges/id_badge_web_generic.png"
+              alt="Download di Google Play"
+              className="h-auto w-full"
+            />
+          </a>
+        )}
       </div>
 
       {isHomepage && homepage?.sections.map((section) => (

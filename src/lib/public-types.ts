@@ -183,6 +183,8 @@ export interface ReadingTypography {
 export interface PlatformProfileDto {
   nama: string;
   slug: string;
+  tagline: string | null;
+  motto: string | null;
   logoUrl: string | null;
   /** URL favicon browser tab — terpisah dari `logoUrl` (dipakai di header). */
   faviconUrl: string | null;
@@ -201,6 +203,8 @@ export interface PlatformProfileDto {
   /** Verifikasi Google Search Console ("HTML file" method), dibalas dinamis oleh middleware.ts. */
   searchConsoleVerificationFilename: string | null;
   searchConsoleVerificationContent: string | null;
+  /** Link listing app Android ini di Google Play Store; null = jangan tampilkan tautan unduh. */
+  playStoreUrl: string | null;
   /** Fase 7 — nyala/mati fitur rating Book/Chapter. false = sembunyikan seluruh UI rating. */
   enableRating: boolean;
   /** Fase 7 — grain rating saat ini: "book" = widget di detail Book, "chapter" = widget di halaman baca Chapter. */

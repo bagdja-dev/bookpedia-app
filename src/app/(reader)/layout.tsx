@@ -95,6 +95,16 @@ export default async function ReaderLayout({ children }: { children: ReactNode }
           <Link href="/contact" className="underline underline-offset-2 hover:opacity-80">
             Kontak
           </Link>
+          {config.playStoreUrl && (
+            <a
+              href={config.playStoreUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-2 hover:opacity-80"
+            >
+              Download di Google Play
+            </a>
+          )}
         </div>
       </footer>
       </div>
