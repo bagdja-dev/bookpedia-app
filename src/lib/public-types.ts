@@ -180,6 +180,18 @@ export interface ReadingTypography {
   firstLineIndent: number;
 }
 
+export interface PlatformAdSlotSettings {
+  enabled: boolean;
+  script: string;
+}
+
+export interface PlatformAdSlots {
+  borderColor: string;
+  homepage: PlatformAdSlotSettings;
+  bookDetail: PlatformAdSlotSettings;
+  chapterReader: PlatformAdSlotSettings;
+}
+
 export interface PlatformProfileDto {
   nama: string;
   slug: string;
@@ -194,6 +206,7 @@ export interface PlatformProfileDto {
   lockStudio: boolean;
   studioEditMode: 'auto' | 'manual';
   rendererKey: string;
+  adSlots: PlatformAdSlots;
   /** Fase 5 (SEO) — jumlah Chapter pertama tiap Book yang bisa dibaca tanpa login. 0 = SEMUA Chapter gratis (bukan "nol Chapter gratis"). */
   maxFreeChapters: number;
   /** Tampilkan badge status cerita (draft/ongoing/completed) di halaman publik. */

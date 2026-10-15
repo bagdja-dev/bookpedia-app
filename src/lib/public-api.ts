@@ -11,9 +11,16 @@
  */
 import { cache } from 'react';
 
-import type { PlatformProfileDto, TagDto } from './public-types';
+import type { PlatformAdSlots, PlatformProfileDto, TagDto } from './public-types';
 
 const API_BASE = process.env.NEXT_PUBLIC_BOOKPEDIA_API_URL ?? 'http://localhost:5020';
+
+const DEFAULT_AD_SLOTS: PlatformAdSlots = {
+  borderColor: '#f97316',
+  homepage: { enabled: false, script: '' },
+  bookDetail: { enabled: false, script: '' },
+  chapterReader: { enabled: false, script: '' },
+};
 
 /**
  * Default SAMA PERSIS dengan seed awal `platforms` di backend (migration
@@ -43,6 +50,7 @@ const PLATFORM_CONFIG_FALLBACK: PlatformProfileDto = {
   lockStudio: false,
   studioEditMode: 'auto',
   rendererKey: 'reader',
+  adSlots: DEFAULT_AD_SLOTS,
   maxFreeChapters: 0,
   showBookStatus: true,
   maxTagsPerBook: 5,
@@ -153,6 +161,12 @@ export const getPlatformConfig = cache(async (platformSlug: string): Promise<Pla
     lockStudio: config.lockStudio ?? PLATFORM_CONFIG_FALLBACK.lockStudio,
     studioEditMode: config.studioEditMode ?? PLATFORM_CONFIG_FALLBACK.studioEditMode,
     rendererKey: config.rendererKey || PLATFORM_CONFIG_FALLBACK.rendererKey,
+    adSlots: {
+      borderColor: config.adSlots?.borderColor ?? DEFAULT_AD_SLOTS.borderColor,
+      homepage: { ...DEFAULT_AD_SLOTS.homepage, ...(config.adSlots?.homepage ?? {}) },
+      bookDetail: { ...DEFAULT_AD_SLOTS.bookDetail, ...(config.adSlots?.bookDetail ?? {}) },
+      chapterReader: { ...DEFAULT_AD_SLOTS.chapterReader, ...(config.adSlots?.chapterReader ?? {}) },
+    },
     maxFreeChapters: config.maxFreeChapters ?? PLATFORM_CONFIG_FALLBACK.maxFreeChapters,
     showBookStatus: config.showBookStatus ?? PLATFORM_CONFIG_FALLBACK.showBookStatus,
     maxTagsPerBook: config.maxTagsPerBook ?? PLATFORM_CONFIG_FALLBACK.maxTagsPerBook,

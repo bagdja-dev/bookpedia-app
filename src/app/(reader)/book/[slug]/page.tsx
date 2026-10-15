@@ -10,6 +10,7 @@ import { StarRatingDisplay } from '@/components/reader/star-rating-display';
 import { BookCommentsButton } from '@/components/reader/book-comments-button';
 import { ChapterCommentsButton } from '@/components/reader/chapter-comments-button';
 import { BookSlider } from '@/components/reader/book-slider';
+import { AdSlot } from '@/components/reader/ad-slot';
 import { BookCollectionAction } from '@/components/reader/book-collection-action';
 import { BookShareButton } from '@/components/reader/book-share-button';
 import { Badge } from '@/components/ui/badge';
@@ -366,6 +367,8 @@ export default async function BookDetailPage({ params }: BookPageProps) {
           </div>
         </div>
       </div>
+
+      <AdSlot slot={config.adSlots.bookDetail} borderColor={config.adSlots.borderColor} className="mt-8" />
 
       <div className="mt-10">
         <h2

@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { Fragment } from 'react';
 import { X } from 'lucide-react';
 
 import { BookMasonryGrid } from '@/components/reader/book-masonry-grid';
 import { BookSlider } from '@/components/reader/book-slider';
+import { AdSlot } from '@/components/reader/ad-slot';
 import { getPlatformSlug } from '@/lib/platform';
 import { getPlatformConfig, publicFetch } from '@/lib/public-api';
 import { buildSocialMetadata } from '@/lib/seo';
@@ -221,39 +223,42 @@ export default async function CatalogPage({
         )}
       </div>
 
-      {isHomepage && homepage?.sections.map((section) => (
-        <section key={section.key} className="mb-10" aria-labelledby={`section-${section.key}`}>
-          <div className="mb-4 flex items-end justify-between gap-4">
-            <h2
-              id={`section-${section.key}`}
-              className="text-2xl font-semibold text-[var(--reader-foreground)]"
-              style={{ fontFamily: 'var(--font-source-serif)' }}
-            >
-              {section.title}
-            </h2>
-            <Link
-              href={section.slug ? `/list/${section.slug}` : '/?view=all'}
-              className="shrink-0 text-xs font-medium text-[var(--reader-muted)] hover:text-[var(--reader-terracotta)]"
-            >
-              Lihat semua
-            </Link>
-          </div>
-          {section.items.length > 0 ? (
-            <BookSlider
-              books={section.items}
-              platformSlug={slug}
-              layout={section.layout}
-              showStatus={config.showBookStatus}
-              showRating={config.enableRating}
-              showLike={config.enableLike}
-              showComment={config.enableComment}
-            />
-          ) : (
-            <p className="rounded-lg border border-[var(--reader-border)] bg-[var(--reader-surface)] px-4 py-6 text-sm text-[var(--reader-muted)]">
-              Belum ada cerita di section ini.
-            </p>
-          )}
-        </section>
+      {isHomepage && homepage?.sections.map((section, index) => (
+        <Fragment key={section.key}>
+          <section className="mb-10" aria-labelledby={`section-${section.key}`}>
+            <div className="mb-4 flex items-end justify-between gap-4">
+              <h2
+                id={`section-${section.key}`}
+                className="text-2xl font-semibold text-[var(--reader-foreground)]"
+                style={{ fontFamily: 'var(--font-source-serif)' }}
+              >
+                {section.title}
+              </h2>
+              <Link
+                href={section.slug ? `/list/${section.slug}` : '/?view=all'}
+                className="shrink-0 text-xs font-medium text-[var(--reader-muted)] hover:text-[var(--reader-terracotta)]"
+              >
+                Lihat semua
+              </Link>
+            </div>
+            {section.items.length > 0 ? (
+              <BookSlider
+                books={section.items}
+                platformSlug={slug}
+                layout={section.layout}
+                showStatus={config.showBookStatus}
+                showRating={config.enableRating}
+                showLike={config.enableLike}
+                showComment={config.enableComment}
+              />
+            ) : (
+              <p className="rounded-lg border border-[var(--reader-border)] bg-[var(--reader-surface)] px-4 py-6 text-sm text-[var(--reader-muted)]">
+                Belum ada cerita di section ini.
+              </p>
+            )}
+          </section>
+          {index === 0 && <AdSlot slot={config.adSlots.homepage} borderColor={config.adSlots.borderColor} className="mb-10" />}
+        </Fragment>
       ))}
 
       {categoryList.length > 0 && (
