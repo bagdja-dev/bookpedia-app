@@ -218,6 +218,8 @@ export interface PlatformProfileDto {
   searchConsoleVerificationContent: string | null;
   /** Link listing app Android ini di Google Play Store; null = jangan tampilkan tautan unduh. */
   playStoreUrl: string | null;
+  /** Google AdSense publisher ID used for per-platform site ownership verification. */
+  adsensePublisherId: string | null;
   /** Fase 7 — nyala/mati fitur rating Book/Chapter. false = sembunyikan seluruh UI rating. */
   enableRating: boolean;
   /** Fase 7 — grain rating saat ini: "book" = widget di detail Book, "chapter" = widget di halaman baca Chapter. */
