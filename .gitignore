@@ -6,3 +6,6 @@ out/
 *.log
 .DS_Store
 *.tsbuildinfo
+
+# graphify knowledge graph — generated locally, not committed
+graphify-out/
