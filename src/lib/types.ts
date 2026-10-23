@@ -160,7 +160,7 @@ export interface CreateBookPayload {
 export interface UpdateBookPayload {
   judul?: string;
   sinopsis?: string;
-  genreId?: string;
+  genreId?: string | null;
   categoryId?: string | null;
   coverUrl?: string;
   status?: BookStatus;

@@ -123,6 +123,7 @@ export function BookForm({ mode, initialValues, submitting, submitLabel, onSubmi
 
   const [genres, setGenres] = useState<GenreDto[] | null>(null);
   const [categories, setCategories] = useState<CategoryDto[] | null>(null);
+  const selectedGenreId = genreId || genres?.[0]?.id || '';
 
   // Autocomplete Tag (debounce ~300ms) — saran diambil dari SEMUA Tag yang
   // pernah dipakai penulis mana pun di Platform ini (folksonomi bersama,
@@ -223,7 +224,7 @@ export function BookForm({ mode, initialValues, submitting, submitLabel, onSubmi
       judul: judul.trim(),
       slug: slug.trim(),
       sinopsis: sinopsis.trim(),
-      genreId,
+      genreId: selectedGenreId,
       categoryId,
       coverUrl: coverUrl.trim(),
       bookType,
@@ -331,7 +332,7 @@ export function BookForm({ mode, initialValues, submitting, submitLabel, onSubmi
       <div className="flex flex-col gap-2">
         <Label htmlFor="genre">Genre</Label>
         <Select
-          value={genreId || undefined}
+          value={selectedGenreId || undefined}
           onValueChange={(value) => setGenreId(value)}
           disabled={submitting || !genres}
         >

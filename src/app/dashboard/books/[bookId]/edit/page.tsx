@@ -44,7 +44,7 @@ export default function EditBookPage({ params }: { params: Promise<{ bookId: str
       const payload: UpdateBookPayload = {
         judul: values.judul,
         sinopsis: values.sinopsis,
-        genreId: values.genreId,
+        genreId: values.genreId || null,
         categoryId: values.categoryId || null,
         coverUrl: values.coverUrl,
         bookType: values.bookType,
