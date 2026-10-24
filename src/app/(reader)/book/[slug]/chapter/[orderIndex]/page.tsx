@@ -7,7 +7,7 @@ import { getPlatformSlug } from '@/lib/platform';
 import { authedFetch, getPlatformConfig, publicFetch } from '@/lib/public-api';
 import { getSession } from '@/lib/session';
 import { buildSocialMetadata } from '@/lib/seo';
-import type { ChapterPreviewDto, ChapterReadDto } from '@/lib/public-types';
+import type { BookCatalogDto, BookDetailDto, ChapterPreviewDto, ChapterReadDto, SeriesPublicDetailDto, SimilarBooksResponse } from '@/lib/public-types';
 import { HighlightableChapter } from '@/components/highlightable-chapter';
 import { ReadingProgressTracker } from '@/components/reading-progress-tracker';
 import { ChapterViewTracker } from '@/components/reader/chapter-view-tracker';
@@ -68,9 +68,10 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
   const platformSlug = await getPlatformSlug();
   const apiPath = `/public/platforms/${platformSlug}/books/${slug}/chapters/${orderIndex}`;
 
-  const [config, preview] = await Promise.all([
+  const [config, preview, bookDetail] = await Promise.all([
     getPlatformConfig(platformSlug),
     publicFetch<ChapterPreviewDto>(`${apiPath}/preview`),
+    publicFetch<BookDetailDto>(`/public/platforms/${platformSlug}/books/${slug}`),
   ]);
 
   if (!preview) {
@@ -97,6 +98,32 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
     notFound();
   }
 
+  // Load books from the same series or collection/library
+  let collectionBooks: BookCatalogDto[] = [];
+  let collectionTitle = '';
+  let isSeries = false;
+
+  if (bookDetail?.series?.id) {
+    const seriesData = await publicFetch<SeriesPublicDetailDto>(
+      `/public/platforms/${platformSlug}/series/${bookDetail.series.id}`
+    );
+    if (seriesData) {
+      collectionBooks = seriesData.books;
+      collectionTitle = seriesData.nama;
+      isSeries = true;
+    }
+  }
+
+  if (collectionBooks.length === 0 && bookDetail) {
+    const similar = await publicFetch<SimilarBooksResponse>(
+      `/public/platforms/${platformSlug}/books/${slug}/similar`
+    );
+    if (similar) {
+      collectionBooks = [...(similar.related ?? []), ...(similar.others ?? [])];
+      collectionTitle = bookDetail.library?.nama ? `Koleksi ${bookDetail.library.nama}` : 'Koleksi Terkait';
+    }
+  }
+
   return (
     // Area baca: latar & warna teks bisa beda dari halaman lain (Platform Settings → Warna).
     <div className="min-h-screen bg-[var(--reader-reading-bg,transparent)] [--reader-foreground:var(--reader-reading-text,var(--reader-foreground-base))]">
@@ -107,12 +134,17 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
         chapterId={chapter.id}
         platformSlug={platformSlug}
         bookSlug={slug}
+        bookTitle={chapter.book.judul}
         orderIndex={chapter.orderIndex}
         initialLikeCount={chapter.likeCount ?? 0}
         initialCommentCount={chapter.commentCount ?? 0}
         enableLike={config.enableLike}
         enableComment={config.enableComment}
         enableShare={config.enableShare}
+        chapters={bookDetail?.chapters ?? []}
+        collectionTitle={collectionTitle}
+        collectionBooks={collectionBooks}
+        isSeries={isSeries}
       />
 
       <Link
