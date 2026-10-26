@@ -22,6 +22,15 @@ async function proxyRequest(request: NextRequest, context: RouteContext) {
     if (body) options.body = body;
   }
 
+  // Forward internal platform-slug header (set oleh middleware.ts) ke API
+  // supaya backend bisa scope data per-Platform (mis. libraries, books).
+  const headers: Record<string, string> = {};
+  const platformSlug = request.headers.get('x-bookpedia-platform-slug');
+  if (platformSlug) {
+    headers['x-bookpedia-platform-slug'] = platformSlug;
+  }
+  options.headers = headers;
+
   const result = await backendFetch(path, options);
 
   if (result.status === 401) {
