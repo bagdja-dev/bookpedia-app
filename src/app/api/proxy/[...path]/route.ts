@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { backendFetch } from '@/lib/backend-api';
+import { PLATFORM_SLUG_HEADER } from '@/lib/platform-slug-header';
+import { resolvePlatformSlugFromHost } from '@/lib/platform-resolve';
 
 type RouteContext = { params: Promise<{ path: string[] }> };
 
@@ -8,6 +10,28 @@ function buildPath(segments: string[], searchParams: URLSearchParams): string {
   const path = '/' + segments.join('/');
   const qs = searchParams.toString();
   return qs ? `${path}?${qs}` : path;
+}
+
+/**
+ * Resolve slug Platform untuk request ini.
+ *
+ * Prioritas: header internal yang sudah dipasang `middleware.ts`. Kalau tidak
+ * ada (mis. matcher middleware tidak jalan untuk host/route tertentu, atau
+ * middleware di-skip), JANGAN diteruskan kosong ke API — resolve ulang dari
+ * Host request. Header kosong dulu berujung API jatuh ke lookup tanpa filter
+ * platform (bug: Studio `bizact` menampilkan Library `novello`).
+ */
+async function resolvePlatformSlug(request: NextRequest): Promise<string | null> {
+  const fromHeader = request.headers.get(PLATFORM_SLUG_HEADER);
+  if (fromHeader) return fromHeader;
+
+  const slug = await resolvePlatformSlugFromHost(request.headers.get('host'));
+  if (!slug) {
+    console.warn(
+      `[proxy] Tidak bisa me-resolve Platform dari Host "${request.headers.get('host') ?? ''}" — request diteruskan tanpa ${PLATFORM_SLUG_HEADER}; endpoint Studio akan menolak (400).`,
+    );
+  }
+  return slug;
 }
 
 async function proxyRequest(request: NextRequest, context: RouteContext) {
@@ -22,12 +46,12 @@ async function proxyRequest(request: NextRequest, context: RouteContext) {
     if (body) options.body = body;
   }
 
-  // Forward internal platform-slug header (set oleh middleware.ts) ke API
-  // supaya backend bisa scope data per-Platform (mis. libraries, books).
+  // Forward internal platform-slug header ke API supaya backend bisa scope
+  // data per-Platform (mis. libraries, books).
   const headers: Record<string, string> = {};
-  const platformSlug = request.headers.get('x-bookpedia-platform-slug');
+  const platformSlug = await resolvePlatformSlug(request);
   if (platformSlug) {
-    headers['x-bookpedia-platform-slug'] = platformSlug;
+    headers[PLATFORM_SLUG_HEADER] = platformSlug;
   }
   options.headers = headers;
 

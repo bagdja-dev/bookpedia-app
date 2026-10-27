@@ -19,7 +19,7 @@
  *  2. `{slug}.{PLATFORM_HOST}` (wildcard subdomain) -> slug langsung dari
  *     hostname, TANPA panggilan API. `{slug}.localhost` (tanpa perlu
  *     `/etc/hosts`) ikut dicek di sini untuk kemudahan dev lokal — lihat
- *     `LOCAL_SUBDOMAIN_PATTERN`.
+ *     `lib/platform-resolve.ts` (`LOCAL_SUBDOMAIN_PATTERN`).
  *  3. Host lain (kandidat custom domain) -> `GET /public/platforms/resolve
  *     ?host=...` — infra §4.3 (Traefik/DNS) sudah aktif production sejak
  *     16 Sep 2026 (custom domain `novello.bagdja.com` terverifikasi & jalan).
@@ -36,56 +36,22 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 import { PLATFORM_SLUG_HEADER } from '@/lib/platform-slug-header';
-import { PLATFORM_HOST } from '@/lib/platform-host';
-
-const API_URL = process.env.NEXT_PUBLIC_BOOKPEDIA_API_URL ?? 'http://localhost:5020';
-const DEFAULT_PLATFORM_SLUG = process.env.NEXT_PUBLIC_DEFAULT_PLATFORM_SLUG ?? 'bookpedia';
-
-const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1']);
-
-const SUBDOMAIN_PATTERN = new RegExp(`^([a-z0-9-]+)\\.${PLATFORM_HOST.replace(/\./g, '\\.')}$`);
+import { API_URL, resolvePlatformSlugFromHost } from '@/lib/platform-resolve';
 
 /**
- * Kemudahan dev lokal (11 Sep 2026) — `{slug}.localhost` resolve otomatis ke
- * `127.0.0.1` di browser modern/OS manapun (RFC 6761), TANPA perlu edit
- * `/etc/hosts`. Dicek terpisah dari `SUBDOMAIN_PATTERN` supaya `.env` tetap
- * boleh berisi domain PRODUCTION asli (`NEXT_PUBLIC_PLATFORM_URL=https://
- * bookpedia.bagdja.com`) tanpa perlu di-toggle manual tiap mau tes subdomain
- * lokal. Aman di production juga (Host asli tidak akan pernah `*.localhost`),
- * jadi tidak perlu digerbang `NODE_ENV`.
+ * Verifikasi Google Search Console per-Platform (17 Sep 2026, susulan SEO —
+ * lihat plan/bookpedia/seo-execution-plan.md §4). Filename Google SELALU
+ * berpola `google<hash>.html` — dibalas dari
+ * `platforms.search_console_verification_content` milik Platform yang
+ * resolve dari Host request.
  */
-const LOCAL_SUBDOMAIN_PATTERN = /^([a-z0-9-]+)\.localhost$/;
-
-async function resolveSlugForDomain(host: string): Promise<string | null> {
-  try {
-    const res = await fetch(`${API_URL}/public/platforms/resolve?host=${encodeURIComponent(host)}`, {
-      next: { revalidate: 300 },
-    });
-    if (!res.ok) return null;
-    const data = (await res.json()) as { slug?: string };
-    return data.slug ?? null;
-  } catch {
-    return null;
-  }
-}
+const GOOGLE_VERIFICATION_PATTERN = /^\/google[a-zA-Z0-9_-]+\.html$/;
 
 function withPlatformSlug(request: NextRequest, slug: string): NextResponse {
   const headers = new Headers(request.headers);
   headers.set(PLATFORM_SLUG_HEADER, slug);
   return NextResponse.next({ request: { headers } });
 }
-
-/**
- * Verifikasi Google Search Console per-Platform (17 Sep 2026, susulan SEO —
- * lihat plan/bookpedia/seo-execution-plan.md §4). Filename Google SELALU
- * berpola `google<hash>.html` — dicek di sini SEBELUM rute aplikasi manapun,
- * dibalas apa adanya dari `platforms.search_console_verification_content`
- * milik Platform yang resolve dari Host request. Menggantikan pendekatan
- * file statis di `public/` (dibagikan SEMUA Platform, butuh rebuild tiap
- * Platform baru mau verifikasi) — sekarang per-Platform lewat Platform
- * Settings, tanpa deploy ulang.
- */
-const GOOGLE_VERIFICATION_PATTERN = /^\/google[a-zA-Z0-9_-]+\.html$/;
 
 async function getPlatformVerificationFile(slug: string): Promise<{ filename: string; content: string } | null> {
   try {
@@ -146,27 +112,12 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const hostHeader = request.headers.get('host') ?? '';
-  const hostname = hostHeader.split(':')[0];
-
-  let slug: string;
-  if (!hostname || LOCAL_HOSTS.has(hostname) || hostname === PLATFORM_HOST) {
-    slug = DEFAULT_PLATFORM_SLUG;
-  } else {
-    const subdomainMatch = hostname.match(SUBDOMAIN_PATTERN) ?? hostname.match(LOCAL_SUBDOMAIN_PATTERN);
-    if (subdomainMatch) {
-      slug = subdomainMatch[1];
-    } else {
-      const resolved = await resolveSlugForDomain(hostname);
-      if (!resolved) {
-        // Host tak-terdaftar (custom domain belum di-resolve) — diamkan,
-        // biarkan `getPlatformSlug()` fallback ke default. Lihat catatan
-        // risiko di plan §4.2 (revisit jadi halaman "Platform not found"
-        // begitu §4.3 aktif).
-        return NextResponse.next();
-      }
-      slug = resolved;
-    }
+  const slug = await resolvePlatformSlugFromHost(request.headers.get('host'));
+  if (!slug) {
+    // Host tak-terdaftar (custom domain belum di-resolve) — diamkan, biarkan
+    // `getPlatformSlug()` fallback ke default. Lihat catatan risiko di plan
+    // §4.2 (revisit jadi halaman "Platform not found" begitu §4.3 aktif).
+    return NextResponse.next();
   }
 
   if (GOOGLE_VERIFICATION_PATTERN.test(request.nextUrl.pathname)) {
