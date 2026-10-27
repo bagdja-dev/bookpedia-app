@@ -247,6 +247,8 @@ export interface PlatformProfileDto {
   seoPrefix: string | null;
   seoSuffix: string | null;
   termsAndConditions: string | null;
+  /** Halaman Kebijakan Privasi (/privacy-policy) — URL-nya dipakai di Google Play Store. */
+  privacyPolicy: string | null;
   /** Halaman Kontak (/contact) — null = baris tidak ditampilkan. */
   contactPhone: string | null;
   contactWhatsapp: string | null;
