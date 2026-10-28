@@ -107,6 +107,33 @@ async function getPlatformAssetLinks(slug: string): Promise<unknown[] | null> {
   }
 }
 
+/**
+ * ads.txt per-Platform (28 Okt 2026) — AdSense menolak verifikasi situs
+ * selama `/ads.txt` di root domain belum ada. Isinya dibangun dari
+ * `adsensePublisherId` (field yang sama dengan meta tag
+ * `google-adsense-account` di root layout), jadi tidak perlu kolom baru.
+ * Admin mengisi format `ca-pub-XXXX`, sedangkan ads.txt butuh `pub-XXXX`, jadi
+ * prefix `ca-` dibuang. Belum diisi = 404.
+ */
+const ADS_TXT_PATH = '/ads.txt';
+// ID sertifikasi TAG milik Google, sama untuk semua publisher AdSense.
+const GOOGLE_ADS_TXT_CERT_ID = 'f08c47fec0942fa0';
+
+async function getPlatformAdsTxt(slug: string): Promise<string | null> {
+  try {
+    const res = await fetch(`${API_URL}/public/platforms/${encodeURIComponent(slug)}`, {
+      next: { revalidate: 300 },
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { adsensePublisherId?: string | null };
+    const publisherId = data.adsensePublisherId?.trim().replace(/^ca-/, '');
+    if (!publisherId || !/^pub-\d+$/.test(publisherId)) return null;
+    return `google.com, ${publisherId}, DIRECT, ${GOOGLE_ADS_TXT_CERT_ID}\n`;
+  } catch {
+    return null;
+  }
+}
+
 export async function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith('/auth/')) {
     return NextResponse.next();
@@ -134,6 +161,16 @@ export async function middleware(request: NextRequest) {
     }
     return NextResponse.json(statements, {
       headers: { 'Cache-Control': 'public, max-age=300' },
+    });
+  }
+
+  if (request.nextUrl.pathname === ADS_TXT_PATH) {
+    const content = await getPlatformAdsTxt(slug);
+    if (!content) {
+      return new NextResponse('Not Found', { status: 404 });
+    }
+    return new NextResponse(content, {
+      headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'public, max-age=300' },
     });
   }
 
