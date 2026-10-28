@@ -38,7 +38,12 @@ const CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID ?? 'bookpedia';
 const REDIRECT_URI =
   process.env.NEXT_PUBLIC_REDIRECT_URI ?? 'http://localhost:5021/auth/callback';
 
-export function buildAuthorizeUrl(state: string, codeChallenge: string, forceLogin = false): string {
+/**
+ * `brand` = slug Platform (28 Okt 2026) — login.bagdja.com memakainya untuk
+ * menampilkan logo/background Platform lewat `brandingUrl` client app
+ * Bookpedia (diatur di bagdja-console). Opsional; tanpa brand tampil default.
+ */
+export function buildAuthorizeUrl(state: string, codeChallenge: string, forceLogin = false, brand?: string | null): string {
   const url = new URL('/oauth/authorize', AUTH_URL);
   url.searchParams.set('client_id', CLIENT_ID);
   url.searchParams.set('response_type', 'code');
@@ -48,6 +53,9 @@ export function buildAuthorizeUrl(state: string, codeChallenge: string, forceLog
   url.searchParams.set('code_challenge_method', 'S256');
   if (forceLogin) {
     url.searchParams.set('prompt', 'login');
+  }
+  if (brand) {
+    url.searchParams.set('brand', brand);
   }
   return url.toString();
 }

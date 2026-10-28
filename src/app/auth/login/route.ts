@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { generateCodeVerifier, generateCodeChallenge, buildAuthorizeUrl } from '@/lib/auth';
 import { generateStateId, saveOAuthState } from '@/lib/oauth-state-store';
 import { resolveOrigin } from '@/lib/resolve-origin';
+import { resolvePlatformSlugFromHost } from '@/lib/platform-resolve';
 
 function safeNextPath(next: string | null): string | null {
   if (!next || !next.startsWith('/') || next.startsWith('//')) return null;
@@ -31,6 +32,10 @@ export async function GET(request: NextRequest) {
 
   // Bookpedia intentionally keeps silent SSO: account selection is not
   // required when a user already has an active Bagdja Login session.
-  const authorizeUrl = buildAuthorizeUrl(stateId, codeChallenge);
+  // `brand` = slug Platform asal (subdomain/custom domain) supaya
+  // login.bagdja.com menampilkan logo/background Platform ini. `/auth/*`
+  // dilewati middleware, jadi slug di-resolve langsung dari host origin.
+  const brand = await resolvePlatformSlugFromHost(new URL(origin).host);
+  const authorizeUrl = buildAuthorizeUrl(stateId, codeChallenge, false, brand);
   return NextResponse.redirect(authorizeUrl);
 }
