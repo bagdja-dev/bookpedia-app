@@ -121,6 +121,12 @@ export interface Book {
   seoOgType: 'website' | 'book' | 'profile' | null;
   seoPrefix: string | null;
   seoSuffix: string | null;
+  /** Template disclaimer yang dipilih Book ini (jika ada) — ditampilkan di bawah sinopsis, di atas tombol aksi. */
+  disclaimerTemplate: {
+    id: string;
+    nama: string;
+    content: string;
+  } | null;
   /** Fase 7 — total dibaca (SUM view_count semua Chapter Book ini), read-only. */
   viewCount: number;
   /** Total komentar pada semua Chapter Book ini, termasuk balasan. */
@@ -153,6 +159,8 @@ export interface CreateBookPayload {
   seoOgType?: 'website' | 'book' | 'profile';
   seoPrefix?: string;
   seoSuffix?: string;
+  /** ID template disclaimer dari GET /platforms/:platformId/disclaimer-templates/active. */
+  disclaimerTemplateId?: string;
 }
 
 // Catatan: `PATCH /books/:id` TIDAK menerima `slug` (kontrak backend) — slug
@@ -178,6 +186,8 @@ export interface UpdateBookPayload {
   seoOgType?: 'website' | 'book' | 'profile' | null;
   seoPrefix?: string | null;
   seoSuffix?: string | null;
+  /** ID template disclaimer dari GET /platforms/:platformId/disclaimer-templates/active. Kirim null untuk menghapus. */
+  disclaimerTemplateId?: string | null;
 }
 
 export interface Chapter {

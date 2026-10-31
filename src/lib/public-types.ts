@@ -426,6 +426,14 @@ export interface BookDetailDto {
   seoOgType: 'website' | 'book' | 'profile' | null;
   seoPrefix: string | null;
   seoSuffix: string | null;
+
+  /** Template disclaimer yang dipilih Book ini (jika ada) — ditampilkan di bawah sinopsis, di atas tombol aksi. */
+  disclaimerTemplate: {
+    id: string;
+    nama: string;
+    content: string;
+  } | null;
+
   library: {
     /** Susulan Inbox/DM, 16 Sep 2026 — dipakai tombol "Kirim Pesan ke Penulis" (POST /messages/direct/libraries/:libraryId). */
     id: string;

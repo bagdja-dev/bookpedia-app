@@ -61,6 +61,8 @@ export interface BookFormValues {
   seoOgType: 'website' | 'book' | 'profile';
   seoPrefix: string;
   seoSuffix: string;
+  /** ID template disclaimer yang dipilih (kosong = tidak ada disclaimer). */
+  disclaimerTemplateId: string;
 }
 
 interface BookFormProps {
@@ -113,6 +115,8 @@ export function BookForm({ mode, initialValues, submitting, submitLabel, onSubmi
   const [seoOgType, setSeoOgType] = useState<'website' | 'book' | 'profile'>(initialValues?.seoOgType ?? 'book');
   const [seoPrefix, setSeoPrefix] = useState(initialValues?.seoPrefix ?? '');
   const [seoSuffix, setSeoSuffix] = useState(initialValues?.seoSuffix ?? '');
+  const [disclaimerTemplateId, setDisclaimerTemplateId] = useState(initialValues?.disclaimerTemplateId ?? '');
+  const [disclaimerTemplates, setDisclaimerTemplates] = useState<{ id: string; nama: string }[]>([]);
   const [tagInput, setTagInput] = useState('');
   const [tagSuggestions, setTagSuggestions] = useState<TagDto[]>([]);
   const [tagSuggestionsOpen, setTagSuggestionsOpen] = useState(false);
@@ -175,6 +179,9 @@ export function BookForm({ mode, initialValues, submitting, submitLabel, onSubmi
     });
     publicFetch<CategoryDto[]>(`/public/platforms/${platformSlug}/categories`).then((data) => {
       if (!cancelled) setCategories(data ?? []);
+    });
+    publicFetch<{ id: string; nama: string }[]>(`/public/platforms/${platformSlug}/disclaimer-templates/active`).then((data) => {
+      if (!cancelled) setDisclaimerTemplates(data ?? []);
     });
     return () => {
       cancelled = true;
@@ -240,6 +247,7 @@ export function BookForm({ mode, initialValues, submitting, submitLabel, onSubmi
       seoOgType,
       seoPrefix,
       seoSuffix,
+      disclaimerTemplateId: disclaimerTemplateId.trim(),
     });
   }
 
@@ -354,6 +362,28 @@ export function BookForm({ mode, initialValues, submitting, submitLabel, onSubmi
         </Select>
         {genres && genres.length === 0 && (
           <p className="text-xs text-muted-foreground">Belum ada genre tersedia.</p>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="disclaimerTemplateId">Template Disclaimer (opsional)</Label>
+        <Select value={disclaimerTemplateId || undefined} onValueChange={(value) => setDisclaimerTemplateId(value)} disabled={submitting}>
+          <SelectTrigger id="disclaimerTemplateId" className="w-full">
+            <SelectValue placeholder={disclaimerTemplates.length > 0 ? 'Pilih template disclaimer (opsional)' : 'Memuat template…'} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem key="none" value="">
+              Tidak ada disclaimer
+            </SelectItem>
+            {disclaimerTemplates.map((t) => (
+              <SelectItem key={t.id} value={t.id}>
+                {t.nama}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {disclaimerTemplates.length === 0 && (
+          <p className="text-xs text-muted-foreground">Belum ada template disclaimer aktif. Buat di Pengaturan Platform terlebih dahulu.</p>
         )}
       </div>
 
