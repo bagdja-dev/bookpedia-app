@@ -354,6 +354,17 @@ export default async function BookDetailPage({ params }: BookPageProps) {
             </div>
           )}
 
+          {book.disclaimerTemplate && (
+            <div className="mt-6 rounded-lg border border-[var(--reader-border)] bg-[var(--reader-bg)] p-4">
+              <p className="mb-2 text-xs font-semibold text-[var(--reader-terracotta)] uppercase tracking-wider">
+                Disclaimer
+              </p>
+              <div className="reading-text text-[var(--reader-foreground)]/90 whitespace-pre-line">
+                {book.disclaimerTemplate.content}
+              </div>
+            </div>
+          )}
+
           <div className="flex flex-wrap items-center gap-2">
             <BookCollectionAction bookId={book.id} bookTitle={book.judul} />
             {config.enableShare && <BookShareButton bookSlug={book.slug} bookTitle={book.judul} />}

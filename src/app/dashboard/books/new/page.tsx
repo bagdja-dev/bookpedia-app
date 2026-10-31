@@ -40,6 +40,7 @@ export default function NewBookPage() {
         seoOgType: values.seoOgType,
         ...(values.seoPrefix ? { seoPrefix: values.seoPrefix } : {}),
         ...(values.seoSuffix ? { seoSuffix: values.seoSuffix } : {}),
+        ...(values.disclaimerTemplateId ? { disclaimerTemplateId: values.disclaimerTemplateId } : {}),
       };
       const book = await apiClient<Book>('/books', {
         method: 'POST',

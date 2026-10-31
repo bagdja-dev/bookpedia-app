@@ -60,6 +60,7 @@ export default function EditBookPage({ params }: { params: Promise<{ bookId: str
         seoOgType: values.seoOgType,
         seoPrefix: values.seoPrefix || null,
         seoSuffix: values.seoSuffix || null,
+        disclaimerTemplateId: values.disclaimerTemplateId || null,
       };
       await apiClient<Book>(`/books/${bookId}`, {
         method: 'PATCH',
@@ -115,6 +116,7 @@ export default function EditBookPage({ params }: { params: Promise<{ bookId: str
               seoOgType: book.seoOgType ?? 'book',
               seoPrefix: book.seoPrefix ?? '',
               seoSuffix: book.seoSuffix ?? '',
+              disclaimerTemplateId: book.disclaimerTemplate?.id ?? '',
             }}
           />
         </CardContent>
