@@ -284,3 +284,29 @@ export interface UpdateSeriesPayload {
   nama?: string;
   bookIds?: string[];
 }
+
+export interface DisclaimerTemplate {
+  id: string;
+  platformId: string;
+  nama: string;
+  content: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateDisclaimerTemplatePayload {
+  nama: string;
+  content: string;
+  isActive?: boolean;
+}
+
+export interface UpdateDisclaimerTemplatePayload {
+  nama?: string;
+  content?: string;
+  isActive?: boolean;
+}
+
+export interface DeletedResponse {
+  deleted: boolean;
+}
