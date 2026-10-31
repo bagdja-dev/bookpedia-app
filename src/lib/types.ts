@@ -291,6 +291,7 @@ export interface DisclaimerTemplate {
   nama: string;
   content: string;
   isActive: boolean;
+  isDefault?: boolean;
   createdAt: string;
   updatedAt: string;
 }

@@ -432,6 +432,7 @@ export interface BookDetailDto {
     id: string;
     nama: string;
     content: string;
+    isDefault?: boolean;
   } | null;
 
   library: {
