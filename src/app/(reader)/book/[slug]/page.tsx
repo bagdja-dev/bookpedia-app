@@ -14,7 +14,6 @@ import { AdSlot } from '@/components/reader/ad-slot';
 import { BookCollectionAction } from '@/components/reader/book-collection-action';
 import { BookShareButton } from '@/components/reader/book-share-button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BOOK_STATUS_LABEL, BOOK_STATUS_VARIANT } from '@/lib/status';
 import { BOOK_TYPE_BADGE_LABEL, formatBookByline, formatBookBylinePrefix } from '@/lib/book-byline';
 import { buildSimilarBooksHref } from '@/lib/book-filter-href';
