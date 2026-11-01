@@ -1,11 +1,10 @@
 node_modules/
 .next/
 out/
-.env
-.env.local
 *.log
 .DS_Store
 *.tsbuildinfo
 
 # graphify knowledge graph — generated locally, not committed
 graphify-out/
+config.bat
