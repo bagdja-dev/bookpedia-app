@@ -30,6 +30,8 @@ export default function NewBookPage() {
         ...(values.coverUrl ? { coverUrl: values.coverUrl } : {}),
         bookType: values.bookType,
         ...(values.originalAuthor ? { originalAuthor: values.originalAuthor } : {}),
+        ...(values.originalTitle ? { originalTitle: values.originalTitle } : {}),
+        ...(values.originalLink ? { originalLink: values.originalLink } : {}),
         ...(values.maxFreeChapters.trim() !== '' ? { maxFreeChapters: Number(values.maxFreeChapters) } : {}),
         ...(values.tags.length > 0 ? { tags: values.tags } : {}),
         ...(values.seoTitle ? { seoTitle: values.seoTitle } : {}),

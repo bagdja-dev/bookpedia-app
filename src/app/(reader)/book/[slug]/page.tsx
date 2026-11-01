@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { BookOpenText, Eye, User, CheckCircle } from 'lucide-react';
+import { BookOpenText, Eye, User } from 'lucide-react';
 import { ContinueReadingButton } from '@/components/reader/continue-reading-button';
 import { BookRatingWidget } from '@/components/reader/book-rating-widget';
 import { SafeImage } from '@/components/safe-image';
@@ -14,6 +14,7 @@ import { AdSlot } from '@/components/reader/ad-slot';
 import { BookCollectionAction } from '@/components/reader/book-collection-action';
 import { BookShareButton } from '@/components/reader/book-share-button';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BOOK_STATUS_LABEL, BOOK_STATUS_VARIANT } from '@/lib/status';
 import { BOOK_TYPE_BADGE_LABEL, formatBookByline, formatBookBylinePrefix } from '@/lib/book-byline';
 import { buildSimilarBooksHref } from '@/lib/book-filter-href';
@@ -226,61 +227,162 @@ export default async function BookDetailPage({ params }: BookPageProps) {
             </p>
           )}
 
-          {/* Info cards 2x2 */}
-          <div className="grid grid-cols-2 gap-3 w-full">
-            <div className="rounded-xl border border-[var(--reader-border)] bg-[var(--reader-surface)] p-4">
-              <p className="text-xs font-semibold text-[var(--reader-muted)] uppercase tracking-wider">
-                Judul Asli
-              </p>
-              <p className="mt-1 text-sm text-[var(--reader-foreground)] leading-tight">
-                {book.bookType !== 'original' && book.originalAuthor ? book.originalAuthor : '-'}
-              </p>
+          {/* Info asli — hanya muncul kalau terisi DAN tipe bukan original */}
+          {book.bookType !== 'original' && (
+            <div className="grid grid-cols-2 gap-3 w-full">
+              {book.originalTitle && (
+                <Card className="rounded-xl border border-[var(--reader-border)] bg-[var(--reader-surface)] p-4">
+                  <CardHeader>
+                    <CardTitle className="text-xs font-semibold text-[var(--reader-muted)] uppercase tracking-wider leading-none">
+                      Judul Asli
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <p className="text-sm text-[var(--reader-foreground)] leading-tight truncate">
+                      {book.originalTitle}
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+              {book.originalAuthor && (
+                <Card className="rounded-xl border border-[var(--reader-border)] bg-[var(--reader-surface)] p-4">
+                  <CardHeader>
+                    <CardTitle className="text-xs font-semibold text-[var(--reader-muted)] uppercase tracking-wider leading-none">
+                      Penulis Asli
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="mt-1 flex items-center gap-2 text-sm text-[var(--reader-foreground)]">
+                      <Link
+                        href={`/author/${encodeURIComponent(book.originalAuthor)}`}
+                        className="font-medium underline-offset-2 hover:text-[var(--reader-terracotta)] hover:underline"
+                      >
+                        {book.originalAuthor}
+                      </Link>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+              {book.originalLink && (
+                <Card className="rounded-xl border border-[var(--reader-border)] bg-[var(--reader-surface)] p-4">
+                  <CardHeader>
+                    <CardTitle className="text-xs font-semibold text-[var(--reader-muted)] uppercase tracking-wider leading-none">
+                      Tautan Raw
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="mt-1">
+                      <Link
+                        href={book.originalLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm font-medium text-[var(--reader-terracotta)] underline-offset-2 hover:underline"
+                      >
+                        Buka karya asli ↗
+                      </Link>
+                      <p className="text-[10px] text-[var(--reader-muted)] mt-0.5 leading-tight">
+                        Dukung karya asli jika mampu
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
-            <div className="rounded-xl border border-[var(--reader-border)] bg-[var(--reader-surface)] p-4">
-              <p className="text-xs font-semibold text-[var(--reader-muted)] uppercase tracking-wider">
-                Penulis
-              </p>
-              <div className="mt-1 flex items-center gap-2 text-sm text-[var(--reader-foreground)]">
-                {book.library.nama}
-                {book.bookType !== 'original' && (
-                  <Badge variant="outline">
-                    Raw
+          )}
+
+          {/* Stats — selalu ditampilkan */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 w-full mt-3">
+            <Card className="rounded-xl border border-[var(--reader-border)] bg-[var(--reader-surface)] p-4">
+              <CardHeader>
+                <CardTitle className="text-xs font-semibold text-[var(--reader-muted)] uppercase tracking-wider leading-none">
+                  Status
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="mt-1 flex items-center gap-2">
+                  <Badge variant={BOOK_STATUS_VARIANT[book.status]}>
+                    {BOOK_STATUS_LABEL[book.status]}
                   </Badge>
-                )}
-              </div>
-            </div>
-            <div className="rounded-xl border border-[var(--reader-border)] bg-[var(--reader-surface)] p-4">
-              <p className="text-xs font-semibold text-[var(--reader-muted)] uppercase tracking-wider">
-                Status
-              </p>
-              <div className="mt-1 flex items-center gap-2">
-                <Badge variant={BOOK_STATUS_VARIANT[book.status]}>
-                  {BOOK_STATUS_LABEL[book.status]}
-                </Badge>
-                <span className="text-xs text-[var(--reader-muted)]">{book.chapters.length} Bab</span>
-              </div>
-            </div>
-            <div className="rounded-xl border border-[var(--reader-border)] bg-[var(--reader-surface)] p-4">
-              <p className="text-xs font-semibold text-[var(--reader-muted)] uppercase tracking-wider">
-                Tautan Raw
-              </p>
-              <div className="mt-1">
-                <Link
-                  href="#"
-                  className="text-sm font-medium text-[var(--reader-terracotta)] underline-offset-2 hover:underline"
-                >
-                  Tautan eksternal ↗
-                </Link>
-                <p className="text-[10px] text-[var(--reader-muted)] mt-0.5 leading-tight">
-                  Dukung penulis asli jika mampu
-                </p>
-              </div>
-            </div>
+                  <span className="text-xs text-[var(--reader-muted)]">{book.chapters.length} Bab</span>
+                </div>
+              </CardContent>
+            </Card>
+            {book.series && (
+              <Card className="rounded-xl border border-[var(--reader-border)] bg-[var(--reader-surface)] p-4">
+                <CardHeader>
+                  <CardTitle className="text-xs font-semibold text-[var(--reader-muted)] uppercase tracking-wider leading-none">
+                    Series
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="mt-1 flex items-center gap-2 text-sm text-[var(--reader-foreground)]">
+                    <BookOpenText className="h-3.5 w-3.5 shrink-0" />
+                    <Link
+                      href={`/series/${book.series.id}`}
+                      className="font-medium underline-offset-2 hover:text-[var(--reader-terracotta)] hover:underline"
+                    >
+                      {book.series.nama}
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+            <Card className="rounded-xl border border-[var(--reader-border)] bg-[var(--reader-surface)] p-4">
+              <CardHeader>
+                <CardTitle className="text-xs font-semibold text-[var(--reader-muted)] uppercase tracking-wider leading-none">
+                  Total Dibaca
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="mt-1 flex flex-col gap-0.5">
+                  <p className="text-sm font-semibold text-[var(--reader-foreground)]">
+                    {book.viewCount.toLocaleString('id-ID')}
+                  </p>
+                  <p className="text-[10px] text-[var(--reader-muted)] leading-none">
+                    view
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="rounded-xl border border-[var(--reader-border)] bg-[var(--reader-surface)] p-4">
+              <CardHeader>
+                <CardTitle className="text-xs font-semibold text-[var(--reader-muted)] uppercase tracking-wider leading-none">
+                  Pembaca
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="mt-1 flex flex-col gap-0.5">
+                  <p className="text-sm font-semibold text-[var(--reader-foreground)]">
+                    {book.uniqueReaderCount.toLocaleString('id-ID')}
+                  </p>
+                  <p className="text-[10px] text-[var(--reader-muted)] leading-none">
+                    reader
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="rounded-xl border border-[var(--reader-border)] bg-[var(--reader-surface)] p-4">
+              <CardHeader>
+                <CardTitle className="text-xs font-semibold text-[var(--reader-muted)] uppercase tracking-wider leading-none">
+                  Total Like
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="mt-1 flex flex-col gap-0.5">
+                  <p className="text-sm font-semibold text-[var(--reader-foreground)]">
+                    {book.likeCount.toLocaleString('id-ID')}
+                  </p>
+                  <p className="text-[10px] text-[var(--reader-muted)] leading-none">
+                    like
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Tags */}
           {book.tags.length > 0 && (
-            <div className="flex flex-wrap items-center gap-1.5 mt-2">
+            <div className="flex flex-wrap items-center gap-1.5 mt-3">
               {book.tags.map((tag) => (
                 <Link
                   key={tag.id}
@@ -292,12 +394,6 @@ export default async function BookDetailPage({ params }: BookPageProps) {
               ))}
             </div>
           )}
-
-          {/* Update schedule */}
-          <div className="flex items-center gap-2 mt-3 text-xs text-emerald-600">
-            <CheckCircle className="h-3.5 w-3.5" />
-            <span>Update tiap Senin &amp; Kamis</span>
-          </div>
         </div>
       </div>
 

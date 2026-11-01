@@ -418,6 +418,10 @@ export interface BookDetailDto {
   bookType: BookType;
   /** Nama penulis asli — relevan kalau `bookType` bukan 'original'. */
   originalAuthor: string | null;
+  /** Judul karya asli — relevan kalau `bookType` bukan 'original'. */
+  originalTitle: string | null;
+  /** Tautan ke karya asli / sumber — relevan kalau `bookType` bukan 'original'. */
+  originalLink: string | null;
   seoTitle: string | null;
   seoDescription: string | null;
   seoH1: string | null;
@@ -432,6 +436,7 @@ export interface BookDetailDto {
     id: string;
     nama: string;
     content: string;
+    isDefault?: boolean;
   } | null;
 
   library: {
