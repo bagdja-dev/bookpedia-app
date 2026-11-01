@@ -9,27 +9,30 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { apiClient, ApiError } from '@/lib/api-client';
 import type { DeletedResponse, DisclaimerTemplate, CreateDisclaimerTemplatePayload, UpdateDisclaimerTemplatePayload } from '@/lib/types';
+import { useLibraryContext } from '@/context/library-context';
 import { X, Pencil, Trash2 } from 'lucide-react';
 
 export default function DisclaimerTemplatesPage() {
+  const { id: libraryId } = useLibraryContext();
   const [templates, setTemplates] = useState<DisclaimerTemplate[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState<{ nama: string; content: string; isActive: boolean }>({
+  const [form, setForm] = useState<{ nama: string; content: string; isActive: boolean; isDefault: boolean }>({
     nama: '',
     content: '',
     isActive: true,
+    isDefault: false,
   });
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
-    apiClient<DisclaimerTemplate[]>('/disclaimer-templates').then((data) => {
+    apiClient<DisclaimerTemplate[]>(`/libraries/${libraryId}/disclaimer-templates`).then((data) => {
       if (!cancelled) setTemplates(data ?? []);
     }).catch(() => {
       // Gagal diam-diam — tidak kritikal
     });
     return () => { cancelled = true; };
-  }, []);
+  }, [libraryId]);
 
   async function handleCreate() {
     setSubmitting(true);
@@ -38,12 +41,13 @@ export default function DisclaimerTemplatesPage() {
         nama: form.nama.trim(),
         content: form.content.trim(),
         isActive: form.isActive,
+        isDefault: form.isDefault,
       };
-      await apiClient<DisclaimerTemplate>('/disclaimer-templates', {
+      await apiClient<DisclaimerTemplate>(`/libraries/${libraryId}/disclaimer-templates`, {
         method: 'POST',
         body: JSON.stringify(payload),
       });
-      setForm({ nama: '', content: '', isActive: true });
+      setForm({ nama: '', content: '', isActive: true, isDefault: false });
       setEditingId(null);
       await refresh();
       toast.success('Template disclaimer berhasil dibuat.');
@@ -62,12 +66,13 @@ export default function DisclaimerTemplatesPage() {
         nama: form.nama.trim(),
         content: form.content.trim(),
         isActive: form.isActive,
+        isDefault: form.isDefault,
       };
-      await apiClient<DisclaimerTemplate>(`/disclaimer-templates/${editingId}`, {
+      await apiClient<DisclaimerTemplate>(`/libraries/${libraryId}/disclaimer-templates/${editingId}`, {
         method: 'PATCH',
         body: JSON.stringify(payload),
       });
-      setForm({ nama: '', content: '', isActive: true });
+      setForm({ nama: '', content: '', isActive: true, isDefault: false });
       setEditingId(null);
       await refresh();
       toast.success('Template disclaimer berhasil diperbarui.');
@@ -81,7 +86,7 @@ export default function DisclaimerTemplatesPage() {
   async function handleDelete(id: string) {
     if (!window.confirm('Hapus template disclaimer ini? Book yang memilih template ini akan tidak menampilkan disclaimer.')) return;
     try {
-      await apiClient<DeletedResponse>(`/disclaimer-templates/${id}`, { method: 'DELETE' });
+      await apiClient<DeletedResponse>(`/libraries/${libraryId}/disclaimer-templates/${id}`, { method: 'DELETE' });
       await refresh();
       toast.success('Template disclaimer berhasil dihapus.');
     } catch (err) {
@@ -90,35 +95,35 @@ export default function DisclaimerTemplatesPage() {
   }
 
   async function refresh() {
-    const data = await apiClient<DisclaimerTemplate[]>('/disclaimer-templates');
+    const data = await apiClient<DisclaimerTemplate[]>(`/libraries/${libraryId}/disclaimer-templates`);
     setTemplates(data ?? []);
   }
 
   function startEdit(t: DisclaimerTemplate) {
     setEditingId(t.id);
-    setForm({ nama: t.nama, content: t.content, isActive: t.isActive });
+    setForm({ nama: t.nama, content: t.content, isActive: t.isActive, isDefault: t.isDefault ?? false });
   }
 
   function cancelEdit() {
     setEditingId(null);
-    setForm({ nama: '', content: '', isActive: true });
+    setForm({ nama: '', content: '', isActive: true, isDefault: false });
   }
 
   return (
     <div className="mx-auto max-w-3xl">
       <Card>
         <CardHeader>
-          <CardTitle className="text-xl">Template Disclaimer</CardTitle>
+          <CardTitle className="text-xl">Template Disclaimer Studio</CardTitle>
           <CardDescription>
-            Kelola template disclaimer yang bisa dipilih penulis saat membuat/mengedit Book. Tampil di halaman
-            detail Book (di bawah sinopsis, di atas tombol aksi).
+            Kelola template disclaimer level Studio/Library ini. Template hanya tersedia untuk Book di
+            Library/Studio Anda. Tampil di halaman detail Book (di bawah sinopsis, di atas tombol aksi).
           </CardDescription>
         </CardHeader>
         <CardContent>
           {!editingId && (
             <Button type="button" variant="outline" size="sm" onClick={() => {
               setEditingId('new');
-              setForm({ nama: '', content: '', isActive: true });
+              setForm({ nama: '', content: '', isActive: true, isDefault: false });
             }} disabled={submitting}>
               + Tambah Template
             </Button>
@@ -149,17 +154,35 @@ export default function DisclaimerTemplatesPage() {
                   required
                 />
               </div>
-              <div className="flex items-start gap-2">
-                <input
-                  type="checkbox"
-                  id="dt-is-active"
-                  checked={form.isActive}
-                  onChange={(e) => setForm((prev) => ({ ...prev, isActive: e.target.checked }))}
-                  disabled={submitting}
-                  className="mt-1"
-                />
-                <div>
-                  <Label htmlFor="dt-is-active">Template aktif (bisa dipilih penulis)</Label>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex items-start gap-2">
+                  <input
+                    type="checkbox"
+                    id="dt-is-active"
+                    checked={form.isActive}
+                    onChange={(e) => setForm((prev) => ({ ...prev, isActive: e.target.checked }))}
+                    disabled={submitting}
+                    className="mt-1"
+                  />
+                  <div>
+                    <Label htmlFor="dt-is-active">Template aktif</Label>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <input
+                    type="checkbox"
+                    id="dt-is-default"
+                    checked={form.isDefault}
+                    onChange={(e) => setForm((prev) => ({ ...prev, isDefault: e.target.checked }))}
+                    disabled={submitting}
+                    className="mt-1"
+                  />
+                  <div>
+                    <Label htmlFor="dt-is-default">Template default Studio</Label>
+                    <p className="text-[10px] text-muted-foreground">
+                      Hanya satu default per Studio — tampil kalau Book tidak memilih template sendiri.
+                    </p>
+                  </div>
                 </div>
               </div>
               <div className="flex justify-end gap-2 pt-2">
@@ -201,6 +224,11 @@ export default function DisclaimerTemplatesPage() {
                     <tr key={t.id} className="border-b">
                       <td className="px-3 py-2">
                         <span className="font-medium text-[var(--reader-foreground)]">{t.nama}</span>
+                        {t.isDefault && (
+                          <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700">
+                            Default
+                          </span>
+                        )}
                       </td>
                       <td className="px-3 py-2 text-xs text-muted-foreground truncate max-w-[200px]">
                         {t.content}

@@ -20,7 +20,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { SeoTemplateField } from '@/components/seo-template-field';
 import { usePlatformContext } from '@/context/platform-context';
-import { slugify } from '@/lib/api-client';
+import { apiClient, slugify } from '@/lib/api-client';
 import { publicFetch, searchTags } from '@/lib/public-api';
 import type { CategoryDto, GenreDto, TagDto } from '@/lib/public-types';
 import type { BookStatus, BookType } from '@/lib/types';
@@ -75,6 +75,8 @@ interface BookFormProps {
   submitting: boolean;
   submitLabel: string;
   onSubmit: (values: BookFormValues) => void | Promise<void>;
+  /** ID Library/Studio untuk fetch template disclaimer level studio. */
+  libraryId?: string;
 }
 
 /**
@@ -96,7 +98,7 @@ interface BookFormProps {
  * bantu UX memilih) — Genre yang belum masuk Category manapun dikelompokkan
  * di bawah label "Lainnya".
  */
-export function BookForm({ mode, initialValues, submitting, submitLabel, onSubmit }: BookFormProps) {
+export function BookForm({ mode, initialValues, submitting, submitLabel, onSubmit, libraryId }: BookFormProps) {
   const { slug: platformSlug, config: platformConfig } = usePlatformContext();
   const [judul, setJudul] = useState(initialValues?.judul ?? '');
   const [slug, setSlug] = useState(initialValues?.slug ?? '');
@@ -122,7 +124,8 @@ export function BookForm({ mode, initialValues, submitting, submitLabel, onSubmi
   const [seoPrefix, setSeoPrefix] = useState(initialValues?.seoPrefix ?? '');
   const [seoSuffix, setSeoSuffix] = useState(initialValues?.seoSuffix ?? '');
   const [disclaimerTemplateId, setDisclaimerTemplateId] = useState(initialValues?.disclaimerTemplateId ?? '');
-  const [disclaimerTemplates, setDisclaimerTemplates] = useState<{ id: string; nama: string }[]>([]);
+  const [disclaimerTemplates, setDisclaimerTemplates] = useState<{ id: string; nama: string; source: 'platform' | 'library' }[]>([]);
+  const [libraryTemplates, setLibraryTemplates] = useState<{ id: string; nama: string }[]>([]);
   const [tagInput, setTagInput] = useState('');
   const [tagSuggestions, setTagSuggestions] = useState<TagDto[]>([]);
   const [tagSuggestionsOpen, setTagSuggestionsOpen] = useState(false);
@@ -187,12 +190,24 @@ export function BookForm({ mode, initialValues, submitting, submitLabel, onSubmi
       if (!cancelled) setCategories(data ?? []);
     });
     publicFetch<{ id: string; nama: string }[]>(`/public/platforms/${platformSlug}/disclaimer-templates/active`).then((data) => {
-      if (!cancelled) setDisclaimerTemplates(data ?? []);
+      if (!cancelled) {
+        const plats = (data ?? []).map((t) => ({ id: t.id, nama: t.nama, source: 'platform' as const }));
+        setDisclaimerTemplates(plats);
+      }
     });
+    if (libraryId) {
+      apiClient<{ id: string; nama: string }[]>(`/libraries/${libraryId}/disclaimer-templates/active`).then((data) => {
+        if (!cancelled) {
+          const libs = (data ?? []).map((t) => ({ id: t.id, nama: t.nama, source: 'library' as const }));
+          setLibraryTemplates(libs);
+          setDisclaimerTemplates((prev) => [...prev.filter((t) => t.source === 'platform'), ...libs.map((t) => ({ ...t, source: 'library' as const }))]);
+        }
+      });
+    }
     return () => {
       cancelled = true;
     };
-  }, [platformSlug]);
+  }, [platformSlug, libraryId]);
 
   // Kelompokkan Genre per Category (murni tampilan dropdown) — Genre yang
   // belum jadi anggota Category manapun masuk grup "Lainnya" di akhir.
@@ -383,15 +398,32 @@ export function BookForm({ mode, initialValues, submitting, submitLabel, onSubmi
             <SelectItem key="none" value="">
               Tidak ada disclaimer
             </SelectItem>
-            {disclaimerTemplates.map((t) => (
-              <SelectItem key={t.id} value={t.id}>
-                {t.nama}
-              </SelectItem>
-            ))}
+            {disclaimerTemplates.length > 0 && (
+              <SelectGroup>
+                <SelectLabel>Platform</SelectLabel>
+                {disclaimerTemplates.filter((t) => t.source === 'platform').map((t) => (
+                  <SelectItem key={t.id} value={t.id}>
+                    {t.nama}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            )}
+            {libraryTemplates.length > 0 && (
+              <SelectGroup>
+                <SelectLabel>Studio</SelectLabel>
+                {libraryTemplates.map((t) => (
+                  <SelectItem key={t.id} value={t.id}>
+                    {t.nama}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            )}
           </SelectContent>
         </Select>
-        {disclaimerTemplates.length === 0 && (
-          <p className="text-xs text-muted-foreground">Belum ada template disclaimer aktif. Buat di Pengaturan Platform terlebih dahulu.</p>
+        {disclaimerTemplates.length === 0 && libraryTemplates.length === 0 && (
+          <p className="text-xs text-muted-foreground">
+            Belum ada template disclaimer aktif. Buat di Pengaturan Platform (admin) atau Pengaturan Studio.
+          </p>
         )}
       </div>
 

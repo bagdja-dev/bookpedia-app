@@ -437,6 +437,7 @@ export interface BookDetailDto {
     nama: string;
     content: string;
     isDefault?: boolean;
+    libraryId?: string | null;
   } | null;
 
   library: {

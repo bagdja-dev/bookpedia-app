@@ -300,6 +300,7 @@ export interface UpdateSeriesPayload {
 export interface DisclaimerTemplate {
   id: string;
   platformId: string;
+  libraryId: string | null;
   nama: string;
   content: string;
   isActive: boolean;
@@ -312,12 +313,14 @@ export interface CreateDisclaimerTemplatePayload {
   nama: string;
   content: string;
   isActive?: boolean;
+  isDefault?: boolean;
 }
 
 export interface UpdateDisclaimerTemplatePayload {
   nama?: string;
   content?: string;
   isActive?: boolean;
+  isDefault?: boolean;
 }
 
 export interface DeletedResponse {

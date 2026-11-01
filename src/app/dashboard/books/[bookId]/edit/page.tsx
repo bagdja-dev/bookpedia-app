@@ -96,6 +96,7 @@ export default function EditBookPage({ params }: { params: Promise<{ bookId: str
             submitting={submitting}
             submitLabel="Simpan Perubahan"
             onSubmit={handleSubmit}
+            libraryId={book.libraryId}
             initialValues={{
               judul: book.judul,
               slug: book.slug,
