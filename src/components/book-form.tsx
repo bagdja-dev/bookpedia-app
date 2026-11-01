@@ -48,6 +48,10 @@ export interface BookFormValues {
   coverUrl: string;
   bookType: BookType;
   originalAuthor: string;
+  /** Judul karya asli — relevan kalau bookType bukan 'original'. */
+  originalTitle: string;
+  /** Tautan ke karya asli / sumber — relevan kalau bookType bukan 'original'. */
+  originalLink: string;
   status: BookStatus;
   /** Fase 5 (SEO) — string kosong = ikut kebijakan Platform (null di payload). */
   maxFreeChapters: string;
@@ -104,6 +108,8 @@ export function BookForm({ mode, initialValues, submitting, submitLabel, onSubmi
   const [coverUploading, setCoverUploading] = useState(false);
   const [bookType, setBookType] = useState<BookType>(initialValues?.bookType ?? 'original');
   const [originalAuthor, setOriginalAuthor] = useState(initialValues?.originalAuthor ?? '');
+  const [originalTitle, setOriginalTitle] = useState(initialValues?.originalTitle ?? '');
+  const [originalLink, setOriginalLink] = useState(initialValues?.originalLink ?? '');
   const [status, setStatus] = useState<BookStatus>(initialValues?.status ?? 'draft');
   const [maxFreeChapters, setMaxFreeChapters] = useState(initialValues?.maxFreeChapters ?? '');
   const [tags, setTags] = useState<string[]>(initialValues?.tags ?? []);
@@ -236,6 +242,8 @@ export function BookForm({ mode, initialValues, submitting, submitLabel, onSubmi
       coverUrl: coverUrl.trim(),
       bookType,
       originalAuthor: originalAuthor.trim(),
+      originalTitle: originalTitle.trim(),
+      originalLink: originalLink.trim(),
       status,
       maxFreeChapters,
       tags,
@@ -416,6 +424,39 @@ export function BookForm({ mode, initialValues, submitting, submitLabel, onSubmi
           <p className="text-xs text-muted-foreground">
             Nama penulis karya asli yang kamu {bookType === 'translation' ? 'terjemahkan' : 'adaptasi'} — opsional,
             tapi disarankan diisi.
+          </p>
+        </div>
+      )}
+
+      {bookType !== 'original' && (
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="originalTitle">Judul Karya Asli</Label>
+          <Input
+            id="originalTitle"
+            value={originalTitle}
+            onChange={(e) => setOriginalTitle(e.target.value)}
+            placeholder="mis. The Wind in the Willows"
+            disabled={submitting}
+          />
+          <p className="text-xs text-muted-foreground">
+            Judul karya asli yang kamu {bookType === 'translation' ? 'terjemahkan' : 'adaptasi'} — tampil di halaman detail Book sebagai "Judul Asli".
+          </p>
+        </div>
+      )}
+
+      {bookType !== 'original' && (
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="originalLink">Tautan Karya Asli / Raw</Label>
+          <Input
+            id="originalLink"
+            type="url"
+            value={originalLink}
+            onChange={(e) => setOriginalLink(e.target.value)}
+            placeholder="https://example.com/karya-asli"
+            disabled={submitting}
+          />
+          <p className="text-xs text-muted-foreground">
+            Tautan ke versi asli / sumber karya — tampil di halaman detail Book sebagai "Tautan Raw".
           </p>
         </div>
       )}

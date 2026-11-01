@@ -109,6 +109,10 @@ export interface Book {
   bookType: BookType;
   /** Nama penulis asli — relevan kalau `bookType` bukan 'original'. */
   originalAuthor: string | null;
+  /** Judul karya asli — relevan kalau `bookType` bukan 'original'. */
+  originalTitle: string | null;
+  /** Tautan ke karya asli / sumber — relevan kalau `bookType` bukan 'original'. */
+  originalLink: string | null;
   /** Saklar publikasi level Book, terpisah dari `status` di atas dan dari status publish per-Chapter. */
   publishedAt: string | null;
   /** Fase 5 (SEO) — override "Maximum Free Chapter" Platform. null = ikut kebijakan Platform. */
@@ -148,6 +152,10 @@ export interface CreateBookPayload {
   coverUrl?: string;
   bookType?: BookType;
   originalAuthor?: string;
+  /** Judul karya asli — relevan kalau bookType bukan 'original'. */
+  originalTitle?: string;
+  /** Tautan ke karya asli / sumber — relevan kalau bookType bukan 'original'. */
+  originalLink?: string;
   maxFreeChapters?: number;
   /** Fase 6 — Tag bebas (nama apa adanya, find-or-create di backend). */
   tags?: string[];
@@ -175,6 +183,10 @@ export interface UpdateBookPayload {
   published?: boolean;
   bookType?: BookType;
   originalAuthor?: string | null;
+  /** Judul karya asli — relevan kalau bookType bukan 'original'. */
+  originalTitle?: string | null;
+  /** Tautan ke karya asli / sumber — relevan kalau bookType bukan 'original'. */
+  originalLink?: string | null;
   maxFreeChapters?: number | null;
   /** Fase 6 — ganti SELURUH Tag Book ini. [] menghapus semua. */
   tags?: string[];

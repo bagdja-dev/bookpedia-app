@@ -105,6 +105,8 @@ export default function EditBookPage({ params }: { params: Promise<{ bookId: str
               coverUrl: book.coverUrl ?? '',
               bookType: book.bookType,
               originalAuthor: book.originalAuthor ?? '',
+              originalTitle: book.originalTitle ?? '',
+              originalLink: book.originalLink ?? '',
               status: book.status,
               maxFreeChapters: book.maxFreeChapters === null ? '' : String(book.maxFreeChapters),
               tags: book.tags.map((t) => t.nama),
