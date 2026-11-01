@@ -7,7 +7,7 @@
  * DTO publik beda — sudah termasuk relasi `library`/`chapters` yang di-embed,
  * bukan foreign key mentah.
  */
-import type { BookStatus, BookType } from './types';
+import type { BookStatus, BookType, OriginalWorkLink } from './types';
 
 /** Fase 7 — grain rating: "book" = satu rating per Book, "chapter" = rating terpisah tiap Chapter (diagregasi ke Book saat ditampilkan). */
 export type RatingMode = 'book' | 'chapter';
@@ -420,7 +420,9 @@ export interface BookDetailDto {
   originalAuthor: string | null;
   /** Judul karya asli — relevan kalau `bookType` bukan 'original'. */
   originalTitle: string | null;
-  /** Tautan ke karya asli / sumber — relevan kalau `bookType` bukan 'original'. */
+  /** Tautan karya asli beserta label tampilannya. */
+  originalLinks: OriginalWorkLink[];
+  /** Tautan pertama, untuk kompatibilitas klien lama. */
   originalLink: string | null;
   seoTitle: string | null;
   seoDescription: string | null;

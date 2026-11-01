@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { BookOpen, BookOpenText, Eye, Heart, ListFilter, MessageCircle, User, UserRound } from 'lucide-react';
+import { BookOpen, BookOpenText, ExternalLink, Eye, Heart, ListFilter, MessageCircle, User, UserRound } from 'lucide-react';
 import { ContinueReadingButton } from '@/components/reader/continue-reading-button';
 import { BookRatingWidget } from '@/components/reader/book-rating-widget';
 import { SafeImage } from '@/components/safe-image';
@@ -13,8 +13,7 @@ import { BookSlider } from '@/components/reader/book-slider';
 import { AdSlot } from '@/components/reader/ad-slot';
 import { BookCollectionAction } from '@/components/reader/book-collection-action';
 import { BookShareButton } from '@/components/reader/book-share-button';
-import { Badge } from '@/components/ui/badge';
-import { BOOK_STATUS_LABEL, BOOK_STATUS_VARIANT } from '@/lib/status';
+import { BOOK_STATUS_LABEL } from '@/lib/status';
 import { BOOK_TYPE_BADGE_LABEL, formatBookByline, formatBookBylinePrefix } from '@/lib/book-byline';
 import { buildSimilarBooksHref } from '@/lib/book-filter-href';
 import { getPlatformSlug } from '@/lib/platform';
@@ -87,6 +86,18 @@ function formatDate(iso: string | null): string {
   return new Date(iso).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
+function getSafeExternalUrl(value: string | null): string | null {
+  if (!value) return null;
+
+  try {
+    const trimmedValue = value.trim();
+    const url = new URL(/^[a-z][a-z\d+.-]*:/i.test(trimmedValue) ? trimmedValue : `https://${trimmedValue}`);
+    return url.protocol === 'http:' || url.protocol === 'https:' ? url.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
 export default async function BookDetailPage({ params }: BookPageProps) {
   const { slug: bookSlug } = await params;
   const platformSlug = await getPlatformSlug();
@@ -124,6 +135,11 @@ export default async function BookDetailPage({ params }: BookPageProps) {
 
   const firstChapter = book.chapters[0];
   const similarHref = buildSimilarBooksHref(book);
+  const originalWorkLinks = book.originalLinks?.length
+    ? book.originalLinks
+    : book.originalLink
+      ? [{ label: 'Karya Asli', link: book.originalLink }]
+      : [];
 
   // JSON-LD (SEO Fase 3, plan/bookpedia/seo-execution-plan.md §3.1) — Book
   // schema.org, supaya Google bisa tampilkan rich result (cover, penulis,
@@ -154,25 +170,47 @@ export default async function BookDetailPage({ params }: BookPageProps) {
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: bookJsonLd }} />
-      <div className="flex flex-col items-start gap-6 sm:flex-row">
-        <div className="w-40 shrink-0 self-start overflow-hidden rounded-lg border border-[var(--reader-border)] bg-[var(--reader-surface)] shadow-sm sm:w-56">
-          <div className="relative aspect-[3/4] w-full bg-[var(--reader-bg)]">
-            {book.coverUrl ? (
-              <SafeImage
-                src={book.coverUrl}
-                alt={`Sampul novel ${book.judul}${bookTypeLabel ? ` ${bookTypeLabel}` : ''}`}
-                fill
-                priority
-                sizes="(min-width: 640px) 224px, 160px"
-                className="object-cover"
-              />
-            ) : (
-              <div
-                className="flex h-full w-full items-center justify-center text-5xl font-semibold text-[var(--reader-muted)]"
-                style={{ fontFamily: 'var(--font-source-serif)' }}
+      <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
+        <div className="w-40 shrink-0 self-center sm:w-56 sm:self-start">
+          <div className="overflow-hidden rounded-lg border border-[var(--reader-border)] bg-[var(--reader-surface)] shadow-sm">
+            <div className="relative aspect-[3/4] w-full bg-[var(--reader-bg)]">
+              {book.coverUrl ? (
+                <SafeImage
+                  src={book.coverUrl}
+                  alt={`Sampul novel ${book.judul}${bookTypeLabel ? ` ${bookTypeLabel}` : ''}`}
+                  fill
+                  priority
+                  sizes="(min-width: 640px) 224px, 160px"
+                  className="object-cover"
+                />
+              ) : (
+                <div
+                  className="flex h-full w-full items-center justify-center text-5xl font-semibold text-[var(--reader-muted)]"
+                  style={{ fontFamily: 'var(--font-source-serif)' }}
+                >
+                  {book.judul.charAt(0).toUpperCase()}
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+            {config.showBookStatus && (
+              <span
+                className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+                  book.status === 'ongoing'
+                    ? 'bg-emerald-100 text-emerald-800'
+                    : book.status === 'completed'
+                      ? 'bg-[var(--reader-bg)] text-[var(--reader-muted)]'
+                      : 'bg-amber-100 text-amber-800'
+                }`}
               >
-                {book.judul.charAt(0).toUpperCase()}
-              </div>
+                {BOOK_STATUS_LABEL[book.status]}
+              </span>
+            )}
+            {book.bookType !== 'original' && (
+              <span className="rounded-full bg-[var(--reader-terracotta)]/10 px-2.5 py-1 text-xs font-medium text-[var(--reader-terracotta)]">
+                {BOOK_TYPE_BADGE_LABEL[book.bookType]}
+              </span>
             )}
           </div>
         </div>
@@ -194,18 +232,6 @@ export default async function BookDetailPage({ params }: BookPageProps) {
               {book.library.nama}
             </Link>
           </p>
-
-          {book.bookType !== 'original' && book.originalAuthor && (
-            <p className="w-fit text-sm text-[var(--reader-muted)]">
-              Penulis asli:{' '}
-              <Link
-                href={`/author/${encodeURIComponent(book.originalAuthor)}`}
-                className="font-medium underline-offset-2 hover:text-[var(--reader-terracotta)] hover:underline"
-              >
-                {book.originalAuthor}
-              </Link>
-            </p>
-          )}
 
           <div className="flex items-center gap-2.5">
             <Link
@@ -254,15 +280,99 @@ export default async function BookDetailPage({ params }: BookPageProps) {
             <SendMessageToLibraryButton libraryId={book.library.id} />
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            {config.showBookStatus && (
-              <Badge variant={BOOK_STATUS_VARIANT[book.status]}>{BOOK_STATUS_LABEL[book.status]}</Badge>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {book.bookType !== 'original' && (
+              <div className="rounded-xl border border-[var(--reader-border)] bg-[var(--reader-surface)] p-3">
+                <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--reader-muted)]">
+                  Judul asli
+                </p>
+                <p className="text-sm font-medium text-[var(--reader-foreground)]">
+                  {book.originalTitle?.trim() || 'Belum dicantumkan'}
+                </p>
+              </div>
+            )}
+            {book.bookType !== 'original' && book.originalAuthor && (
+              <div className="rounded-xl border border-[var(--reader-border)] bg-[var(--reader-surface)] p-3">
+                <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--reader-muted)]">
+                  Penulis asli
+                </p>
+                <Link
+                  href={`/author/${encodeURIComponent(book.originalAuthor)}`}
+                  className="text-sm font-medium text-[var(--reader-foreground)] underline-offset-2 hover:text-[var(--reader-terracotta)] hover:underline"
+                >
+                  {book.originalAuthor}
+                </Link>
+              </div>
             )}
             {book.bookType !== 'original' && (
-              <span className="rounded-full bg-[var(--reader-terracotta)]/10 px-2.5 py-0.5 text-xs font-medium text-[var(--reader-terracotta)]">
-                {BOOK_TYPE_BADGE_LABEL[book.bookType]}
-              </span>
+              <div className="rounded-xl border border-[var(--reader-border)] bg-[var(--reader-surface)] p-3">
+                <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--reader-muted)]">
+                  Tautan karya asli
+                </p>
+                {originalWorkLinks.length > 0 ? (
+                  <ul className="flex flex-col gap-1">
+                    {originalWorkLinks.map((item, index) => {
+                      const safeUrl = getSafeExternalUrl(item.link);
+                      return (
+                        <li key={`${item.label}-${index}`}>
+                          {safeUrl ? (
+                            <a
+                              href={safeUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex max-w-full items-center gap-1 break-words text-sm font-medium text-[var(--reader-foreground)] underline-offset-2 hover:text-[var(--reader-terracotta)] hover:underline"
+                            >
+                              {item.label}
+                              <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+                            </a>
+                          ) : (
+                            <span className="text-sm text-[var(--reader-foreground)]">{item.label}</span>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-[var(--reader-foreground)]">Belum dicantumkan</p>
+                )}
+              </div>
             )}
+            <div className="rounded-xl border border-[var(--reader-border)] bg-[var(--reader-surface)] p-3">
+              <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--reader-muted)]">
+                Statistik buku
+              </p>
+              <div className="flex flex-wrap gap-x-4 gap-y-2">
+                <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">
+                  <BookOpen className="h-3.5 w-3.5" />
+                  {book.chapters.length.toLocaleString('id-ID')} chapter
+                </span>
+                <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">
+                  <Eye className="h-3.5 w-3.5" />
+                  {book.viewCount.toLocaleString('id-ID')} dibaca
+                </span>
+                <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">
+                  <UserRound className="h-3.5 w-3.5" />
+                  {(book.uniqueReaderCount ?? 0).toLocaleString('id-ID')} reader
+                </span>
+                {config.enableLike && (
+                  <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">
+                    <Heart className="h-3.5 w-3.5" />
+                    {(book.likeCount ?? 0).toLocaleString('id-ID')} suka
+                  </span>
+                )}
+                {config.enableComment && (
+                  <BookCommentsButton
+                    platformSlug={platformSlug}
+                    bookSlug={book.slug}
+                    commentCount={book.commentCount ?? 0}
+                    className="flex items-center gap-1 text-xs text-[var(--reader-muted)] hover:text-[var(--reader-terracotta)]"
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
             {book.category && (
               <Link
                 href={`/?category=${encodeURIComponent(book.category.slug)}`}
@@ -278,26 +388,6 @@ export default async function BookDetailPage({ params }: BookPageProps) {
               >
                 {book.genre.nama}
               </Link>
-            )}
-            <span className="text-xs text-[var(--reader-muted)]">{book.chapters.length} chapter</span>
-            <span className="text-xs text-[var(--reader-muted)]">{book.viewCount.toLocaleString('id-ID')}x dibaca</span>
-            <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">
-              <UserRound className="h-3.5 w-3.5" />
-              {(book.uniqueReaderCount ?? 0).toLocaleString('id-ID')} reader
-            </span>
-            {config.enableLike && (
-              <span className="flex items-center gap-1 text-xs text-[var(--reader-muted)]">
-                <Heart className="h-3.5 w-3.5" />
-                {(book.likeCount ?? 0).toLocaleString('id-ID')}
-              </span>
-            )}
-            {config.enableComment && (
-              <BookCommentsButton
-                platformSlug={platformSlug}
-                bookSlug={book.slug}
-                commentCount={book.commentCount ?? 0}
-                className="flex items-center gap-1 text-xs text-[var(--reader-muted)] hover:text-[var(--reader-terracotta)]"
-              />
             )}
           </div>
 
@@ -344,27 +434,6 @@ export default async function BookDetailPage({ params }: BookPageProps) {
             </Link>
           )}
 
-          {book.sinopsis && (
-            <div className="reading-text text-[var(--reader-foreground)]/90">
-              {book.sinopsis.split(/\n\s*\n/).map((paragraph, index) => (
-                <p key={`${index}-${paragraph.slice(0, 20)}`} className="whitespace-pre-line">
-                  {paragraph}
-                </p>
-              ))}
-            </div>
-          )}
-
-          {book.disclaimerTemplate && (
-            <div className="mt-6 rounded-lg border border-[var(--reader-border)] bg-[var(--reader-bg)] p-4">
-              <p className="mb-2 text-xs font-semibold text-[var(--reader-terracotta)] uppercase tracking-wider">
-                Disclaimer
-              </p>
-              <div className="reading-text text-[var(--reader-foreground)]/90 whitespace-pre-line">
-                {book.disclaimerTemplate.content}
-              </div>
-            </div>
-          )}
-
           <div className="flex flex-wrap items-center gap-2">
             <BookCollectionAction bookId={book.id} bookTitle={book.judul} />
             {config.enableShare && <BookShareButton bookSlug={book.slug} bookTitle={book.judul} />}
@@ -378,6 +447,35 @@ export default async function BookDetailPage({ params }: BookPageProps) {
           </div>
         </div>
       </div>
+
+      {book.sinopsis && (
+        <section className="mt-8 w-full rounded-2xl border border-[var(--reader-border)] bg-[var(--reader-surface)] p-5 sm:p-6">
+          <h2
+            className="mb-3 text-lg font-semibold text-[var(--reader-foreground)]"
+            style={{ fontFamily: 'var(--font-source-serif)' }}
+          >
+            Sinopsis
+          </h2>
+          <div className="reading-text text-[var(--reader-foreground)]/90">
+            {book.sinopsis.split(/\n\s*\n/).map((paragraph, index) => (
+              <p key={`${index}-${paragraph.slice(0, 20)}`} className="whitespace-pre-line">
+                {paragraph}
+              </p>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {book.disclaimerTemplate && (
+        <section className="mt-4 rounded-lg border border-[var(--reader-border)] bg-[var(--reader-bg)] p-4">
+          <p className="mb-2 text-xs font-semibold text-[var(--reader-terracotta)] uppercase tracking-wider">
+            Disclaimer
+          </p>
+          <div className="reading-text text-[var(--reader-foreground)]/90 whitespace-pre-line">
+            {book.disclaimerTemplate.content}
+          </div>
+        </section>
+      )}
 
       <AdSlot slot={config.adSlots.bookDetail} borderColor={config.adSlots.borderColor} className="mt-8" />
 

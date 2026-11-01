@@ -88,6 +88,10 @@ export type BookStatus = 'draft' | 'ongoing' | 'completed';
 export type ChapterStatus = 'draft' | 'published';
 /** original (default) / translation / adaptation — Book terjemahan/adaptasi karya orang lain. */
 export type BookType = 'original' | 'translation' | 'adaptation';
+export interface OriginalWorkLink {
+  label: string;
+  link: string;
+}
 
 export interface Book {
   id: string;
@@ -111,7 +115,9 @@ export interface Book {
   originalAuthor: string | null;
   /** Judul karya asli — relevan kalau `bookType` bukan 'original'. */
   originalTitle: string | null;
-  /** Tautan ke karya asli / sumber — relevan kalau `bookType` bukan 'original'. */
+  /** Tautan karya asli beserta label tampilannya. */
+  originalLinks: OriginalWorkLink[];
+  /** Tautan pertama, untuk kompatibilitas klien lama. */
   originalLink: string | null;
   /** Saklar publikasi level Book, terpisah dari `status` di atas dan dari status publish per-Chapter. */
   publishedAt: string | null;
@@ -154,7 +160,9 @@ export interface CreateBookPayload {
   originalAuthor?: string;
   /** Judul karya asli — relevan kalau bookType bukan 'original'. */
   originalTitle?: string;
-  /** Tautan ke karya asli / sumber — relevan kalau bookType bukan 'original'. */
+  /** Tautan karya asli beserta label tampilannya. */
+  originalLinks?: OriginalWorkLink[];
+  /** Kompatibilitas untuk klien lama. */
   originalLink?: string;
   maxFreeChapters?: number;
   /** Fase 6 — Tag bebas (nama apa adanya, find-or-create di backend). */
@@ -185,7 +193,9 @@ export interface UpdateBookPayload {
   originalAuthor?: string | null;
   /** Judul karya asli — relevan kalau bookType bukan 'original'. */
   originalTitle?: string | null;
-  /** Tautan ke karya asli / sumber — relevan kalau bookType bukan 'original'. */
+  /** Tautan karya asli beserta label tampilannya. */
+  originalLinks?: OriginalWorkLink[] | null;
+  /** Kompatibilitas untuk klien lama. */
   originalLink?: string | null;
   maxFreeChapters?: number | null;
   /** Fase 6 — ganti SELURUH Tag Book ini. [] menghapus semua. */

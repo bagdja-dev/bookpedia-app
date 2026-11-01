@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, type FormEvent, type KeyboardEvent } from 'react';
-import { X } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 
 import { AccordionSection } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
@@ -23,7 +23,7 @@ import { usePlatformContext } from '@/context/platform-context';
 import { apiClient, slugify } from '@/lib/api-client';
 import { publicFetch, searchTags } from '@/lib/public-api';
 import type { CategoryDto, GenreDto, TagDto } from '@/lib/public-types';
-import type { BookStatus, BookType } from '@/lib/types';
+import type { BookStatus, BookType, OriginalWorkLink } from '@/lib/types';
 
 const UNCATEGORIZED_LABEL = 'Lainnya';
 
@@ -50,8 +50,8 @@ export interface BookFormValues {
   originalAuthor: string;
   /** Judul karya asli — relevan kalau bookType bukan 'original'. */
   originalTitle: string;
-  /** Tautan ke karya asli / sumber — relevan kalau bookType bukan 'original'. */
-  originalLink: string;
+  /** Tautan karya asli beserta label tampilannya. */
+  originalLinks: OriginalWorkLink[];
   status: BookStatus;
   /** Fase 5 (SEO) — string kosong = ikut kebijakan Platform (null di payload). */
   maxFreeChapters: string;
@@ -111,7 +111,7 @@ export function BookForm({ mode, initialValues, submitting, submitLabel, onSubmi
   const [bookType, setBookType] = useState<BookType>(initialValues?.bookType ?? 'original');
   const [originalAuthor, setOriginalAuthor] = useState(initialValues?.originalAuthor ?? '');
   const [originalTitle, setOriginalTitle] = useState(initialValues?.originalTitle ?? '');
-  const [originalLink, setOriginalLink] = useState(initialValues?.originalLink ?? '');
+  const [originalLinks, setOriginalLinks] = useState<OriginalWorkLink[]>(initialValues?.originalLinks ?? []);
   const [status, setStatus] = useState<BookStatus>(initialValues?.status ?? 'draft');
   const [maxFreeChapters, setMaxFreeChapters] = useState(initialValues?.maxFreeChapters ?? '');
   const [tags, setTags] = useState<string[]>(initialValues?.tags ?? []);
@@ -258,7 +258,9 @@ export function BookForm({ mode, initialValues, submitting, submitLabel, onSubmi
       bookType,
       originalAuthor: originalAuthor.trim(),
       originalTitle: originalTitle.trim(),
-      originalLink: originalLink.trim(),
+      originalLinks: originalLinks
+        .map(({ label, link }) => ({ label: label.trim(), link: link.trim() }))
+        .filter(({ label, link }) => label && link),
       status,
       maxFreeChapters,
       tags,
@@ -471,25 +473,70 @@ export function BookForm({ mode, initialValues, submitting, submitLabel, onSubmi
             disabled={submitting}
           />
           <p className="text-xs text-muted-foreground">
-            Judul karya asli yang kamu {bookType === 'translation' ? 'terjemahkan' : 'adaptasi'} — tampil di halaman detail Book sebagai "Judul Asli".
+            Judul karya asli yang kamu {bookType === 'translation' ? 'terjemahkan' : 'adaptasi'} — tampil di halaman detail Book sebagai Judul Asli.
           </p>
         </div>
       )}
 
       {bookType !== 'original' && (
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="originalLink">Tautan Karya Asli / Raw</Label>
-          <Input
-            id="originalLink"
-            type="url"
-            value={originalLink}
-            onChange={(e) => setOriginalLink(e.target.value)}
-            placeholder="https://example.com/karya-asli"
-            disabled={submitting}
-          />
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between gap-3">
+            <Label>Tautan Karya Asli / Sumber</Label>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={submitting}
+              onClick={() => setOriginalLinks((current) => [...current, { label: '', link: '' }])}
+            >
+              <Plus className="mr-1 h-4 w-4" />
+              Tambah tautan
+            </Button>
+          </div>
           <p className="text-xs text-muted-foreground">
-            Tautan ke versi asli / sumber karya — tampil di halaman detail Book sebagai "Tautan Raw".
+            Isi label yang akan tampil dan URL tujuan. Labelnya menjadi tautan yang bisa diklik di halaman detail.
           </p>
+          {originalLinks.map((item, index) => (
+            <div key={`original-link-${index}`} className="flex items-start gap-2">
+              <div className="grid min-w-0 flex-1 gap-2 sm:grid-cols-2">
+                <Input
+                  aria-label={`Label tautan karya asli ${index + 1}`}
+                  value={item.label}
+                  required={Boolean(item.label || item.link)}
+                  onChange={(e) =>
+                    setOriginalLinks((current) =>
+                      current.map((link, linkIndex) => linkIndex === index ? { ...link, label: e.target.value } : link),
+                    )
+                  }
+                  placeholder="Label, mis. Baca versi asli"
+                  disabled={submitting}
+                />
+                <Input
+                  aria-label={`URL tautan karya asli ${index + 1}`}
+                  type="url"
+                  value={item.link}
+                  required={Boolean(item.label || item.link)}
+                  onChange={(e) =>
+                    setOriginalLinks((current) =>
+                      current.map((link, linkIndex) => linkIndex === index ? { ...link, link: e.target.value } : link),
+                    )
+                  }
+                  placeholder="https://example.com/karya-asli"
+                  disabled={submitting}
+                />
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                aria-label={`Hapus tautan karya asli ${index + 1}`}
+                disabled={submitting}
+                onClick={() => setOriginalLinks((current) => current.filter((_, linkIndex) => linkIndex !== index))}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
         </div>
       )}
 

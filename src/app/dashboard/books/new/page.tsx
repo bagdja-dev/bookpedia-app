@@ -31,7 +31,7 @@ export default function NewBookPage() {
         bookType: values.bookType,
         ...(values.originalAuthor ? { originalAuthor: values.originalAuthor } : {}),
         ...(values.originalTitle ? { originalTitle: values.originalTitle } : {}),
-        ...(values.originalLink ? { originalLink: values.originalLink } : {}),
+        ...(values.originalLinks.length ? { originalLinks: values.originalLinks } : {}),
         ...(values.maxFreeChapters.trim() !== '' ? { maxFreeChapters: Number(values.maxFreeChapters) } : {}),
         ...(values.tags.length > 0 ? { tags: values.tags } : {}),
         ...(values.seoTitle ? { seoTitle: values.seoTitle } : {}),

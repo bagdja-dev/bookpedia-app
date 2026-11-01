@@ -49,6 +49,8 @@ export default function EditBookPage({ params }: { params: Promise<{ bookId: str
         coverUrl: values.coverUrl,
         bookType: values.bookType,
         originalAuthor: values.originalAuthor,
+        originalTitle: values.originalTitle,
+        originalLinks: values.originalLinks,
         status: values.status,
         maxFreeChapters: values.maxFreeChapters.trim() === '' ? null : Number(values.maxFreeChapters),
         tags: values.tags,
@@ -107,7 +109,11 @@ export default function EditBookPage({ params }: { params: Promise<{ bookId: str
               bookType: book.bookType,
               originalAuthor: book.originalAuthor ?? '',
               originalTitle: book.originalTitle ?? '',
-              originalLink: book.originalLink ?? '',
+              originalLinks: book.originalLinks?.length
+                ? book.originalLinks
+                : book.originalLink
+                  ? [{ label: 'Karya Asli', link: book.originalLink }]
+                  : [],
               status: book.status,
               maxFreeChapters: book.maxFreeChapters === null ? '' : String(book.maxFreeChapters),
               tags: book.tags.map((t) => t.nama),
