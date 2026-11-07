@@ -11,6 +11,7 @@ import { BookCommentsButton } from '@/components/reader/book-comments-button';
 import { ChapterCommentsButton } from '@/components/reader/chapter-comments-button';
 import { BookSlider } from '@/components/reader/book-slider';
 import { AdSlot } from '@/components/reader/ad-slot';
+import { DonationCallout } from '@/components/reader/donation-callout';
 import { BookCollectionAction } from '@/components/reader/book-collection-action';
 import { BookShareButton } from '@/components/reader/book-share-button';
 import { BOOK_STATUS_LABEL } from '@/lib/status';
@@ -475,6 +476,14 @@ export default async function BookDetailPage({ params }: BookPageProps) {
             {book.disclaimerTemplate.content}
           </div>
         </section>
+      )}
+
+      {config.donation && (
+        <DonationCallout
+          settings={config.donation}
+          location="book_detail"
+          platformSlug={platformSlug}
+        />
       )}
 
       <AdSlot slot={config.adSlots.bookDetail} borderColor={config.adSlots.borderColor} className="mt-8" />

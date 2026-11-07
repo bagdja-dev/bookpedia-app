@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Source_Serif_4 } from 'next/font/google';
 
 import { ReaderAuthNav } from '@/components/reader/reader-auth-nav';
+import { DonationLink } from '@/components/reader/donation-callout';
 import { GooglePlayLink } from '@/components/reader/google-play-link';
 import { RealtimeProvider } from '@/components/reader/realtime-provider';
 import { SafeImage } from '@/components/safe-image';
@@ -79,7 +80,7 @@ export default async function ReaderLayout({ children }: { children: ReactNode }
 
           <SearchBar />
 
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-3">
             <ReaderAuthNav lockStudio={config.lockStudio} />
           </div>
         </div>
@@ -99,6 +100,7 @@ export default async function ReaderLayout({ children }: { children: ReactNode }
           <Link href="/contact" className="underline underline-offset-2 hover:opacity-80">
             Kontak
           </Link>
+          {config.donation && <DonationLink settings={config.donation} location="footer" />}
           {config.playStoreUrl && (
             <GooglePlayLink
               href={config.playStoreUrl}

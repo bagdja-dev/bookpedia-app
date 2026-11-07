@@ -43,7 +43,12 @@ const REDIRECT_URI =
  * menampilkan logo/background Platform lewat `brandingUrl` client app
  * Bookpedia (diatur di bagdja-console). Opsional; tanpa brand tampil default.
  */
-export function buildAuthorizeUrl(state: string, codeChallenge: string, forceLogin = false, brand?: string | null): string {
+export function buildAuthorizeUrl(
+  state: string,
+  codeChallenge: string,
+  forceLogin = false,
+  brand?: string | null,
+): string {
   const url = new URL('/oauth/authorize', AUTH_URL);
   url.searchParams.set('client_id', CLIENT_ID);
   url.searchParams.set('response_type', 'code');

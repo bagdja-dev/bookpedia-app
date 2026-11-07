@@ -25,7 +25,9 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     metadataBase: new URL(origin),
-    title: `${config.nama} — Baca & Tulis Cerita`,
+    title: config.seoSiteTitleSuffix
+      ? `${config.nama} — ${config.seoSiteTitleSuffix}`
+      : config.nama,
     description: `${config.nama}, platform Bagdja untuk membaca dan menulis novel/cerita berseri — jelajahi katalog cerita dari berbagai penulis, buat akun gratis untuk mulai membaca.`,
     icons: config.faviconUrl ? { icon: config.faviconUrl } : undefined,
     other: config.adsensePublisherId

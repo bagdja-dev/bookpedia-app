@@ -6,6 +6,7 @@ import { X } from 'lucide-react';
 import { BookMasonryGrid } from '@/components/reader/book-masonry-grid';
 import { BookSlider } from '@/components/reader/book-slider';
 import { AdSlot } from '@/components/reader/ad-slot';
+import { DonationCallout } from '@/components/reader/donation-callout';
 import { GooglePlayLink } from '@/components/reader/google-play-link';
 import { getPlatformSlug } from '@/lib/platform';
 import { getPlatformConfig, publicFetch } from '@/lib/public-api';
@@ -29,8 +30,9 @@ function resolveCatalogSeo(params: {
   tag: string;
   page: number;
   platformNama: string;
+  siteTitleSuffix: string | null;
 }): { title: string; noindex: boolean; canonicalQuery: string | null } {
-  const { search, genre, category, tag, page, platformNama } = params;
+  const { search, genre, category, tag, page, platformNama, siteTitleSuffix } = params;
   const filterDimensions = [genre, category, tag].filter(Boolean);
   const isMultiTagCombo = tag.includes(',');
   const isAdHoc = Boolean(search) || page > 1 || filterDimensions.length > 1 || isMultiTagCombo;
@@ -49,7 +51,7 @@ function resolveCatalogSeo(params: {
   // ke `/`. Kombinasi ad-hoc -> noindex, TANPA canonical (menaruh canonical
   // ke tempat lain sambil noindex adalah sinyal yang saling bertentangan).
   return {
-    title: `${platformNama} — Baca & Tulis Cerita`,
+    title: siteTitleSuffix ? `${platformNama} — ${siteTitleSuffix}` : platformNama,
     noindex: isAdHoc,
     canonicalQuery: isAdHoc ? null : '',
   };
@@ -65,7 +67,15 @@ export async function generateMetadata({
 
   const slug = await getPlatformSlug();
   const config = await getPlatformConfig(slug);
-  const seo = resolveCatalogSeo({ search, genre, category, tag, page, platformNama: config.nama });
+  const seo = resolveCatalogSeo({
+    search,
+    genre,
+    category,
+    tag,
+    page,
+    platformNama: config.nama,
+    siteTitleSuffix: config.seoSiteTitleSuffix,
+  });
   const description = `Jelajahi katalog novel & cerita berseri dari berbagai penulis di ${config.nama}.`;
 
   return {
@@ -221,6 +231,8 @@ export default async function CatalogPage({
           </GooglePlayLink>
         )}
       </div>
+
+      {isHomepage && config.donation && <DonationCallout settings={config.donation} location="home" />}
 
       {isHomepage && homepage?.sections.map((section, index) => (
         <Fragment key={section.key}>

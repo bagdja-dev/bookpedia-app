@@ -30,12 +30,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL('/?error=server_misconfigured', resolveOrigin(request)));
   }
 
-  // Bookpedia intentionally keeps silent SSO: account selection is not
-  // required when a user already has an active Bagdja Login session.
   // `brand` = slug Platform asal (subdomain/custom domain) supaya
   // login.bagdja.com menampilkan logo/background Platform ini. `/auth/*`
   // dilewati middleware, jadi slug di-resolve langsung dari host origin.
-  const brand = await resolvePlatformSlugFromHost(new URL(origin).host);
-  const authorizeUrl = buildAuthorizeUrl(stateId, codeChallenge, false, brand);
+  const forceLogin = request.nextUrl.searchParams.get('force_login') === '1';
+  const brand = forceLogin ? null : await resolvePlatformSlugFromHost(new URL(origin).host);
+  const authorizeUrl = buildAuthorizeUrl(stateId, codeChallenge, forceLogin, brand);
   return NextResponse.redirect(authorizeUrl);
 }

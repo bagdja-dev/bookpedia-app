@@ -15,6 +15,7 @@ import { ChapterRatingWidget } from '@/components/reader/chapter-rating-widget';
 import { StarRatingDisplay } from '@/components/reader/star-rating-display';
 import { ChapterEngagementBar } from '@/components/reader/chapter-engagement-bar';
 import { AdSlot } from '@/components/reader/ad-slot';
+import { DonationCallout } from '@/components/reader/donation-callout';
 
 interface ChapterPageProps {
   params: Promise<{ slug: string; orderIndex: string }>;
@@ -184,6 +185,8 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
       )}
 
       <AdSlot slot={config.adSlots.chapterReader} borderColor={config.adSlots.borderColor} className="mt-10" />
+
+      {config.donation && <DonationCallout settings={config.donation} location="chapter_end" />}
 
       <nav className="mt-12 flex items-center justify-between gap-4 border-t border-[var(--reader-border)] pt-6">
         {chapter.prevOrderIndex !== null ? (

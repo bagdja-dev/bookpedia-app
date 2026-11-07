@@ -33,6 +33,7 @@ const PLATFORM_CONFIG_FALLBACK: PlatformProfileDto = {
   slug: 'bookpedia',
   tagline: null,
   motto: null,
+  seoSiteTitleSuffix: 'Baca & Tulis Cerita',
   logoUrl: null,
   faviconUrl: null,
   notificationSoundUrl: null,
@@ -51,6 +52,7 @@ const PLATFORM_CONFIG_FALLBACK: PlatformProfileDto = {
   studioEditMode: 'auto',
   rendererKey: 'reader',
   adSlots: DEFAULT_AD_SLOTS,
+  donation: null,
   maxFreeChapters: 0,
   showBookStatus: true,
   maxTagsPerBook: 5,
@@ -156,6 +158,10 @@ export const getPlatformConfig = cache(async (platformSlug: string): Promise<Pla
     slug: config.slug || platformSlug,
     tagline: config.tagline ?? null,
     motto: config.motto ?? null,
+    seoSiteTitleSuffix:
+      config.seoSiteTitleSuffix !== undefined
+        ? config.seoSiteTitleSuffix
+        : PLATFORM_CONFIG_FALLBACK.seoSiteTitleSuffix,
     logoUrl: config.logoUrl ?? PLATFORM_CONFIG_FALLBACK.logoUrl,
     faviconUrl: config.faviconUrl ?? PLATFORM_CONFIG_FALLBACK.faviconUrl,
     notificationSoundUrl: config.notificationSoundUrl ?? PLATFORM_CONFIG_FALLBACK.notificationSoundUrl,
@@ -169,6 +175,7 @@ export const getPlatformConfig = cache(async (platformSlug: string): Promise<Pla
       bookDetail: { ...DEFAULT_AD_SLOTS.bookDetail, ...(config.adSlots?.bookDetail ?? {}) },
       chapterReader: { ...DEFAULT_AD_SLOTS.chapterReader, ...(config.adSlots?.chapterReader ?? {}) },
     },
+    donation: config.donation ?? null,
     maxFreeChapters: config.maxFreeChapters ?? PLATFORM_CONFIG_FALLBACK.maxFreeChapters,
     showBookStatus: config.showBookStatus ?? PLATFORM_CONFIG_FALLBACK.showBookStatus,
     maxTagsPerBook: config.maxTagsPerBook ?? PLATFORM_CONFIG_FALLBACK.maxTagsPerBook,

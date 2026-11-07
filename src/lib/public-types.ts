@@ -192,11 +192,33 @@ export interface PlatformAdSlots {
   chapterReader: PlatformAdSlotSettings;
 }
 
+export type DonationLocation = 'home' | 'book_detail' | 'chapter_end' | 'footer' | 'reader_menu';
+
+export interface PublicDonationOption {
+  id: string;
+  title: string;
+  description: string;
+  imageUrl?: string;
+  type: 'fixed' | 'custom';
+  amount?: number;
+  multiple?: number;
+  isPopular: boolean;
+}
+
+export interface PublicDonationSettings {
+  title: string;
+  description: string;
+  buttonLabel: string;
+  locations: DonationLocation[];
+  options: PublicDonationOption[];
+}
+
 export interface PlatformProfileDto {
   nama: string;
   slug: string;
   tagline: string | null;
   motto: string | null;
+  seoSiteTitleSuffix: string | null;
   logoUrl: string | null;
   /** URL favicon browser tab — terpisah dari `logoUrl` (dipakai di header). */
   faviconUrl: string | null;
@@ -207,6 +229,7 @@ export interface PlatformProfileDto {
   studioEditMode: 'auto' | 'manual';
   rendererKey: string;
   adSlots: PlatformAdSlots;
+  donation: PublicDonationSettings | null;
   /** Fase 5 (SEO) — jumlah Chapter pertama tiap Book yang bisa dibaca tanpa login. 0 = SEMUA Chapter gratis (bukan "nol Chapter gratis"). */
   maxFreeChapters: number;
   /** Tampilkan badge status cerita (draft/ongoing/completed) di halaman publik. */
