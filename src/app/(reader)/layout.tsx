@@ -91,6 +91,9 @@ export default async function ReaderLayout({ children }: { children: ReactNode }
       <footer className="border-t border-[var(--reader-border)] bg-[var(--reader-footer-bg,transparent)] px-4 py-6 text-center text-xs text-[var(--reader-footer-text,var(--reader-muted))] sm:px-6">
         <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
           <span>{config.nama} — Baca &amp; tulis cerita, oleh Bagdja.</span>
+          <Link href="/about" className="underline underline-offset-2 hover:opacity-80">
+            Tentang
+          </Link>
           <Link href="/terms-and-conditions" className="underline underline-offset-2 hover:opacity-80">
             Terms &amp; Conditions
           </Link>

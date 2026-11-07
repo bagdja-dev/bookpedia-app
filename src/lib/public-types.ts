@@ -269,6 +269,7 @@ export interface PlatformProfileDto {
   seoDefaultOgType: 'website' | 'book' | 'profile' | null;
   seoPrefix: string | null;
   seoSuffix: string | null;
+  aboutContent: string | null;
   termsAndConditions: string | null;
   /** Halaman Kebijakan Privasi (/privacy-policy) — URL-nya dipakai di Google Play Store. */
   privacyPolicy: string | null;
