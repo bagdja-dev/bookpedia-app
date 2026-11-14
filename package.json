@@ -2,11 +2,11 @@
   "name": "bagdja-bookpedia-app",
   "version": "0.1.0",
   "private": true,
-  "description": "Bagdja Bookpedia \u2014 satu app untuk pembaca & penulis (Next.js App Router + shadcn/ui). Rute reader (katalog, baca) + rute /studio/* (CMS penulis).",
+  "description": "Bagdja Bookpedia — satu app untuk pembaca & penulis (Next.js App Router + shadcn/ui). Rute reader (katalog, baca) + rute /studio/* (CMS penulis).",
   "scripts": {
-    "dev": "node init && next dev -p 5021 --webpack",
-    "build": "node init && next build --webpack",
-    "start": "node init && next start -p 5021",
+    "dev": "next dev -p 5021 --webpack",
+    "build": "next build --webpack",
+    "start": "next start -p 5021",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
